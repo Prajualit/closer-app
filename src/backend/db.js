@@ -1,6 +1,8 @@
-const mongoose = require('mongoose');
-main().catch((err) => console.log(err));
+const mongoose = require("mongoose");
+const mongo_URI = "mongodb+srv://prajualit:vesna8934@cluster0.1x6rm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/test");
-}
+const mongoDB = async () => {
+  await mongoose.connect(mongo_URI);
+};
+
+module.exports = mongoDB;

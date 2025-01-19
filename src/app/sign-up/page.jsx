@@ -4,22 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import LoadingButton from "@/components/Loadingbutton";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 const Page = () => {
   const router = useRouter();
   const [pending, setPending] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const [credentials, setCredentials] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  const password = watch("password");
 
   const onSubmit = async (data) => {
+    setPending(true); // Set loading state
     try {
       const response = await fetch("http://localhost:5000/api/CreateUser", {
         method: "POST",
@@ -32,16 +33,18 @@ const Page = () => {
           password: data.password,
         }),
       });
+
       const responseData = await response.json();
-
-      if (!response.ok) {
+      console.log(responseData);
+      if (!responseData.success) {
         throw new Error(responseData.message);
+      } else {
+        router.push("/sign-in");
       }
-
-      setCredentials({ name: "", email: "", password: "", confirmPassword: "" });
-      router.push("/sign-in");
     } catch (error) {
-      console.error("Error during sign up:", error.message);
+      console.log("Error during sign up:", error.message);
+    } finally {
+      setPending(false); // Reset loading state
     }
   };
 
@@ -60,7 +63,9 @@ const Page = () => {
                   htmlFor={field}
                   className="block text-sm font-medium text-gray-700"
                 >
-                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                  {field === "confirmPassword"
+                    ? "Confirm Password"
+                    : field.charAt(0).toUpperCase() + field.slice(1)}
                 </label>
                 <Input
                   id={field}
@@ -74,11 +79,11 @@ const Page = () => {
                   placeholder={`Enter your ${field}`}
                   {...register(field, {
                     required: `${field} is required`,
-                    validate: field === "confirmPassword"
-                      ? (value) =>
-                          value === credentials.password ||
-                          "Passwords do not match"
-                      : undefined,
+                    validate:
+                      field === "confirmPassword"
+                        ? (value) =>
+                            value === password || "Passwords do not match"
+                        : undefined,
                   })}
                   autoComplete="off"
                   className={`mt-1 block w-full ${
@@ -92,13 +97,15 @@ const Page = () => {
                 )}
               </div>
             ))}
-            <LoadingButton pending={pending}>Sign up</LoadingButton>
+            <LoadingButton pending={pending} disabled={pending}>
+              Sign up
+            </LoadingButton>
           </form>
           <div className="mt-4 text-center text-sm">
-						<Link href="/sign-in" className="text-primary hover:underline">
-							Already have an account? Sign in
-						</Link>
-					</div>
+            <Link href="/sign-in" className="text-primary hover:underline">
+              Already have an account? Sign in
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
