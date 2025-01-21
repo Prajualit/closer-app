@@ -26,7 +26,7 @@ router.post(
       const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
       const user = await User.create({
-        name: req.body.name,
+        username: req.body.username,
         password: hashedPassword,
         email: req.body.email,
       });

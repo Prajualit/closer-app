@@ -12,6 +12,8 @@ import Image from "next/image";
 const page = () => {
     const router = useRouter();
     const [pending, setPending] = useState(false);
+    const [image, setImage] = useState("")
+
     const {
         register,
         handleSubmit,
@@ -24,6 +26,11 @@ const page = () => {
 
     const handleImageClick = () => {
         inputRef.current.click();
+    }
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setImage(e.target.files[0]);
     }
 
     const onSubmit = async (data) => {
@@ -57,6 +64,8 @@ const page = () => {
         }
     };
 
+
+
     return (
         <div>
             <div className="h-screen flex justify-center items-center">
@@ -82,17 +91,18 @@ const page = () => {
                                                     : field.charAt(0).toUpperCase() + field.slice(1)}
                                             </label>
                                             <Input
+                                                as={field === "bio" ? "textarea" : "Input"} // Use <textarea> for bio
                                                 id={field}
-                                                type={"text"}
+                                                type={field === "bio" ? undefined : "text"}
                                                 placeholder={`Enter your ${field}`}
                                                 {...register(field, {
                                                     required: `${field} is required`,
-
                                                 })}
                                                 autoComplete="off"
                                                 className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
-                                                    }`}
+                                                    } ${field === "bio" ? "max-h-[23vh]" : ""} placeholder:text-start `} // Custom styles for bio
                                             />
+
                                             {errors[field] && (
                                                 <p className="text-red-500 text-sm mt-1">
                                                     {errors[field].message}
@@ -108,9 +118,13 @@ const page = () => {
                                     >
                                         Profile Photo
                                     </label>
-                                    <div onClick={handleImageClick} className="border-dashed border-gray-300 border-[1px] rounded-xl  ">
-                                        <Image className="fill-white" src={addImage} alt="" />
-                                        <input ref={inputRef} type="file" className="" />
+                                    <div onClick={handleImageClick} className={`${!image ? "border-[1px]" : "border-none"} border-dashed border-gray-300  rounded-xl flex items-center justify-center `}>
+                                        {image ? (
+                                            <Image width={300} height={300} className="object-cover rounded-full" src={URL.createObjectURL(image)} alt="" />
+                                        ) : (
+                                            <Image  src={addImage} alt="" />
+                                        )}
+                                        <input ref={inputRef} type="file" onChange={handleImageChange} style={{ display: "none" }} className="" />
                                     </div>
                                 </div>
                             </div>

@@ -39,7 +39,7 @@ const Page = () => {
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
-        router.push("/sign-in");
+        router.push("/setup-profile");
       }
     } catch (error) {
       console.log("Error during sign up:", error.message);
