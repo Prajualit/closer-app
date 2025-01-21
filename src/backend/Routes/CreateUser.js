@@ -7,13 +7,13 @@ const { body, validationResult } = require("express-validator");
 router.post(
   "/createuser",
   [
-    body("name", "Name must be at least 5 characters long")
+    body("username", "Username must be at least 5 characters long")
       .notEmpty()
-      .isLength({ min: 5 }),
+      .isLength({ min: 5 }).matches(/^\S+$/),
     body("email", "Please enter a valid email").isEmail().notEmpty(),
     body("password", "Password must be at least 8 characters long")
       .isLength({ min: 8 })
-      .notEmpty(),
+      .notEmpty().matches(/^\S+$/),
   ],
   async (req, res) => {
     const errors = validationResult(req);

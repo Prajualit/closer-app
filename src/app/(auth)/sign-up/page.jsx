@@ -28,7 +28,7 @@ const Page = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: data.name,
+          username: data.username,
           email: data.email,
           password: data.password,
         }),
@@ -57,7 +57,7 @@ const Page = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            {["name", "email", "password", "confirmPassword"].map((field) => (
+            {["username", "email", "password", "confirmPassword"].map((field) => (
               <div key={field} className="mb-4">
                 <label
                   htmlFor={field}
