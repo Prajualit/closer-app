@@ -67,54 +67,56 @@ const page = () => {
                     </CardHeader>
                     <CardContent>
                         <form
-                            className="flex justify-between items-start space-x-10 borde "
+                            className="flex flex-col justify-between items-start space-y-5 "
                             onSubmit={handleSubmit(onSubmit)} noValidate >
-                            <div className="w-full">
-                                {["name", "username", "bio"].map((field) => (
-                                    <div key={field} className="mb-4">
-                                        <label
-                                            htmlFor={field}
-                                            className="block text-sm font-medium text-gray-700"
-                                        >
-                                            {field === "confirmPassword"
-                                                ? "Confirm Password"
-                                                : field.charAt(0).toUpperCase() + field.slice(1)}
-                                        </label>
-                                        <Input
-                                            id={field}
-                                            type={"text"}
-                                            placeholder={`Enter your ${field}`}
-                                            {...register(field, {
-                                                required: `${field} is required`,
+                            <div className="w-full h-full space-x-5 justify-center flex ">
+                                <div className="w-full">
+                                    {["name", "username", "bio"].map((field) => (
+                                        <div key={field} className="mb-4">
+                                            <label
+                                                htmlFor={field}
+                                                className="block text-sm font-medium text-gray-700"
+                                            >
+                                                {field === "confirmPassword"
+                                                    ? "Confirm Password"
+                                                    : field.charAt(0).toUpperCase() + field.slice(1)}
+                                            </label>
+                                            <Input
+                                                id={field}
+                                                type={"text"}
+                                                placeholder={`Enter your ${field}`}
+                                                {...register(field, {
+                                                    required: `${field} is required`,
 
-                                            })}
-                                            autoComplete="off"
-                                            className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
-                                                }`}
-                                        />
-                                        {errors[field] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {errors[field].message}
-                                            </p>
-                                        )}
+                                                })}
+                                                autoComplete="off"
+                                                className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
+                                                    }`}
+                                            />
+                                            {errors[field] && (
+                                                <p className="text-red-500 text-sm mt-1">
+                                                    {errors[field].message}
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="space-y-1 w-full flex flex-col h-full ">
+                                    <label
+                                        htmlFor={"avatarUrl"}
+                                        className="block text-sm font-medium text-gray-700"
+                                    >
+                                        Profile Photo
+                                    </label>
+                                    <div onClick={handleImageClick} className="border-dashed border-gray-300 border-[1px] rounded-xl  ">
+                                        <Image className="fill-white" src={addImage} alt="" />
+                                        <input ref={inputRef} type="file" className="" />
                                     </div>
-                                ))}
-                                <LoadingButton pending={pending} disabled={pending}>
-                                    Complete Setup
-                                </LoadingButton>
-                            </div>
-                            <div className="space-y-1 w-full flex flex-col h-full ">
-                                <label
-                                    htmlFor={"avatarUrl"}
-                                    className="block text-sm font-medium text-gray-700"
-                                >
-                                    Profile Photo
-                                </label>
-                                <div onClick={handleImageClick} className="border-dashed border-gray-300 border-[1px] rounded-xl  ">
-                                    <Image className="fill-white" src={addImage} alt="" />
-                                    <input ref={inputRef} type="file" className="" />
                                 </div>
                             </div>
+                            <LoadingButton pending={pending} disabled={pending}>
+                                Complete Setup
+                            </LoadingButton>
 
                         </form>
                         {/* <div className="mt-4 text-center text-sm">
