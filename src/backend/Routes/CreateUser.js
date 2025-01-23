@@ -7,24 +7,31 @@ const { body, validationResult } = require("express-validator");
 router.post(
   "/createuser",
   [
-    body("username", "Username must be at least 5 characters long")
+    // Validation for username, email, and password
+    body("username", "Username must be at least 5 characters long and contain no spaces")
       .notEmpty()
-      .isLength({ min: 5 }).matches(/^\S+$/),
+      .isLength({ min: 5 })
+      .matches(/^\S+$/),
     body("email", "Please enter a valid email").isEmail().notEmpty(),
-    body("password", "Password must be at least 8 characters long")
+    body("password", "Password must be at least 8 characters long and contain no spaces")
       .isLength({ min: 8 })
-      .notEmpty().matches(/^\S+$/),
+      .notEmpty()
+      .matches(/^\S+$/),
   ],
   async (req, res) => {
     const errors = validationResult(req);
+
+    // Handle validation errors
     if (!errors.isEmpty()) {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
     try {
+      // Hash the password
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
+      // Create the user
       const user = await User.create({
         username: req.body.username,
         password: hashedPassword,
@@ -35,18 +42,21 @@ router.post(
     } catch (err) {
       console.error("Error creating user:", err.message);
 
+      // Handle duplicate field errors
       if (err.code === 11000) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Email already exists" });
+        const duplicateField = Object.keys(err.keyValue)[0]; // Get the field causing the error
+        return res.status(400).json({
+          success: false,
+          message: `${duplicateField.charAt(0).toUpperCase() + duplicateField.slice(1)} already exists`,
+        });
       }
+
+      // Generic error response
       return res
         .status(500)
         .json({ success: false, message: "Internal Server Error" });
     }
   }
 );
-
-
 
 module.exports = router;

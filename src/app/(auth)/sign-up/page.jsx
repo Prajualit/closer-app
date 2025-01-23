@@ -31,6 +31,7 @@ const Page = () => {
           username: data.username,
           email: data.email,
           password: data.password,
+          avatarUrl: data.avatarUrl,
         }),
       });
 
