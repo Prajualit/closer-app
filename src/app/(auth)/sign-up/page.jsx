@@ -36,7 +36,7 @@ const Page = () => {
       });
 
       const responseData = await response.json();
-      console.log(responseData);
+      console.log(responseData._id);
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
