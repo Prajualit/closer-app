@@ -17,7 +17,7 @@ const upload = multer({
       "image/webp",
     ];
     if (file && allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
+      cb(file.mimetype, true);
     } else if (!file) {
       cb(null, true);
     } else {

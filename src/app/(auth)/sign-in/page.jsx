@@ -71,7 +71,6 @@ const page = () => {
                   {field.charAt(0).toUpperCase() + field.slice(1)}
                 </label>
                 <Input
-
                   type={field === "password" ? "password" : "text"}
                   label={field}
                   {...register(field, {
@@ -80,6 +79,11 @@ const page = () => {
                   placeholder={`Enter your ${field}`}
                   error={errors[field]}
                 />
+                {errors[field] && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors[field].message}
+                  </p>
+                )}
               </div>
             ))}
             <LoadingButton

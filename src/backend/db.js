@@ -13,28 +13,35 @@ const mongoDB = async () => {
 
     console.log("Connected to MongoDB");
 
-    // Access the 'users' collection
+    // Access the 'users' and 'profiles' collections
     const fetched_user = mongoose.connection.db.collection("users");
     const fetched_profile = mongoose.connection.db.collection("profiles");
 
-    // Fetch one document
+    // Fetch one profile
     const profile = await fetched_profile.findOne({});
-    const user = await fetched_user.find({})
-    if (user[0]) {
-      const matchingProfile = await fetched_profile.findOne({
-        username: user[0].username, // Match on username
+
+    if (profile) {
+      // Find the user where the username matches the profile's username
+      const matchingUser = await fetched_user.findOne({
+        username : profile.username,
       });
 
-      console.log("Fetched User:", user[0]);
-      console.log("Matching Profile:", matchingProfile);
+      if (matchingUser) {
+        console.log("Matching Profile:", profile);
+        console.log("Matching User:", matchingUser);
 
-      return { user: user[0], profile: matchingProfile };
-      console.log("Fetched User:", user);
-      console.log("Fetched Profile:", profile);
+        return { user: matchingUser, profile };
+      } else {
+        console.log("No matching user found for the profile.");
+        return null;
+      }
+    } else {
+      console.log("No profiles found.");
+      return null;
     }
   } catch (err) {
-    console.error("Error connecting to MongoDB:", err);
-    throw err; // Throw error if needed
+    console.error("Error connecting to MongoDB or fetching data:", err);
+    throw err;
   }
 };
 
