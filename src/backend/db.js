@@ -30,7 +30,8 @@ const mongoDB = async () => {
         console.log("Matching Profile:", profile);
         console.log("Matching User:", matchingUser);
 
-        return { user: matchingUser, profile };
+        global.profile = profile;
+        global.user = matchingUser;
       } else {
         console.log("No matching user found for the profile.");
         return null;
