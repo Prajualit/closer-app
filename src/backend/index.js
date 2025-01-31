@@ -1,37 +1,21 @@
-const express = require("express");
-const cors = require("cors");
-const mongoDB = require('./db');
-mongoDB();
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import mongoDB from "./db/index.js";
+import { app } from "./app.js";
 
-const app = express();
-const port = 5000;
-
-// CORS Middleware
-app.use(cors({ origin: "http://localhost:3000" }));
-
-// Middleware to parse JSON
-app.use(express.json());
-
-// Routes
-app.use("/api", require("./Routes/CreateUser"));
-app.use("/api", require("./Routes/LoginUser"));
-app.use("/api", require("./Routes/SetupProfile"));
-app.use("/api", require("./Routes/GetUser"));
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+dotenv.config({
+  path: "./env",
 });
 
-// Global Error Handling Middleware
-app.use((err, req, res, next) => {
-  console.error("Unhandled Error:", err.stack);
+mongoDB()
+.then(() => {
+  app.listen(process.env.PORT || 5000,() => {
+    console.log(`Server is running on port ${process.env.PORT}`);
+  })
+})
+.catch((error) => {
+  console.log("MongoDB Failed to Connect", error)
+})
 
-  if (!res.headersSent) {
-    res.status(500).json({ success: false, message: "Something went wrong!" });
-  }
-});
-
-// Start the Server
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
