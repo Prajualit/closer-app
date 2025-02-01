@@ -1,10 +1,19 @@
 import { Router } from "express";
 import { body, validationResult } from "express-validator";
 import { registerUser } from "../controllers/user.controllers.js";
+import { upload } from "../middleware/multer.middleware.js";
+
 
 const router = Router();
 
-router.route("/register").post(registerUser);
+router.route("/register").post(
+  registerUser
+);
+
+router.route("/setup").post(
+  upload.single("avatarUrl"),
+  registerUser
+);
 
 
 // router.post(
