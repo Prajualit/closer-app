@@ -2,6 +2,7 @@ import { apiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   // Requesting User Data from frontend
@@ -18,7 +19,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new apiError(409, "User already exists");
   }
 
-  const avatarLocalPath = req.file?.avatarUrl[0].path;
+  const avatarLocalPath = req.file?.path;
   if (!avatarLocalPath) {
     throw new apiError(400, "Avatar is required");
   }
@@ -41,8 +42,6 @@ const registerUser = asyncHandler(async (req, res) => {
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
-
-  //   Error handling
   if (!createdUser) {
     throw new apiError(500, "Something went wrong while registering the user");
   }
