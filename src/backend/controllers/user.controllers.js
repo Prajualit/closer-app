@@ -5,30 +5,40 @@ import { apiResponse } from "../utils/apiResponse.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   // Requesting User Data from frontend
-  const { username, email, password } = req.body;
+  const { username, password, name, bio } = req.body;
 
   // Validation for email and password
-  if ([email, password].some((field) => field?.trim() === "")) {
+  if ([username, password, name, bio].some((field) => field?.trim() === "")) {
     throw new apiError(400, "All fields are required");
   }
 
   //Duplicate responses check
-  const existedUser = User.findOne({
-    $or: [{ username }, { email }],
-  });
+  const existedUser = await User.findOne({ username });
   if (existedUser) {
     throw new apiError(409, "User already exists");
+  }
+
+  const avatarLocalPath = req.file?.avatarUrl[0].path;
+  if (!avatarLocalPath) {
+    throw new apiError(400, "Avatar is required");
+  }
+
+  const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
+  if (!avatarUpload || !avatarUpload.url) {
+    throw new apiError(400, "Avatar upload failed");
   }
 
   //   create user in database
   const user = await User.create({
     username,
-    email,
     password,
+    name,
+    bio,
+    avatarUrl: avatarUpload.url,
   });
 
   //   remove password and refreshtoken from response
-  const createdUser = await User.findbyId(user._id).select(
+  const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
 

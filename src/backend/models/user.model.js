@@ -12,12 +12,9 @@ const userSchema = new Schema(
       trim: true,
       index: true,
     },
-    email: {
+    password: {
       type: String,
       required: true,
-      trim: true,
-      lowercase: true,
-      unique: true,
     },
     name: {
       type: String,
@@ -30,10 +27,6 @@ const userSchema = new Schema(
       required: true,
     },
     avatarUrl: {
-      type: String,
-      required: true,
-    },
-    password: {
       type: String,
       required: true,
     },

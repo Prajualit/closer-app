@@ -1,15 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import LoadingButton from "@/components/Loadingbutton";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import addImage from "@/assets/addImage.png";
+import Image from "next/image";
 
 const Page = () => {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [image, setImage] = useState(null);
   const {
     register,
     handleSubmit,
@@ -17,22 +20,44 @@ const Page = () => {
     formState: { errors },
   } = useForm();
 
+  const inputRef = useRef(null);
+
+  // Trigger file input when clicking on the image
+  const handleImageClick = () => {
+    inputRef.current.click();
+  };
+
+  // Handle file input changes
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
   const password = watch("password");
 
   const onSubmit = async (data) => {
     setPending(true); // Set loading state
     try {
+      // Create a FormData object
+      const formData = new FormData();
+
+      // Append all user data
+      formData.append("username", data.username);
+      formData.append("password", data.password);
+      formData.append("name", data.name);
+      formData.append("bio", data.bio);
+
+      // Append the image file if it exists
+      if (image) {
+        formData.append("avatar", image); // 'avatar' should match your multer field name
+      }
+
       const response = await fetch("http://localhost:5000/api/CreateUser", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: data.username,
-          email: data.email,
-          password: data.password,
-          avatarUrl: data.avatarUrl,
-        }),
+        // Remove the Content-Type header - FormData will set it automatically
+        body: formData,
       });
 
       const responseData = await response.json();
@@ -40,7 +65,7 @@ const Page = () => {
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
-        router.push("/setup-profile");
+        router.push("/");
       }
     } catch (error) {
       console.log("Error during sign up:", error.message);
@@ -51,65 +76,100 @@ const Page = () => {
 
   return (
     <div className="h-screen flex justify-center items-center">
-      <Card className="w-full max-w-md rounded-xl shadow-md">
+      <Card className="w-full max-w-[60%]  rounded-xl shadow-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
           <CardDescription>Create Your Account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            {["username", "email", "password", "confirmPassword"].map((field) => (
-              <div key={field} className="mb-4">
+            <div className="flex space-x-5">
+              <div className="w-full">
+                {["username", "name", "bio", "password", "confirmPassword"].map((field) => (
+                  <div key={field} className="mb-4 flex flex-col">
+                    <label
+                      htmlFor={field}
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      {field === "confirmPassword"
+                        ? "Confirm Password"
+                        : field.charAt(0).toUpperCase() + field.slice(1)}
+                    </label>
+                    <Input
+                      id={field}
+                      type={
+                        field === "password" || field === "confirmPassword"
+                          ? "password"
+                          : field === "email"
+                            ? "email"
+                            : "text"
+                      }
+                      placeholder={`Enter your ${field}`}
+                      {...register(field, {
+                        required: `${field} is required`,
+                        validate:
+                          field === "confirmPassword"
+                            ? (value) =>
+                              value === password || "Passwords do not match"
+                            : undefined,
+                      })}
+                      autoComplete="off"
+                      className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
+                        }`}
+                    />
+                    {errors[field] && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors[field].message}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-1 w-full flex flex-col h-full">
                 <label
-                  htmlFor={field}
+                  htmlFor={"avatar"}
                   className="block text-sm font-medium text-gray-700"
                 >
-                  {field === "confirmPassword"
-                    ? "Confirm Password"
-                    : field.charAt(0).toUpperCase() + field.slice(1)}
+                  Profile Photo (Optional)
                 </label>
-                <Input
-                  id={field}
-                  type={
-                    field === "password" || field === "confirmPassword"
-                      ? "password"
-                      : field === "email"
-                      ? "email"
-                      : "text"
-                  }
-                  placeholder={`Enter your ${field}`}
-                  {...register(field, {
-                    required: `${field} is required`,
-                    validate:
-                      field === "confirmPassword"
-                        ? (value) =>
-                            value === password || "Passwords do not match"
-                        : undefined,
-                  })}
-                  autoComplete="off"
-                  className={`mt-1 block w-full ${
-                    errors[field] ? "border-red-500" : "border-gray-300"
-                  }`}
-                />
-                {errors[field] && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors[field].message}
-                  </p>
-                )}
+                <div
+                  onClick={handleImageClick}
+                  className={`${!image ? "border-[1px]" : "border-none"
+                    } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer`}
+                >
+                  {image ? (
+                    <Image
+                      width={300}
+                      height={300}
+                      className="object-cover rounded-full"
+                      src={URL.createObjectURL(image)}
+                      alt="Profile Preview"
+                    />
+                  ) : (
+                    <Image src={addImage} alt="Add Image" />
+                  )}
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ display: "none" }}
+                  />
+                </div>
               </div>
-            ))}
+            </div>
             <LoadingButton pending={pending} disabled={pending}>
               Sign up
             </LoadingButton>
+            <div className="mt-2 text-center text-sm">
+              <Link href="/sign-in" className="text-primary hover:underline">
+                Already have an account? Sign in
+              </Link>
+            </div>
           </form>
-          <div className="mt-4 text-center text-sm">
-            <Link href="/sign-in" className="text-primary hover:underline">
-              Already have an account? Sign in
-            </Link>
-          </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 };
 
