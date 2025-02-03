@@ -21,12 +21,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const avatarLocalPath = req.file?.path;
   if (!avatarLocalPath) {
-    throw new apiError(400, "Avatar is required");
+    throw new apiError(400, `Avatar is required ${avatarLocalPath}`);
   }
 
   const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
   if (!avatarUpload || !avatarUpload.url) {
-    throw new apiError(400, "Avatar upload failed");
+    throw new apiError(400, `Avatar upload failed ${avatarUpload}`);
   }
 
   //   create user in database
