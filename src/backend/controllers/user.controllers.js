@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import path from "path";
 
 const registerUser = asyncHandler(async (req, res) => {
   // Requesting User Data from frontend
@@ -19,7 +20,15 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new apiError(409, "User already exists");
   }
 
-  const avatarLocalPath = req.file?.path;
+  req.files = { ...req.files };
+  // let avatarLocalPath = null;
+  // if(!req.files?.avatarUrl) {
+  //   avatarLocalPath = path.normalize(req.files?.avatarUrl[0]?.path);
+  // }else if(!req.files?.avatarUrl[0]) {
+  //   avatarLocalPath = path.normalize(req.files?.avatarUrl.path);
+  // }
+  const avatarLocalPath = path.normalize(req.files?.avatarUrl[0]?.path);
+  console.log(avatarLocalPath);
   if (!avatarLocalPath) {
     throw new apiError(400, `Avatar is required ${avatarLocalPath}`);
   }
@@ -35,7 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     name,
     bio,
-    avatarUrl: avatarUpload.url,
+    avatarUrl: !avatarUpload.url ? "" : avatarUpload.url,
   });
 
   //   remove password and refreshtoken from response
