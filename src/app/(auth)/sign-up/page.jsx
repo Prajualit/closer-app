@@ -13,6 +13,7 @@ const Page = () => {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [image, setImage] = useState(null);
+  const [error, setError] = useState(null);
   const {
     register,
     handleSubmit,
@@ -31,6 +32,10 @@ const Page = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image file.");
+        return;
+      }
       setImage(file);
     }
   };
@@ -38,7 +43,8 @@ const Page = () => {
   const password = watch("password");
 
   const onSubmit = async (data) => {
-    setPending(true); // Set loading state
+    setPending(true);
+    setError(null); // Reset error state before submission
     try {
       // Create a FormData object
       const formData = new FormData();
@@ -51,17 +57,15 @@ const Page = () => {
 
       // Append the image file if it exists
       if (image) {
-        formData.append("avatar", image); // 'avatar' should match your multer field name
+        formData.append("avatarUrl", image); // 'avatar' should match your multer field name
       }
 
-      const response = await fetch("http://localhost:5000/api/CreateUser", {
+      const response = await fetch("http://localhost:5000/api/v1/users/register", {
         method: "POST",
-        // Remove the Content-Type header - FormData will set it automatically
         body: formData,
       });
 
       const responseData = await response.json();
-      console.log(responseData._id);
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
@@ -69,6 +73,7 @@ const Page = () => {
       }
     } catch (error) {
       console.log("Error during sign up:", error.message);
+      setError(error.message); // Set the error message to state
     } finally {
       setPending(false); // Reset loading state
     }
@@ -97,25 +102,18 @@ const Page = () => {
                     </label>
                     <Input
                       id={field}
-                      type={
-                        field === "password" || field === "confirmPassword"
-                          ? "password"
-                          : field === "email"
-                            ? "email"
-                            : "text"
-                      }
+                      type={field === "password" || field === "confirmPassword" ? "password" : "text"}
                       placeholder={`Enter your ${field}`}
+                      disabled={pending}
                       {...register(field, {
                         required: `${field} is required`,
                         validate:
                           field === "confirmPassword"
-                            ? (value) =>
-                              value === password || "Passwords do not match"
+                            ? (value) => value === password || "Passwords do not match"
                             : undefined,
                       })}
                       autoComplete="off"
-                      className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
-                        }`}
+                      className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"}`}
                     />
                     {errors[field] && (
                       <p className="text-red-500 text-sm mt-1">
@@ -149,6 +147,7 @@ const Page = () => {
                     <Image src={addImage} alt="Add Image" />
                   )}
                   <input
+                    disabled={pending}
                     ref={inputRef}
                     type="file"
                     accept="image/*"
@@ -158,6 +157,7 @@ const Page = () => {
                 </div>
               </div>
             </div>
+            {error && <p className="text-red-500">{error}</p>} {/* Show error message */}
             <LoadingButton pending={pending} disabled={pending}>
               Sign up
             </LoadingButton>
@@ -169,7 +169,7 @@ const Page = () => {
           </form>
         </CardContent>
       </Card>
-    </div >
+    </div>
   );
 };
 
