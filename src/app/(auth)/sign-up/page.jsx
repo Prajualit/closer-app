@@ -128,7 +128,7 @@ const Page = () => {
                   htmlFor={"avatar"}
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Profile Photo (Optional)
+                  Profile Photo
                 </label>
                 <div
                   onClick={handleImageClick}
@@ -147,6 +147,7 @@ const Page = () => {
                     <Image src={addImage} alt="Add Image" />
                   )}
                   <input
+                    {...register("avatarUrl", { required: "Profile photo is required" })}
                     disabled={pending}
                     ref={inputRef}
                     type="file"
@@ -157,7 +158,7 @@ const Page = () => {
                 </div>
               </div>
             </div>
-            {error && <p className="text-red-500">{error}</p>} {/* Show error message */}
+            {/* {error && <p className="text-red-500">{error}</p>} Show error message */}
             <LoadingButton pending={pending} disabled={pending}>
               Sign up
             </LoadingButton>

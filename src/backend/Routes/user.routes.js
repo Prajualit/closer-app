@@ -1,9 +1,7 @@
 import { Router } from "express";
-import { body, validationResult } from "express-validator";
-import { registerUser } from "../controllers/user.controllers.js";
-import multer from "multer";
+import { registerUser } from "../controllers/registerUser.controllers.js";
 import { upload } from "../middleware/multer.middleware.js";
-
+import { loginUser } from "../controllers/loginUser.controllers.js";
 
 const router = Router();
 
@@ -15,6 +13,9 @@ router.route("/register").post(
     }
   ]),
   registerUser
+);
+router.route("/login").post(
+  loginUser
 );
 
 export default router;
