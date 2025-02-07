@@ -9,13 +9,13 @@ const registerUser = asyncHandler(async (req, res) => {
   // Requesting User Data from frontend
   const { username, password, name, bio } = req.body;
 
-  // Validation for email and password
+  // Validation for and password
   if ([username, password, name, bio].some((field) => field?.trim() === "")) {
     throw new apiError(400, "All fields are required");
   }
-
+  const normalizedUsername = username.trim().toLowerCase();
   //Duplicate responses check
-  const existedUser = await User.findOne({ username });
+  const existedUser = await User.findOne({ username: normalizedUsername });
   if (existedUser) {
     throw new apiError(409, "User already exists");
   }
@@ -28,7 +28,6 @@ const registerUser = asyncHandler(async (req, res) => {
   //   avatarLocalPath = path.normalize(req.files?.avatarUrl.path);
   // }
   const avatarLocalPath = path.normalize(req.files?.avatarUrl[0]?.path);
-  console.log(avatarLocalPath);
   if (!avatarLocalPath) {
     throw new apiError(400, `Avatar is required ${avatarLocalPath}`);
   }
@@ -40,7 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   //   create user in database
   const user = await User.create({
-    username,
+    username: normalizedUsername,
     password,
     name,
     bio,
