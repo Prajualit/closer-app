@@ -16,7 +16,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
   } catch (error) {
     throw new apiError(
       500,
-      "Something went wrong while generating Access and Refresh Token"
+      error?.message || "Something went wrong while generating Access and Refresh Token"
     );
   }
 };
