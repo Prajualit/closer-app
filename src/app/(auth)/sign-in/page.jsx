@@ -42,8 +42,6 @@ const page = () => {
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else if (responseData.success) {
-        localStorage.setItem("userEmail", data.email)
-        localStorage.setItem("authToken", responseData.authToken);
         router.push('http://localhost:3000/');
       }
     }
