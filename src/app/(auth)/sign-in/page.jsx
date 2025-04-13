@@ -15,6 +15,7 @@ const page = () => {
 
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState(null);
   const {
     register,
     handleSubmit,
@@ -29,6 +30,7 @@ const page = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           username: data.username,
           password: data.password,
@@ -43,7 +45,8 @@ const page = () => {
       }
     }
     catch (error) {
-      console.log("Error during sign up:", error.message);
+      setError(error.message);
+      console.log("Error during login:", error.message);
     }
     finally {
       setPending(false);
@@ -78,6 +81,11 @@ const page = () => {
                 {errors[field] && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors[field].message}
+                  </p>
+                )}
+                {error && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {error}
                   </p>
                 )}
               </div>

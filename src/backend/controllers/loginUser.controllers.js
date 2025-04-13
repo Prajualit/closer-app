@@ -100,4 +100,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 });
 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    
+})
+
 export { loginUser, logoutUser };

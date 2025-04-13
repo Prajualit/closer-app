@@ -8,28 +8,7 @@ import UserButton from '@/components/HomePg/UserButton'
 
 
 const Navbar = () => {
-    const [userData, setUserData] = useState("")
-
-    const loadUserData = async () => {
-        try {
-            const user = await fetch('http://localhost:5000/api/getuser', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                }
-            })
-            const data = await user.json()
-            setUserData(data)
-        } catch (err) {
-            console.log("Error in fetching: ", err)
-        }
-    }
-
-    useEffect(() => {
-        loadUserData()
-    }
-        , [])
+  
 
 
     return (
@@ -38,7 +17,7 @@ const Navbar = () => {
                 <Image className='w-[100px] ' src={logo} alt="" />
             </Link>
             <Navsearch />
-            <UserButton userData={userData} />
+            <UserButton  />
         </div>
     )
 }

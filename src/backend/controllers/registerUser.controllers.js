@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import path from "path";
+import jwt from "jsonwebtoken";
 
 const registerUser = asyncHandler(async (req, res) => {
   // Requesting User Data from frontend
@@ -60,4 +61,28 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, createdUser, "User Registered Successfully"));
 });
 
-export { registerUser };
+const getUser = asyncHandler(async (req, res) => {
+  console.log("Cookies:", req.cookies); // Debugging: Print all cookies
+
+  const token = req.cookies.accessToken;
+  if (!token) {
+    throw new apiError(401, "Access token missing or undefined");
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    console.error("JWT Verification Error:", err);
+    throw new apiError(401, "Invalid or expired token");
+  }
+
+  const user = await User.findById(decoded.id).select("-password");
+  if (!user) {
+    throw new apiError(404, "User not found");
+  }
+
+  return res.status(200).json(new apiResponse(200, user, "User Data Fetched Successfully"));
+});
+
+export { registerUser, getUser };
