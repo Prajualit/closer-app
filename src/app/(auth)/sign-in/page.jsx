@@ -41,7 +41,7 @@ const page = () => {
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
-        router.push('/');
+        router.push(`/`);
       }
     }
     catch (error) {
