@@ -23,7 +23,7 @@ const page = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    setPending(true); // Set loading state
+    setPending(true);
     try {
       const response = await fetch("http://localhost:5000/api/v1/users/login", {
         method: "POST",
@@ -41,7 +41,7 @@ const page = () => {
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
-        router.push(`/`);
+        router.push(`/${responseData.data.user.username}`);
       }
     }
     catch (error) {

@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/HomePg/Navbar.jsx";
 
-const Page = () => {
+const Page = ({ params }) => {
     const [user, setUser] = useState(null);
-    const router = useRouter();
+    const { username } = params;
 
     const fetchCurrentUser = async () => {
         try {
@@ -26,8 +26,6 @@ const Page = () => {
         }
     };
 
-    const { username } = router.query.user?.username;
-
     useEffect(() => {
         fetchCurrentUser();
     }, []);
@@ -37,7 +35,7 @@ const Page = () => {
             <Navbar />
             {user ? (
                 <div>
-                    <h2>Welcome, {username}</h2>
+                    <h2>Welcome, {user.username}</h2>
                 </div>
             ) : (
                 <p>Loading user info...</p>
