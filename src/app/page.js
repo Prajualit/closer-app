@@ -1,13 +1,13 @@
 "use client";
-import Image from "next/image";
-import React, { useState, useEffect } from "react";
-import Navbar from "@/components/HomePg/Navbar";
-import axios from "axios";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  return (
-    <>
-   
-    </>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/sign-up");
+  }, [router]);
+
+  return null;
 }
