@@ -35,7 +35,7 @@ const UserButton = () => {
             onClick={handleLogout}
             className='hover:bg-neutral-200 transition-colors duration-300 rounded-full flex space-x-2 items-center p-2'>
             {userDetails ? <Image width={32} height={32} className='rounded-full' src={userDetails.avatarUrl} alt="" /> : <UserAvatar />}
-            <span>{userDetails.name}</span>
+            <span>{userDetails.name.split(" ")[0]}</span>
         </button>
     )
 }
