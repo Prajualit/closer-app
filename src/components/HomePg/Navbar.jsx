@@ -192,11 +192,11 @@ const Navbar = () => {
     ];
 
     return (
-        <div className='h-screen fixed bg-neutral-50 border-r flex flex-col justify-center items-start p-5 w-[15rem] '>
+        <div className='h-screen fixed bg-neutral-50 border-r flex flex-col justify-center items-start px-5 py-10 w-[15rem] space-y-14 '>
             <Link href='/'>
-                <Image className='w-[100px] absolute top-10 left-[16.67%] ' src={logo} alt="" />
+                <Image className='w-[100px] ml-[16.67%] ' src={logo} alt="" />
             </Link>
-            <div className='flex flex-col items-start space-y-5 w-full '>
+            <div className='flex flex-col items-start justify-start h-full space-y-5 w-full '>
                 {navComp.map((nav) => {
                     return (
                         <Link className='w-full' key={nav.name} href={`/${userDetails.username}/${nav.name}`}>

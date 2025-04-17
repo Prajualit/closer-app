@@ -33,7 +33,7 @@ const UserButton = () => {
     return (
         <button
             onClick={handleLogout}
-            className='hover:bg-[#efefef] transition-colors duration-300 rounded-[8px] flex space-x-2 w-full items-center p-2'>
+            className='hover:bg-[#efefef] transition-colors duration-300 rounded-[8px] flex space-x-2 w-full items-center px-4 py-2'>
             {userDetails ? <Image width={32} height={32} className='rounded-full' src={userDetails.avatarUrl} alt="" /> : <UserAvatar />}
             <span>{userDetails.name.split(" ")[0]}</span>
         </button>
