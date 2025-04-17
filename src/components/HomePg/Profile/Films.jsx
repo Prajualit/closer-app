@@ -26,37 +26,37 @@ const Films = () => {
             <path
               d="M2 7H22"
               stroke={color}
-              strokeWidth="1.5"
+              strokeWidth="0.5"
               strokeLinejoin="round"
             />
             <path
               d="M2 17H22"
               stroke={color}
-              strokeWidth="1.5"
+              strokeWidth="0.5"
               strokeLinejoin="round"
             />
             <path
               d="M12 17L12 7"
               stroke={color}
-              strokeWidth="1.5"
+              strokeWidth="0.5"
               strokeLinejoin="round"
             />
             <path
               d="M21.5 21.5V2.5H2.5V21.5H21.5Z"
               stroke={color}
-              strokeWidth="1.5"
+              strokeWidth="0.5"
               strokeLinejoin="round"
             />
             <path
               d="M8 7L8 3M16 7L16 3"
               stroke={color}
-              strokeWidth="1.5"
+              strokeWidth="0.5"
               strokeLinejoin="round"
             />
             <path
               d="M8 21L8 17M16 21L16 17"
               stroke={color}
-              strokeWidth="1.5"
+              strokeWidth="0.5"
               strokeLinejoin="round"
             />
           </svg>
