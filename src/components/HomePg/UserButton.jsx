@@ -2,6 +2,8 @@ import React from 'react'
 import UserAvatar from '../ui/UserAvatar'
 import { apiError } from '@/backend/utils/apiError'
 import { useRouter } from "next/navigation";
+import { useSelector } from 'react-redux';
+import Image from 'next/image';
 
 const UserButton = () => {
 
@@ -27,13 +29,13 @@ const UserButton = () => {
         }
     };
 
-
+    const userDetails = useSelector((state) => state.user.user);
     return (
         <button
             onClick={handleLogout}
             className='hover:bg-neutral-200 transition-colors duration-300 rounded-full flex space-x-2 items-center p-2'>
-            <UserAvatar />
-            <span></span>
+            {userDetails ? <Image width={32} height={32} className='rounded-full' src={userDetails.avatarUrl} alt="" /> : <UserAvatar />}
+            <span>{userDetails.name}</span>
         </button>
     )
 }
