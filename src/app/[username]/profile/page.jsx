@@ -104,10 +104,10 @@ const Page = ({ params }) => {
     ];
 
     return (
-        <div>
+        <div className="flex ">
             <Navbar />
             {userDetails ? (
-                <div className="flex flex-col items-center justify-center h-full p-20 ">
+                <div className="flex flex-col items-center justify-center w-full h-full p-20 ml-[15rem] ">
                     <Userdata />
                     <div className="w-[75%] border mt-20 "></div>
                     <div className="flex justify-center items-center space-x-32 relative w-full mb-20 ">
