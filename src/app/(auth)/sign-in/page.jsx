@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-// import { GoogleLogin } from "@react-oauth/google";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/user/userSlice.js";
 
 const page = () => {
+
+  const dispatch = useDispatch();
 
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -41,6 +41,7 @@ const page = () => {
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
+        dispatch(setUser(responseData.data.user));
         router.push(`/${responseData.data.user.username}`);
       }
     }

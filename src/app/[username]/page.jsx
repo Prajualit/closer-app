@@ -1,41 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/HomePg/Navbar.jsx";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "@/redux/user/userSlice.js";
 
 const Page = ({ params }) => {
-    const [user, setUser] = useState(null);
-    const { username } = params;
-
-    const fetchCurrentUser = async () => {
-        try {
-            const res = await fetch("http://localhost:5000/api/v1/users/getUser", {
-                method: "GET",
-                credentials: "include",
-            });
-
-            const response = await res.json();
-
-            if (res.ok) {
-                console.log("User Info:", response.data);
-                setUser(response.data);
-            } else {
-                console.error("Error:", response.message);
-            }
-        } catch (err) {
-            console.error("Fetch failed:", err);
-        }
-    };
-
-    useEffect(() => {
-        fetchCurrentUser();
-    }, []);
+    const userDetails = useSelector((state) => state.user.user);
 
     return (
         <div>
             <Navbar />
-            {user ? (
+            {userDetails ? (
                 <div>
-                    <h2>Welcome, {user.username}</h2>
+                    <h2>Welcome, {userDetails.name}</h2>
                 </div>
             ) : (
                 <p>Loading user info...</p>
