@@ -15,7 +15,7 @@ const Userdata = () => {
                         <h1 className="text-[32px] ">{userDetails.name}</h1>
                         <p className="italic text-neutral-500 ">{userDetails.bio}</p>
                     </div>
-                    <button className="border px-4 py-1 rounded-[8px] hover:bg-black border-black hover:text-white transition-all focus:bg-transparent focus:text-black duration-300 ">Edit Profile</button>
+                    <button className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Edit Profile</button>
                 </div>
             </div>
         </div>

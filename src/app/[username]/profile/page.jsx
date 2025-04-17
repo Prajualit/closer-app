@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/HomePg/Navbar.jsx";
-import Userdata from "@/components/HomePg/Userdata";
+import Userdata from "@/components/HomePg/Profile/Userdata";
 import { useSelector } from "react-redux";
 import Image from "next/image";
+import Posts from "@/components/HomePg/Profile/Photos.jsx";
+import Films from "@/components/HomePg/Profile/Films.jsx";
 
 const Page = ({ params }) => {
     const userDetails = useSelector((state) => state.user.user);
-    const [activeNav, setActiveNav] = useState("POSTS")
+    const [activeNav, setActiveNav] = useState("PHOTOS")
 
     const GridIcon = ({ size = 18, color = "currentColor" }) => {
         return (
@@ -97,7 +99,7 @@ const Page = ({ params }) => {
     };
 
     const navComp = [
-        { name: "POSTS", icon: <GridIcon /> },
+        { name: "PHOTOS", icon: <GridIcon /> },
         { name: "FILMS", icon: <CameraVideoIcon /> },
     ];
 
@@ -108,7 +110,7 @@ const Page = ({ params }) => {
                 <div className="flex flex-col items-center justify-center h-full p-20 ">
                     <Userdata />
                     <div className="w-[75%] border mt-20 "></div>
-                    <div className="flex justify-center items-center space-x-32 relative w-full ">
+                    <div className="flex justify-center items-center space-x-32 relative w-full mb-20 ">
                         {navComp.map((nav) => (
                             <div key={nav.name} className="flex flex-col text-neutral-500 items-center space-y-5 ">
                                 <div
@@ -127,6 +129,8 @@ const Page = ({ params }) => {
                         )
                         )}
                     </div>
+                    {activeNav === "PHOTOS" && <Posts />}
+                    {activeNav === "FILMS" && <Films />}
                 </div>
             ) : (
                 <p>Loading user info...</p>
