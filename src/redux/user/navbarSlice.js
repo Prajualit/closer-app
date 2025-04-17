@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  activeNav: "Home",
+  activeNav: "home",
 };
 
 const navbarSlice = createSlice({
