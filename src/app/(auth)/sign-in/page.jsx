@@ -42,7 +42,7 @@ const page = () => {
         throw new Error(responseData.message);
       } else {
         dispatch(setUser(responseData.data.user));
-        router.push(`/${responseData.data.user.username}`);
+        router.push(`/${responseData.data.user.username}/home`);
       }
     }
     catch (error) {

@@ -2,6 +2,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
+import path from "path";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -44,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // }else if(!req.files?.avatarUrl[0]) {
   //   avatarLocalPath = path.normalize(req.files?.avatarUrl.path);
   // }
-  const avatarLocalPath = path.normalize(req.file?.avatarUrl[0]?.path);
+  const avatarLocalPath = path.normalize(req.file?.path);
   if (!avatarLocalPath) {
     throw new apiError(400, `Avatar is required ${avatarLocalPath}`);
   }

@@ -12,7 +12,7 @@ const router = Router();
 
 router
   .route("/register")
-  .post(upload.fields([{ name: "avatarUrl", maxCount: 1 }]), registerUser);
+  .post(upload.single("avatarUrl"), registerUser);
 router.route("/login").post(loginUser);
 
 // secured routes
