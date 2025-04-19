@@ -7,6 +7,7 @@ import Navsearch from '@/components/HomePg/Navsearch'
 import UserButton from '@/components/HomePg/UserButton'
 import { useSelector, useDispatch } from "react-redux";
 import { setActiveNav } from '@/redux/user/navbarSlice'
+import CreateModal from '../Modal/CreateModal'
 
 const Navbar = () => {
     const userDetails = useSelector((state) => state.user.user);
@@ -209,12 +210,14 @@ const Navbar = () => {
             <div className='flex flex-col items-start justify-start h-full space-y-5 w-full '>
                 {navComp.map((nav) => {
                     return (
-                        <Link className='w-full' key={nav.name} href={`/${userDetails.username}/${nav.name.toLowerCase()}`}>
-                            <button onClick={() => dispatch(setActiveNav(nav.name.toLowerCase()))} className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-[#efefef]  focus:bg-neutral-100 focus:text-black w-full ${activeNav === nav.name.toLowerCase() ? "text-black" : "text-neutral-500"}`}>
-                                {nav.icon}
-                                <span>{nav.name}</span>
-                            </button>
-                        </Link>
+                        nav.name === "Create" ? <CreateModal key={nav.name} nav={nav} activeNav={activeNav} /> : (
+                            <Link className='w-full' key={nav.name} href={`/${userDetails.username}/${nav.name.toLowerCase()}`}>
+                                <button onClick={() => dispatch(setActiveNav(nav.name.toLowerCase()))} className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-[#efefef] focus:bg-neutral-100 focus:text-black w-full ${activeNav === nav.name.toLowerCase() ? "text-black" : "text-neutral-500"}`}>
+                                    {nav.icon}
+                                    <span>{nav.name}</span>
+                                </button>
+                            </Link>
+                        )
                     )
                 })}
             </div>
