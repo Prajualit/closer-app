@@ -1,7 +1,6 @@
 import express, { urlencoded } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { upload } from "./middleware/multer.middleware.js";
 
 const app = express();
 
@@ -17,7 +16,10 @@ app.use("/temp", express.static("temp"));
 
 // Routes
 import userRouter from "./Routes/user.routes.js";
+import createRouter from "./Routes/create.route.js";
+
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1", createRouter);
 
 
 export { app };
