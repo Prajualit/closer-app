@@ -29,6 +29,14 @@ const userSchema = new Schema(
     avatarUrl: {
       type: String,
     },
+    media: [
+      {
+        url: { type: String },
+        public_id: { type: String },
+        resource_type: { type: String },
+        uploadedAt: { type: Date, default: Date.now }, 
+      },
+    ],
     refreshToken: {
       type: String,
     },
