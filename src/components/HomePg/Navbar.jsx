@@ -7,7 +7,7 @@ import Navsearch from '@/components/HomePg/Navsearch'
 import UserButton from '@/components/HomePg/UserButton'
 import { useSelector, useDispatch } from "react-redux";
 import { setActiveNav } from '@/redux/user/navbarSlice'
-import CreateModal from '../Modal/CreateModal'
+import CreateModal from '../Modal/Create.modal'
 
 const Navbar = () => {
     const userDetails = useSelector((state) => state.user.user);

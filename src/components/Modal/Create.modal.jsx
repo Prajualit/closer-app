@@ -44,12 +44,33 @@ const CreateModal = ({ nav, activeNav }) => {
 
     const [file, setFile] = useState(null);
 
-    const handleFileChange = (e) => {
-        const selected = e.target.files[0];
-        if (selected) {
-            setFile(selected);
+   const handleSubmitfile = async () => {
+    if (!file) {
+        console.error('Please select a file first');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('http://localhost:5000/api/v1/create', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            console.log('File uploaded successfully');
+        } else {
+            console.error('Failed to upload file');
         }
-    };
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        console.error('Error uploading file');
+    }
+};
+
+
 
     return (
         <Dialog className="z-50 ">
@@ -73,7 +94,7 @@ const CreateModal = ({ nav, activeNav }) => {
                         <Button
                             variant="outline"
                             className="rounded-[8px] hover:bg-black hover:text-white text-black duration-300"
-                            onClick={() => document.getElementById("upload")?.click()}
+                            onClick={() => handleSubmitfile()}
                         >
                             {file ? "Change File" : "Select from computer"}
                         </Button>
@@ -81,7 +102,7 @@ const CreateModal = ({ nav, activeNav }) => {
                             id="upload"
                             type="file"
                             accept="image/*"
-                            onChange={handleFileChange}
+                            onChange={(e) => setFile(e.target.files[0])}
                             className="hidden"
                         />
                     </div>
