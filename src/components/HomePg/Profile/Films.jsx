@@ -1,21 +1,16 @@
-'use client';
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateUser } from '@/redux/slice/userSlice';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useDispatch } from 'react-redux';
-import { updateUser } from '@/redux/slice/userSlice';
 
 const Films = () => {
-
   const user = useSelector((state) => state.user.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [file, setFile] = useState(null);
@@ -27,9 +22,28 @@ const Films = () => {
     Array.isArray(user?.media) &&
     user.media.some((item) => item.resource_type === "video");
 
+  const [videoOrientations, setVideoOrientations] = useState({});
+
+  useEffect(() => {
+    if (!user?.media) return;
+
+    user.media
+      .filter((m) => m.resource_type === "video")
+      .forEach((media, index) => {
+        const video = document.createElement("video");
+        video.src = media.url;
+        video.onloadedmetadata = () => {
+          const isPortrait = video.videoWidth < video.videoHeight;
+          setVideoOrientations((prev) => ({
+            ...prev,
+            [media.url]: isPortrait,
+          }));
+        };
+      });
+  }, [user?.media]);
+
   const handleFileUpload = async () => {
     if (!file) return;
-
     const formData = new FormData();
     formData.append('file', file);
 
@@ -54,7 +68,7 @@ const Films = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!file) {
       setPreviewUrl(null);
       return;
@@ -117,24 +131,57 @@ const Films = () => {
   return (
     <>
       {hasFilms ? (
-        <div className="grid grid-cols-3 items-center justify-center gap-2 h-[20rem] ">
+        <div className="grid grid-cols-3 items-center justify-center gap-2  ">
           {user?.media
             ?.filter((m) => m.resource_type === "video")
-            .map((m, i) => (
-              <div key={i} className='h-full group relative '>
-                <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
-                <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200 ' key={i}>
-                  <video className='' src={m.url} height={200} width={200} alt={`image-${i}`} />
+            .map((m, i) => {
+              const isPortrait = videoOrientations[m.url];
+              const videoClass = isPortrait !== undefined
+                ? isPortrait
+                  ? "object-cover"
+                  : "object-contain"
+                : "object-contain";
+
+              const videoRef = React.createRef();
+
+              const handleMouseEnter = () => {
+                videoRef.current?.play();
+              };
+
+              const handleMouseLeave = () => {
+                videoRef.current?.pause();
+                videoRef.current.currentTime = 0; // optional: reset to start
+              };
+
+              return (
+                <div
+                  key={i}
+                  className="h-[20rem] w-[12.5rem] group relative cursor-pointer "
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
+                  <div className="bg-[#181818] h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
+                    <video
+                      ref={videoRef}
+                      className={`w-full h-full ${videoClass}`}
+                      src={m.url}
+                      muted
+                      loop
+                      playsInline
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+
         </div>
       ) : (
-        <div className='flex flex-col items-center justify-center space-y-5'>
+        <div className="flex flex-col items-center justify-center space-y-5">
           <FilmIcon size={100} color="black" />
-          <h1 className='text-2xl font-semibold'>No Films Yet</h1>
-          <p className='text-neutral-500'>When you share films, they will appear on your profile.</p>
-          <Button onClick={() => setIsModalOpen(true)} className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Share your first film</Button>
+          <h1 className="text-2xl font-semibold">No Films Yet</h1>
+          <p className="text-neutral-500">When you share films, they will appear on your profile.</p>
+          <Button onClick={() => setIsModalOpen(true)} className="rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300">Share your first film</Button>
         </div>
       )}
 
@@ -168,8 +215,8 @@ const Films = () => {
                     height={200}
                     width={200}
                     src={previewUrl}
-                    alt="Preview"
                     className="max-w-xs max-h-48 rounded-md mt-2 object-contain"
+                    controls
                   />
                 )}
               </>
@@ -185,7 +232,10 @@ const Films = () => {
         </DialogContent>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
-export default Films
+export default Films;
+
+
+
