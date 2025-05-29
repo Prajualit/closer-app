@@ -1,81 +1,190 @@
-'use client'
-import React from 'react'
-import { useSelector } from 'react-redux'
-import Image from "next/image";
-import { useState, useEffect } from 'react'
+'use client';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '@/redux/slice/userSlice';
 
 const Films = () => {
 
-      const userDetails = useSelector((state) => state.user.user);
-      const [hasFilms, setHasFilms] = useState(false);
-    
-      // if (userDetails.films.length > 0) {
-      //   setHasFilms(true);
-      // }
+  const user = useSelector((state) => state.user.user);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const inputRef = React.useRef(null);
+  const dispatch = useDispatch();
 
-      const FilmIcon = ({ size = 24, color = "#000000" }) => {
-        return (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={size}
-            height={size}
-            viewBox="0 0 24 24"
-            fill="none"
-            role="img"
-          >
-            <path
-              d="M2 7H22"
-              stroke={color}
-              strokeWidth="0.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M2 17H22"
-              stroke={color}
-              strokeWidth="0.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M12 17L12 7"
-              stroke={color}
-              strokeWidth="0.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M21.5 21.5V2.5H2.5V21.5H21.5Z"
-              stroke={color}
-              strokeWidth="0.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M8 7L8 3M16 7L16 3"
-              stroke={color}
-              strokeWidth="0.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M8 21L8 17M16 21L16 17"
-              stroke={color}
-              strokeWidth="0.5"
-              strokeLinejoin="round"
-            />
-          </svg>
-        );
-      };
-    
+  const hasFilms =
+    Array.isArray(user?.media) &&
+    user.media.some((item) => item.resource_type === "video");
+
+  const handleFileUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/v1/create', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        dispatch(updateUser({ media: data.data.media }));
+        setIsModalOpen(false);
+        setFile(null);
+        setPreviewUrl(null);
+      } else {
+        console.error('Upload failed');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const FilmIcon = ({ size = 24, color = "#000000" }) => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        role="img"
+      >
+        <path
+          d="M2 7H22"
+          stroke={color}
+          strokeWidth="0.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M2 17H22"
+          stroke={color}
+          strokeWidth="0.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M12 17L12 7"
+          stroke={color}
+          strokeWidth="0.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M21.5 21.5V2.5H2.5V21.5H21.5Z"
+          stroke={color}
+          strokeWidth="0.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M8 7L8 3M16 7L16 3"
+          stroke={color}
+          strokeWidth="0.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M8 21L8 17M16 21L16 17"
+          stroke={color}
+          strokeWidth="0.5"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  };
+
   return (
-    hasFilms ? (
-        <div>
-  
+    <>
+      {hasFilms ? (
+        <div className="grid grid-cols-3 items-center justify-center gap-2 h-[20rem] ">
+          {user?.media
+            ?.filter((m) => m.resource_type === "video")
+            .map((m, i) => (
+              <div key={i} className='h-full group relative '>
+                <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
+                <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200 ' key={i}>
+                  <video className='' src={m.url} height={200} width={200} alt={`image-${i}`} />
+                </div>
+              </div>
+            ))}
         </div>
       ) : (
         <div className='flex flex-col items-center justify-center space-y-5'>
           <FilmIcon size={100} color="black" />
           <h1 className='text-2xl font-semibold'>No Films Yet</h1>
           <p className='text-neutral-500'>When you share films, they will appear on your profile.</p>
-          <button className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Share your first film</button>
+          <Button onClick={() => setIsModalOpen(true)} className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Share your first film</Button>
         </div>
-      )
+      )}
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="bg-white h-[80%] w-[40%]">
+          <DialogHeader>
+            <DialogTitle>Create New Post</DialogTitle>
+          </DialogHeader>
+
+          <DialogDescription className="flex flex-col items-center space-y-5 text-lg text-black">
+            <span>Upload a photo or video</span>
+            <input
+              ref={inputRef}
+              type="file"
+              accept="video/*"
+              className="hidden"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+            />
+            <Button
+              variant="outline"
+              onClick={() => inputRef.current?.click()}
+              className="rounded-[8px] text-black"
+            >
+              {file ? 'Change File' : 'Select from Computer'}
+            </Button>
+            {file && (
+              <>
+                <span className="text-sm text-neutral-500">Selected: {file.name}</span>
+                {previewUrl && file.type.startsWith('video/') && (
+                  <video
+                    height={200}
+                    width={200}
+                    src={previewUrl}
+                    alt="Preview"
+                    className="max-w-xs max-h-48 rounded-md mt-2 object-contain"
+                  />
+                )}
+              </>
+            )}
+            <Button
+              className="mt-2 bg-black text-white rounded-[8px] hover:bg-neutral-800"
+              onClick={handleFileUpload}
+              disabled={!file}
+            >
+              Upload
+            </Button>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
