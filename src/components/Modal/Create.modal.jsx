@@ -9,13 +9,16 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useDispatch } from "react-redux";
+import { updateUser } from "@/redux/slice/userSlice.js";
+
 
 const CreateModal = ({ nav, activeNav }) => {
     const [file, setFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const inputRef = useRef(null);
 
-    // Create a preview URL when file changes
+    const dispatch = useDispatch();
     useEffect(() => {
         if (!file) {
             setPreviewUrl(null);
@@ -23,8 +26,6 @@ const CreateModal = ({ nav, activeNav }) => {
         }
         const url = URL.createObjectURL(file);
         setPreviewUrl(url);
-
-        // Cleanup the object URL on unmount or when file changes
         return () => URL.revokeObjectURL(url);
     }, [file]);
 
@@ -53,7 +54,6 @@ const CreateModal = ({ nav, activeNav }) => {
             />
         </svg>
     );
-
     const handleSubmitFile = async () => {
         if (!file) {
             console.error("Please select a file first");
@@ -67,13 +67,16 @@ const CreateModal = ({ nav, activeNav }) => {
             const response = await fetch("http://localhost:5000/api/v1/create", {
                 method: "POST",
                 body: formData,
-                credentials: "include", // ✅ Important: send cookies!
+                credentials: "include",
             });
 
             if (response.ok) {
+                const data = await response.json(); 
                 console.log("File uploaded successfully");
-                setFile(null); // reset file input
-                setPreviewUrl(null); // clear preview after upload (optional)
+                setFile(null);
+                setPreviewUrl(null);
+
+                dispatch(updateUser({ media: data.data.media })); 
             } else {
                 console.error("Failed to upload file");
             }
@@ -81,6 +84,7 @@ const CreateModal = ({ nav, activeNav }) => {
             console.error("Error uploading file:", error);
         }
     };
+
 
     return (
         <Dialog>
