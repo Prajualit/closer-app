@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
 import {
@@ -16,12 +16,15 @@ import { updateUser } from '@/redux/slice/userSlice';
 
 const Photos = () => {
   const user = useSelector((state) => state.user.user);
-  const hasPhotos = Array.isArray(user?.media) && user.media.length > 0;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const inputRef = React.useRef(null);
   const dispatch = useDispatch();
+
+  const hasPhotos =
+    Array.isArray(user?.media) &&
+    user.media.some((item) => item.resource_type === "image");
 
   const handleFileUpload = async () => {
     if (!file) return;
@@ -102,18 +105,44 @@ const Photos = () => {
     );
   };
 
+  const SmartImage = ({ src, alt = "Image", containerClass = "" }) => {
+    const [isPortrait, setIsPortrait] = useState(false);
+
+    useEffect(() => {
+      const img = new Image();
+      img.onload = () => {
+        setIsPortrait(img.naturalWidth < img.naturalHeight);
+      };
+      img.src = src;
+    }, [src]);
+
+    return (
+      <div className={`w-[400px] h-[300px] bg-[#181818] flex items-center justify-center overflow-hidden ${containerClass}`}>
+        <img
+          src={src}
+          alt={alt}
+          height={200}
+          width={200}
+          className={`w-full h-full ${isPortrait ? "object-cover" : "object-contain"}`}
+        />
+      </div>
+    );
+  };
+
   return (
     <>
       {hasPhotos ? (
         <div className="grid grid-cols-3 items-center justify-center gap-2">
-          {user?.media?.map((m, i) => (
-            <div key={i} className='h-full group relative '>
-              <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
-              <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200 ' key={i}>
-                <Image className='' src={m.url} height={200} width={200} alt="media" />
+          {user?.media
+            ?.filter((m) => m.resource_type === "image")
+            .map((m, i) => (
+              <div key={i} className='group relative h-[12.5rem] w-[12.5rem] '>
+                <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
+                <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200 '>
+                  <SmartImage src={m.url} alt={`image-${i}`} />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center space-y-5">
