@@ -1,17 +1,64 @@
-'use client'
-import React from 'react'
-import { useSelector } from 'react-redux'
-import Image from "next/image";
-import { useState, useEffect } from 'react'
+'use client';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '@/redux/slice/userSlice';
 
 const Photos = () => {
+  const user = useSelector((state) => state.user.user);
+  const hasPhotos = Array.isArray(user?.media) && user.media.length > 0;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const inputRef = React.useRef(null);
+  const dispatch = useDispatch();
 
-  const userDetails = useSelector((state) => state.user.user);
-  const [hasPhotos, setHasPhotos] = useState(false);
+  const handleFileUpload = async () => {
+    if (!file) return;
 
-  // if (userDetails.posts.length > 0) {
-  //   setHasPosts(true);
-  // }
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/v1/create', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        dispatch(updateUser({ media: data.data.media }));
+        setIsModalOpen(false);
+        setFile(null);
+        setPreviewUrl(null);
+      } else {
+        console.error('Upload failed');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   const ProfileShareIcon = ({ size = 62, color = "currentColor" }) => {
     return (
@@ -56,19 +103,84 @@ const Photos = () => {
   };
 
   return (
-    hasPhotos ? (
-      <div>
+    <>
+      {hasPhotos ? (
+        <div className="grid grid-cols-3 items-center justify-center gap-2">
+          {user?.media?.map((m, i) => (
+            <div key={i} className='h-full group relative '>
+              <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
+              <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200 ' key={i}>
+                <Image className='' src={m.url} height={200} width={200} alt="media" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center space-y-5">
+          <ProfileShareIcon size={100} color="black" />
+          <h1 className="text-2xl font-semibold">No Photos Yet</h1>
+          <p className="text-neutral-500">
+            When you share photos, they will appear on your profile.
+          </p>
+          <Button
+            className="rounded-[8px] hover:text-[#474747] transition-all"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Share your first photo
+          </Button>
+        </div>
+      )}
 
-      </div>
-    ) : (
-      <div className='flex flex-col items-center justify-center space-y-5'>
-        <ProfileShareIcon size={100} color="black" />
-        <h1 className='text-2xl font-semibold'>No Photos Yet</h1>
-        <p className='text-neutral-500'>When you share photos, they will appear on your profile.</p>
-        <button className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Share your first photo</button>
-      </div>
-    )
-  )
-}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="bg-white h-[80%] w-[40%]">
+          <DialogHeader>
+            <DialogTitle>Create New Post</DialogTitle>
+          </DialogHeader>
 
-export default Photos
+          <DialogDescription className="flex flex-col items-center space-y-5 text-lg text-black">
+            <span>Upload a photo or video</span>
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+            />
+            <Button
+              variant="outline"
+              onClick={() => inputRef.current?.click()}
+              className="rounded-[8px] text-black"
+            >
+              {file ? 'Change File' : 'Select from Computer'}
+            </Button>
+            {file && (
+              <>
+                <span className="text-sm text-neutral-500">Selected: {file.name}</span>
+                {previewUrl && file.type.startsWith('image/') && (
+                  <Image
+                    height={200}
+                    width={200}
+                    src={previewUrl}
+                    alt="Preview"
+                    className="max-w-xs max-h-48 rounded-md mt-2 object-contain"
+                  />
+                )}
+              </>
+            )}
+            <Button
+              className="mt-2 bg-black text-white rounded-[8px] hover:bg-neutral-800"
+              onClick={handleFileUpload}
+              disabled={!file}
+            >
+              Upload
+            </Button>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+export default Photos;
+
+
