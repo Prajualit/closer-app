@@ -6,8 +6,8 @@ import logo from "@/assets/logo.png"
 import Navsearch from '@/components/HomePg/Navsearch'
 import UserButton from '@/components/HomePg/UserButton'
 import { useSelector, useDispatch } from "react-redux";
-import { setActiveNav } from '@/redux/user/navbarSlice'
-import CreateModal from '../Modal/Create.modal'
+import { setActiveNav } from '@/redux/slice/navbarSlice'
+import CreateModal from '../Modal/create.modal'
 
 const Navbar = () => {
     const userDetails = useSelector((state) => state.user.user);
