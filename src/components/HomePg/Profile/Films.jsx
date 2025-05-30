@@ -131,6 +131,8 @@ const Films = () => {
     );
   };
 
+  const activeMedia = user?.media?.find((m) => m.url === activeVideoUrl);
+
   return (
     <>
       {hasFilms ? (
@@ -179,7 +181,7 @@ const Films = () => {
               );
             })}
           <ImageModal
-            videoUrl={activeVideoUrl}
+            videoUrl={activeMedia}
             onClose={() => setActiveVideoUrl(null)}
             user={user}
           />
