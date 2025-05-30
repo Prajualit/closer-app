@@ -108,6 +108,7 @@ const Photos = () => {
     );
   };
 
+  const activeMedia = user?.media?.find((m) => m.url === activeImageUrl);
 
 
   return (
@@ -155,7 +156,7 @@ const Photos = () => {
               )
             })}
           <ImageModal
-            imageUrl={activeImageUrl}
+            imageUrl={activeMedia}
             onClose={() => setActiveImageUrl(null)}
             user={user}
           />
