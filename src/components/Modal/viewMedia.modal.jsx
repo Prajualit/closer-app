@@ -16,30 +16,34 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
 
     return (
         <Dialog open={!!imageUrl || !!videoUrl} onOpenChange={onClose}>
-            <DialogContent className="flex flex-col md:flex-row w-full md:w-[50%] border-none p-0 gap-0 rounded-lg overflow-hidden">
+            <DialogContent className="flex max-w-[80%] h-[80%] border-none p-0 gap-0 rounded-lg overflow-hidden">
                 {videoUrl ? (
-                    <video
-                        src={videoUrl.url}
-                        controls
-                        className="object-cover"
-                        width={400}
-                        height={400}
-                        playsInline
-                    />
+                    <div className="w-fit min-w-[40%] max-w-[50%] flex items-center object-contain bg-[#000000] ">
+                        <video
+                            src={videoUrl.url}
+                            controls
+                            className="object-contain w-full"
+                            width={400}
+                            height={400}
+                            playsInline
+                        />
+                    </div>
                 ) : imageUrl ? (
-                    <NextImage
-                        src={imageUrl.url}
-                        alt={`Enlarged view of ${user?.name || 'the media'}`}
-                        width={400}
-                        height={400}
-                        className="object-cover"
-                    />
+                    <div className="w-fit min-w-[40%] max-w-[50%] flex items-center object-contain bg-[#00000085] ">
+                        <NextImage
+                            src={imageUrl.url}
+                            alt={`Enlarged view of ${user?.name || 'the media'}`}
+                            width={400}
+                            height={400}
+                            className="object-contain w-full"
+                        />
+                    </div>
                 ) : (
-                    <div className="flex items-center justify-center w-full h-full bg-gray-200">
+                    <div className="flex items-center justify-center w-full h-full bg-[black] ">
                         <span>No media available</span>
                     </div>
                 )}
-                <div className="flex flex-col w-full flex-1">
+                <div className="flex flex-col w-[40%] flex-1">
                     <DialogTitle className="w-full h-[3rem] flex space-x-2 items-center px-3 bg-white border-[#0000003c]">
                         <NextImage
                             src={user?.avatarUrl}
