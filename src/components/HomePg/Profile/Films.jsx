@@ -9,12 +9,15 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import ImageModal from '@/components/Modal/viewMedia.modal.jsx';
 
 const Films = () => {
   const user = useSelector((state) => state.user.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [activeVideoUrl, setActiveVideoUrl] = useState(null);
+
   const inputRef = React.useRef(null);
   const dispatch = useDispatch();
 
@@ -159,6 +162,7 @@ const Films = () => {
                   className="h-[20rem] w-[12.5rem] group relative cursor-pointer "
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
+                  onClick={() => setActiveVideoUrl(m.url)}
                 >
                   <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
                   <div className="bg-[#181818] h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
@@ -174,6 +178,11 @@ const Films = () => {
                 </div>
               );
             })}
+          <ImageModal
+            videoUrl={activeVideoUrl}
+            onClose={() => setActiveVideoUrl(null)}
+            user={user}
+          />
 
         </div>
       ) : (
