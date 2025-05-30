@@ -13,12 +13,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '@/redux/slice/userSlice';
+import ImageModal from '@/components/Modal/viewMedia.modal.jsx';
 
 const Photos = () => {
   const user = useSelector((state) => state.user.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [activeImageUrl, setActiveImageUrl] = useState(null);
+
   const inputRef = React.useRef(null);
   const dispatch = useDispatch();
 
@@ -139,7 +142,11 @@ const Photos = () => {
                 );
               };
               return (
-                <div key={i} className='group relative h-[12.5rem] w-[12.5rem] '>
+                <div
+                  key={i}
+                  className='group relative h-[12.5rem] w-[12.5rem] '
+                  onClick={() => setActiveImageUrl(m.url)}
+                >
                   <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
                   <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200 '>
                     <SmartImage src={m.url} alt={`image-${i}`} />
@@ -147,6 +154,11 @@ const Photos = () => {
                 </div>
               )
             })}
+          <ImageModal
+            imageUrl={activeImageUrl}
+            onClose={() => setActiveImageUrl(null)}
+            user={user}
+          />
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center space-y-5">
