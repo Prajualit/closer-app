@@ -33,16 +33,16 @@ const ImageModal = ({ imageUrl, onClose, user }) => {
                         </span>
                     </DialogTitle>
                     <DialogDescription className="h-full bg-white w-full flex-1 p-3 flex flex-col " >
-                        <div>
+                        <p>
                             <span className='font-semibold'>
                                 {user?.username}
                             </span>
                             <span>
                                 &nbsp;Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta rerum mollitia dolore sunt! Quibusdam, quas?
                             </span>
-                        </div>
+                        </p>
                         <span>
-                            
+                            {user?.media[0]?.uploadedAt?.slice(0, 10)}
                         </span>
                     </DialogDescription>
                 </div>
