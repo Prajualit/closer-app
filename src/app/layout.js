@@ -3,6 +3,7 @@ import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import dotenv from "dotenv";
 import ReduxProvider from "@/redux/reduxProvider";
+import TokenCheck from "@/lib/tokenCheck";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <GoogleOAuthProvider clientId={`${process.env.GOOGLE_CLIENT_ID}`}>
+          <TokenCheck />
           <ReduxProvider>{children}</ReduxProvider>
         </GoogleOAuthProvider>
       </body>
