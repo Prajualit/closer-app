@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import logo from "@/assets/logo.png";
 
 export default function AuthGuard({ children }) {
   const router = useRouter();
@@ -42,7 +44,13 @@ export default function AuthGuard({ children }) {
     checkAuth();
   }, [router]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <Image src={logo} alt="logo" width={300} height={300} priority />
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }
