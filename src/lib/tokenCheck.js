@@ -17,6 +17,7 @@ function isTokenExpired(token) {
 
     return payload.exp < Date.now() / 1000;
   } catch (err) {
+    console.error("Failed to parse JWT:", err);
     return true;
   }
 }
@@ -28,12 +29,12 @@ function getCookie(name) {
 
 export default function TokenCheck() {
   const pathname = usePathname();
-  const [loading, setLoading] = useState(true); // Manage loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkToken = async () => {
       if (pathname === "/sign-in" || pathname === "/sign-up") {
-        console.log("On login page, skipping token check.");
+        console.log("On login/signup page, skipping token check.");
         setLoading(false);
         return;
       }
@@ -77,7 +78,7 @@ export default function TokenCheck() {
         console.log("Access token is still valid.");
       }
 
-      setLoading(false); // Token check complete
+      setLoading(false);
     };
 
     checkToken();
@@ -86,8 +87,8 @@ export default function TokenCheck() {
   return (
     <>
       {loading && (
-        <div className="h-screen w-screen flex items-center justify-center">
-            <Image src={logo} alt="logo" width={300} height={300} />
+        <div className="h-screen w-screen flex flex-col items-center justify-center bg-white">
+          <Image src={logo} alt="logo" width={300} height={300} />
         </div>
       )}
     </>

@@ -117,7 +117,7 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const options = { httpOnly: true, secure: true };
+  const options = { httpOnly: true, secure: false };
 
   // send response
   return res
@@ -140,7 +140,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     { new: true }
   );
 
-  const options = { httpOnly: true, secure: true };
+  const options = { httpOnly: true, secure: false };
 
   res
     .status(200)
@@ -154,7 +154,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
-    throw new apiError(401, "unauthorized request");
+    throw new apiError(401, "Unauthorized request: No refresh token provided");
   }
 
   try {
@@ -170,13 +170,24 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     if (incomingRefreshToken !== user?.refreshToken) {
-      throw new apiError(401, "Refresh token is expired or used");
+      throw new apiError(401, "Refresh token expired or already used");
     }
 
-    const options = { httpOnly: true, secure: true };
-
+    // Generate new tokens
     const { accessToken, newRefreshToken } =
       await generateAccessAndRefreshTokens(user._id);
+
+    // Save new refreshToken to DB
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    // Set cookies
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    };
 
     return res
       .status(200)
@@ -186,10 +197,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         new apiResponse(
           200,
           { accessToken, refreshToken: newRefreshToken },
-          "Access token refreshed"
+          "Access token refreshed successfully"
         )
       );
   } catch (error) {
+    console.error("Error in refreshAccessToken:", error);
     throw new apiError(401, error?.message || "Invalid refresh token");
   }
 });
