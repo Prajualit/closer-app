@@ -12,21 +12,19 @@ export default function AuthGuard({ children }) {
   useEffect(() => {
     async function checkAuth() {
       try {
-        // Make a request to backend that will validate tokens from HttpOnly cookies
         const res = await fetch(
           "http://localhost:5000/api/v1/users/refresh-token",
           {
             method: "POST",
-            credentials: "include", // important to send HttpOnly cookies
+            credentials: "include",
           }
         );
 
         if (res.ok) {
           const data = await res.json();
-          // Optionally update local state if needed
+
           setLoading(false);
         } else {
-          // Refresh token invalid or expired, logout backend will clear cookies
           await fetch("http://localhost:5000/api/v1/users/logout", {
             method: "POST",
             credentials: "include",
