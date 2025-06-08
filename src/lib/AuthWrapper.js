@@ -10,8 +10,8 @@ export default function AuthWrapper({ children }) {
   const pathname = usePathname();
 
   if (PUBLIC_ROUTES.includes(pathname)) {
-    return <>{children}</>; // public route, no auth guard
+    return <>{children}</>;
   }
 
-  return <AuthGuard>{children}</AuthGuard>; // protected route, use auth guard
+  return <AuthGuard>{children}</AuthGuard>; 
 }
