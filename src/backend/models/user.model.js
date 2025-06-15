@@ -32,9 +32,10 @@ const userSchema = new Schema(
     media: [
       {
         url: { type: String },
+        caption: { type: String, default: "" },
         public_id: { type: String },
         resource_type: { type: String },
-        uploadedAt: { type: Date, default: Date.now }, 
+        uploadedAt: { type: Date, default: Date.now },
       },
     ],
     refreshToken: {
