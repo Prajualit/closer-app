@@ -11,14 +11,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { useDispatch } from "react-redux";
 import { updateUser } from "@/redux/slice/userSlice.js";
+import { Input } from "@/components/ui/input";
 
 
 const CreateModal = ({ nav, activeNav }) => {
     const [file, setFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [caption, setCaption] = useState(""); // Added caption state
     const inputRef = useRef(null);
 
     const dispatch = useDispatch();
+
     useEffect(() => {
         if (!file) {
             setPreviewUrl(null);
@@ -54,6 +57,7 @@ const CreateModal = ({ nav, activeNav }) => {
             />
         </svg>
     );
+
     const handleSubmitFile = async () => {
         if (!file) {
             console.error("Please select a file first");
@@ -62,6 +66,7 @@ const CreateModal = ({ nav, activeNav }) => {
 
         const formData = new FormData();
         formData.append("file", file);
+        formData.append("caption", caption); // Add caption to form data
 
         try {
             const response = await fetch("http://localhost:5000/api/v1/create", {
@@ -71,12 +76,13 @@ const CreateModal = ({ nav, activeNav }) => {
             });
 
             if (response.ok) {
-                const data = await response.json(); 
+                const data = await response.json();
                 console.log("File uploaded successfully");
                 setFile(null);
                 setPreviewUrl(null);
+                setCaption(""); // Reset caption
 
-                dispatch(updateUser({ media: data.data.media })); 
+                dispatch(updateUser({ media: data.data.media }));
             } else {
                 console.error("Failed to upload file");
             }
@@ -84,7 +90,6 @@ const CreateModal = ({ nav, activeNav }) => {
             console.error("Error uploading file:", error);
         }
     };
-
 
     return (
         <Dialog>
@@ -104,57 +109,67 @@ const CreateModal = ({ nav, activeNav }) => {
                 <DialogHeader>
                     <DialogTitle>Create New Post</DialogTitle>
                 </DialogHeader>
-                <DialogDescription className="flex flex-col space-y-5 justify-center items-center text-lg text-black">
-                    <MediaIcon />
-                    Upload a photo or video
-                </DialogDescription>
-
+                {!file && (
+                    <DialogDescription className="flex flex-col space-y-5 justify-center items-center text-lg text-black">
+                        <MediaIcon />
+                        Upload a photo or video
+                    </DialogDescription>
+                )}
                 <DialogFooter className="flex flex-col items-center justify-center">
                     <div className="py-4 flex flex-col items-center space-y-3">
-                        <input
-                            ref={inputRef}
-                            type="file"
-                            accept="image/*,video/*"
-                            className="hidden"
-                            onChange={(e) => setFile(e.target.files?.[0] || null)}
-                        />
-                        <Button
-                            variant="outline"
-                            onClick={() => inputRef.current?.click()}
-                            className="rounded-[8px] hover:bg-black hover:text-white text-black duration-300"
-                        >
-                            {file ? "Change File" : "Select from Computer"}
-                        </Button>
-
                         {file && (
                             <>
+                                <div className="flex flex-col  justify-center space-y-4 ">
+                                    {previewUrl && file.type.startsWith("image/") && (
+                                        <img
+                                            src={previewUrl}
+                                            alt="Preview"
+                                            className="max-w-[20rem] max-h-[20rem] object-contain"
+                                        />
+                                    )}
+                                    {previewUrl && file.type.startsWith("video/") && (
+                                        <video
+                                            src={previewUrl}
+                                            controls
+                                            className="max-w-[20rem] max-h-[20rem] "
+                                        />
+                                    )}
+                                    <div>
+                                        <textarea
+                                            type="text"
+                                            placeholder="Add a caption"
+                                            value={caption}
+                                            className="w-full rounded border p-2 text-sm outline-neutral-400 "
+                                            onChange={(e) => setCaption(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
                                 <p className="text-sm text-neutral-500">Selected: {file.name}</p>
-
-                                {/* Preview Image or Video */}
-                                {previewUrl && file.type.startsWith("image/") && (
-                                    <img
-                                        src={previewUrl}
-                                        alt="Preview"
-                                        className="max-w-xs max-h-48 rounded-md mt-2 object-contain"
-                                    />
-                                )}
-                                {previewUrl && file.type.startsWith("video/") && (
-                                    <video
-                                        src={previewUrl}
-                                        controls
-                                        className="max-w-xs max-h-48 rounded-md mt-2"
-                                    />
-                                )}
                             </>
                         )}
-
-                        <Button
-                            className="mt-2 bg-black text-white rounded-[8px] hover:bg-neutral-800"
-                            onClick={handleSubmitFile}
-                            disabled={!file}
-                        >
-                            Upload
-                        </Button>
+                        <div className="flex items-center justify-center space-x-4">
+                            <Button
+                                className={`bg-black text-white rounded-[8px] hover:bg-neutral-800 ${!file && "hidden"} `}
+                                onClick={handleSubmitFile}
+                                disabled={!file}
+                            >
+                                Upload
+                            </Button>
+                            <input
+                                ref={inputRef}
+                                type="file"
+                                accept="image/*,video/*"
+                                className="hidden"
+                                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                            />
+                            <Button
+                                variant="outline"
+                                onClick={() => inputRef.current?.click()}
+                                className="rounded-[8px] hover:bg-black hover:text-white text-black duration-300"
+                            >
+                                {file ? "Change File" : "Select from Computer"}
+                            </Button>
+                        </div>
                     </div>
                 </DialogFooter>
             </DialogContent>
