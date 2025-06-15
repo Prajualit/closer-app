@@ -1,6 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import Image from "next/image";
+import EditProfile from "@/components/Modal/editProfile.modal";
 
 const Userdata = () => {
     const userDetails = useSelector((state) => state.user.user);
@@ -16,7 +17,7 @@ const Userdata = () => {
                         <h1 className="text-[32px] ">{userDetails.name}</h1>
                         <p className="italic text-neutral-500 ">{userDetails.bio}</p>
                     </div>
-                    <button className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Edit Profile</button>
+                    <EditProfile />
                 </div>
             </div>
         </div>
