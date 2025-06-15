@@ -16,35 +16,35 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
 
     return (
         <Dialog open={!!imageUrl || !!videoUrl} onOpenChange={onClose}>
-            <DialogContent className="flex max-w-[80%] h-[80%] border-none p-0 gap-0 rounded-lg overflow-hidden">
+            <DialogContent className="flex w-fit min-w-[60%] h-[80%] justify-center border-none p-0 gap-0 !rounded-lg overflow-hidden bg-transparent">
                 {videoUrl ? (
-                    <div className="w-fit min-w-[40%] max-w-[50%] flex items-center object-contain bg-[#000000] ">
+                    <div className="w-fit min-w-[40%] max-w-[50%] flex items-center object-contain bg-[#000000] rounded-l-lg">
                         <video
                             src={videoUrl.url}
                             controls
-                            className="object-contain w-full"
+                            className="object-contain w-full rounded-l-lg"
                             width={400}
                             height={400}
                             playsInline
                         />
                     </div>
                 ) : imageUrl ? (
-                    <div className="w-fit min-w-[40%] max-w-[50%] flex items-center object-contain bg-[#00000085] ">
+                    <div className="w-full h-full flex items-center object-contain bg-[#000000] rounded-l-lg">
                         <NextImage
                             src={imageUrl.url}
                             alt={`Enlarged view of ${user?.name || 'the media'}`}
                             width={400}
                             height={400}
-                            className="object-contain w-full"
+                            className="object-contain w-full rounded-l-lg"
                         />
                     </div>
                 ) : (
-                    <div className="flex items-center justify-center w-full h-full bg-[black] ">
+                    <div className="flex items-center justify-center w-full h-full bg-[black] rounded-l-lg">
                         <span>No media available</span>
                     </div>
                 )}
-                <div className="flex flex-col w-[40%] flex-1">
-                    <DialogTitle className="w-full h-[3rem] flex space-x-2 items-center px-3 bg-white border-[#0000003c]">
+                <div className="flex flex-col w-full rounded-r-lg overflow-hidden">
+                    <DialogTitle className="w-full h-[3rem] flex space-x-2 items-center px-3 bg-white border-[#0000003c] rounded-tr-lg">
                         <NextImage
                             src={user?.avatarUrl}
                             width={28}
@@ -54,10 +54,10 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                         />
                         <span>{user?.name || 'Unknown User'}</span>
                     </DialogTitle>
-                    <DialogDescription className="bg-white w-full flex-1 p-3 flex flex-col gap-2">
+                    <DialogDescription className="bg-white w-full flex-1 p-3 flex flex-col gap-2 rounded-br-lg">
                         <span>
                             <span className="font-semibold">{user?.username || 'unknown'}</span>
-                            &nbsp;Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta rerum mollitia dolore sunt! Quibusdam, quas?
+                            &nbsp;{imageUrl?.caption}
                         </span>
                         <span className='text-[13px] text-gray-500 font-semibold '>
                             {activeMedia?.uploadedAt
