@@ -6,7 +6,7 @@ import path from "path";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const uploadMedia = asyncHandler(async (req, res) => {
-  const userId = req.user?._id; // Make sure auth middleware sets req.user
+  const userId = req.user?._id;
   if (!userId) {
     throw new apiError(401, "Unauthorized: User not authenticated.");
   }
@@ -32,6 +32,7 @@ const uploadMedia = asyncHandler(async (req, res) => {
 
   user.media.push({
     url: uploadedFile.url,
+    caption: req.body.caption || "",
     public_id: uploadedFile.public_id,
     resource_type: uploadedFile.resource_type,
     uploadedAt: new Date(),
