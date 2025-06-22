@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/HomePg/Navbar.jsx";
-import Userdata from "@/components/HomePg/Profile/Userdata";
+import Userdata from "@/components/Profile/Userdata";
 import { useSelector } from "react-redux";
 import Image from "next/image";
-import Posts from "@/components/HomePg/Profile/Photos.jsx";
-import Films from "@/components/HomePg/Profile/Films.jsx";
+import Posts from "@/components/Profile/Photos.jsx";
+import Films from "@/components/Profile/Films.jsx";
 
 const Page = ({ params }) => {
     const userDetails = useSelector((state) => state.user.user);

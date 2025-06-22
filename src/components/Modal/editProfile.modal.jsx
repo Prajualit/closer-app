@@ -9,6 +9,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import LoadingButton from "@/components/Loadingbutton";
+import { Button } from "@/components/ui/button";
 import { useDispatch } from "react-redux";
 import { updateUser } from "@/redux/slice/userSlice.js";
 import { Input } from "@/components/ui/input";
@@ -180,15 +181,17 @@ const EditModal = ({ nav, activeNav }) => {
                                             className={`${!image ? "border-[1px]" : "border-none"
                                                 } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer p-4 `}
                                         >
-                                            {image ? (
-                                                <img
-                                                    src={URL.createObjectURL(image)}
-                                                    alt="Profile Preview"
-                                                    className="w-[170px] h-[170px] object-cover rounded-full"
-                                                />
-                                            ) : (
-                                                <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[166px] h-[166px]" />
-                                            )}
+                                            <div className='w-[166px] h-[166px] rounded-full overflow-hidden relative'>
+                                                {image ? (
+                                                    <img
+                                                        src={URL.createObjectURL(image)}
+                                                        alt="Profile Preview"
+                                                        className="w-[166px] h-[166px] object-cover rounded-full"
+                                                    />
+                                                ) : (
+                                                    <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[166px] h-[166px]" />
+                                                )}
+                                            </div>
                                             <input
                                                 ref={inputRef}
                                                 type="file"
@@ -206,6 +209,9 @@ const EditModal = ({ nav, activeNav }) => {
                                 <LoadingButton className="mt-3" pending={pending} disabled={pending}>
                                     Update Profile
                                 </LoadingButton>
+                                <Button className="mt-3 w-full bg-[#f7f7f7] shadow-md text-black rounded-[8px] transition-colors duration-300 hover:text-white hover:bg-[#cb3a3a]" >
+                                    Change Password
+                                </Button>
                             </form>
                         </CardContent>
                     </Card>

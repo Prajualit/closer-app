@@ -57,7 +57,7 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                     <DialogDescription className="bg-white w-full flex-1 p-3 flex flex-col gap-2 rounded-br-lg">
                         <span>
                             <span className="font-semibold">{user?.username || 'unknown'}</span>
-                            &nbsp;{imageUrl?.caption}
+                            &nbsp;{imageUrl?.caption || videoUrl?.caption}
                         </span>
                         <span className='text-[13px] text-gray-500 font-semibold '>
                             {activeMedia?.uploadedAt

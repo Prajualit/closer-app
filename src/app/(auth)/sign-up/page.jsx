@@ -146,15 +146,17 @@ const Page = () => {
                   className={`${!image ? "border-[1px]" : "border-none"
                     } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer p-4`}
                 >
-                  {image ? (
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt="Profile Preview"
-                      className="w-[150px] h-[150px] object-cover rounded-full"
-                    />
-                  ) : (
-                    <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[100px] h-[100px]" />
-                  )}
+                  <div className='w-[100px] h-[100px] rounded-full overflow-hidden relative'>
+                    {image ? (
+                      <img
+                        src={URL.createObjectURL(image)}
+                        alt="Profile Preview"
+                        className="w-[100px] h-[100px] object-cover rounded-full"
+                      />
+                    ) : (
+                      <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[100px] h-[100px]" />
+                    )}
+                  </div>
                   <input
                     ref={inputRef}
                     type="file"
