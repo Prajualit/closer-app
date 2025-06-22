@@ -154,23 +154,41 @@ const editUser = asyncHandler(async (req, res) => {
 
   const normalizedUsername = username.trim().toLowerCase();
 
-  const avatarLocalPath = path.normalize(req.file?.path);
-  if (!avatarLocalPath) {
-    throw new apiError(400, `Avatar is required ${avatarLocalPath}`);
+  let avatarUrl = null;
+
+  if (req.file?.path) {
+    const avatarLocalPath = path.normalize(req.file.path);
+
+    const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
+    if (!avatarUpload || !avatarUpload.url) {
+      throw new apiError(400, "Avatar upload failed");
+    }
+    avatarUrl = avatarUpload.url;
   }
 
-  const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
-  if (!avatarUpload || !avatarUpload.url) {
-    throw new apiError(400, `Avatar upload failed ${avatarUpload}`);
+  const updateFields = {};
+
+  if (username && username.trim()) {
+    updateFields.username = normalizedUsername;
   }
 
-  const user = await User.findByIdAndUpdate(req.user._id, {
-    username: normalizedUsername,
-    password,
-    name,
-    bio,
-    avatarUrl: !avatarUpload.url ? "" : avatarUpload.url,
-  });
+  if (name !== undefined) {
+    updateFields.name = name;
+  }
+
+  if (bio !== undefined) {
+    updateFields.bio = bio;
+  }
+
+  if (avatarUrl) {
+    updateFields.avatarUrl = avatarUrl;
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    updateFields,
+    { new: true, runValidators: true }
+  );
 
   if (!user) {
     throw new apiError(500, "Something went wrong while updating the user");
@@ -232,5 +250,5 @@ export {
   refreshAccessToken,
   registerUser,
   getCurrentUser,
-  editUser
+  editUser,
 };

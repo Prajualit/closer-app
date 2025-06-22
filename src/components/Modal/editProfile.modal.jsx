@@ -16,8 +16,6 @@ import { useForm } from "react-hook-form";
 import addImage from "@/assets/addImage.png";
 import Image from "next/image";
 
-
-
 const EditModal = ({ nav, activeNav }) => {
     const [pending, setPending] = useState(false);
     const [error, setError] = useState(null);
@@ -58,21 +56,33 @@ const EditModal = ({ nav, activeNav }) => {
         setPending(true);
         setError(null);
 
-        if (!image) {
-            setFormError("avatarUrl", {
-                type: "manual",
-                message: "Profile photo is required",
-            });
-            setPending(false);
-            return;
-        }
-
         try {
             const formData = new FormData();
-            formData.append("username", data.username);
-            formData.append("name", data.name);
-            formData.append("bio", data.bio);
-            formData.append("avatarUrl", image);
+
+            // Only append fields that have values
+            if (data.username && data.username.trim()) {
+                formData.append("username", data.username.trim());
+            }
+
+            if (data.name !== undefined && data.name !== null) {
+                formData.append("name", data.name);
+            }
+
+            if (data.bio !== undefined && data.bio !== null) {
+                formData.append("bio", data.bio);
+            }
+
+            // Only append avatar if a new image is selected
+            if (image) {
+                formData.append("avatarUrl", image);
+            }
+
+            // Check if at least one field is being updated
+            if (!formData.has("username") && !formData.has("name") && !formData.has("bio") && !formData.has("avatarUrl")) {
+                setError("Please update at least one field");
+                setPending(false);
+                return;
+            }
 
             const response = await fetch("http://localhost:5000/api/v1/users/update-profile", {
                 method: "POST",
@@ -86,10 +96,12 @@ const EditModal = ({ nav, activeNav }) => {
                 console.log("Profile Updated successfully");
                 dispatch(updateUser(responseData.data.user));
                 setImage(null);
-                inputRef.current.value = null;
+                if (inputRef.current) {
+                    inputRef.current.value = null;
+                }
             }
         } catch (error) {
-            console.log("Error during sign up:", error.message);
+            console.log("Error during profile update:", error.message);
             setError(error.message);
         } finally {
             setPending(false);
@@ -129,7 +141,12 @@ const EditModal = ({ nav, activeNav }) => {
                                                     disabled={pending}
                                                     autoFocus={field === "username"}
                                                     {...register(field, {
-                                                        required: `${field} is required`,
+                                                        validate: (value) => {
+                                                            if (field === "username" && value && value.trim().length === 0) {
+                                                                return "Username cannot be empty spaces";
+                                                            }
+                                                            return true;
+                                                        }
                                                     })}
                                                     autoComplete="off"
                                                     className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
@@ -144,7 +161,7 @@ const EditModal = ({ nav, activeNav }) => {
 
                                     <div className="space-y-1 w-full flex flex-col h-full">
                                         <label htmlFor={"avatar"} className="block text-sm font-medium text-gray-700">
-                                            Profile Photo
+                                            Profile Photo <span className="text-gray-500 text-xs">(Optional)</span>
                                         </label>
                                         <div
                                             onClick={handleImageClick}
