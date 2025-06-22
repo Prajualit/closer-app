@@ -3,11 +3,12 @@ export default function LoadingButton({
     pending,
     children,
     onClick,
+    className = "",
 }) {
     return (
         <Button
             onClick={onClick}
-            className="w-full border rounded-[7px] hover:bg-white  hover:text-black bg-black text-white duration-300"
+            className={`${className} w-full border rounded-[7px] hover:bg-white  hover:text-black bg-black text-white duration-300`}
             type="submit"
             disabled={pending}
         >

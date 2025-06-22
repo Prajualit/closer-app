@@ -7,12 +7,15 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import LoadingButton from "@/components/Loadingbutton";
 import { useDispatch } from "react-redux";
 import { updateUser } from "@/redux/slice/userSlice.js";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import addImage from "@/assets/addImage.png";
+import Image from "next/image";
+
 
 
 const EditModal = ({ nav, activeNav }) => {
@@ -83,7 +86,7 @@ const EditModal = ({ nav, activeNav }) => {
                 console.log("Profile Updated successfully");
                 dispatch(updateUser(responseData.data.user));
                 setImage(null);
-                inputRef.current.value = null; 
+                inputRef.current.value = null;
             }
         } catch (error) {
             console.log("Error during sign up:", error.message);
@@ -99,17 +102,21 @@ const EditModal = ({ nav, activeNav }) => {
                 <button className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Edit Profile</button>
             </DialogTrigger>
 
-            <DialogContent className="bg-white h-[80%] w-[40%]">
-                <DialogHeader><DialogTitle></DialogTitle></DialogHeader>
-                <div className="text-sm">
-                    <Card className="w-full max-w-[60%] rounded-xl shadow-md">
+            <DialogContent className="bg-white  w-[40%] ">
+                <VisuallyHidden>
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold">Edit Profile</DialogTitle>
+                    </DialogHeader>
+                </VisuallyHidden>
+                <div className="text-sm h-full">
+                    <Card className="w-full h-full border-none shadow-none">
                         <CardHeader>
-                            <CardTitle>Sign Up</CardTitle>
+                            <CardTitle>Edit Profile</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form noValidate onSubmit={handleSubmit(onSubmit)}>
-                                <div className="flex space-x-5">
-                                    <div className="w-full">
+                                <div className="flex space-x-5 ">
+                                    <div className="w-full flex flex-col h-full">
                                         {["username", "name", "bio"].map((field) => (
                                             <div key={field} className="mb-4 flex flex-col">
                                                 <label htmlFor={field} className="block text-sm font-medium text-gray-700">
@@ -125,11 +132,11 @@ const EditModal = ({ nav, activeNav }) => {
                                                         required: `${field} is required`,
                                                     })}
                                                     autoComplete="off"
-                                                    className={`mt-1 block w-full ${error[field] ? "border-red-500" : "border-gray-300"
+                                                    className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
                                                         }`}
                                                 />
-                                                {error[field] && (
-                                                    <p className="text-red-500 text-sm mt-1">{error[field].message}</p>
+                                                {errors[field] && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors[field].message}</p>
                                                 )}
                                             </div>
                                         ))}
@@ -142,16 +149,16 @@ const EditModal = ({ nav, activeNav }) => {
                                         <div
                                             onClick={handleImageClick}
                                             className={`${!image ? "border-[1px]" : "border-none"
-                                                } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer p-4`}
+                                                } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer p-4 `}
                                         >
                                             {image ? (
                                                 <img
                                                     src={URL.createObjectURL(image)}
                                                     alt="Profile Preview"
-                                                    className="w-[150px] h-[150px] object-cover rounded-full"
+                                                    className="w-[170px] h-[170px] object-cover rounded-full"
                                                 />
                                             ) : (
-                                                <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[100px] h-[100px]" />
+                                                <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[166px] h-[166px]" />
                                             )}
                                             <input
                                                 ref={inputRef}
@@ -166,13 +173,9 @@ const EditModal = ({ nav, activeNav }) => {
                                         )}
                                     </div>
                                 </div>
-
-                                {/* General error */}
                                 {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-
-                                {/* Submit Button */}
-                                <LoadingButton pending={pending} disabled={pending}>
-                                    Sign up
+                                <LoadingButton className="mt-3" pending={pending} disabled={pending}>
+                                    Update Profile
                                 </LoadingButton>
                             </form>
                         </CardContent>
