@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
-import path from "path";
+import path, { normalize } from "path";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 
@@ -149,6 +149,38 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, {}, "User logged out successfully"));
 });
 
+const editUser = asyncHandler(async (req, res) => {
+  const { name, bio, username } = req.body;
+
+  const normalizedUsername = username.trim().toLowerCase();
+
+  const avatarLocalPath = path.normalize(req.file?.path);
+  if (!avatarLocalPath) {
+    throw new apiError(400, `Avatar is required ${avatarLocalPath}`);
+  }
+
+  const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
+  if (!avatarUpload || !avatarUpload.url) {
+    throw new apiError(400, `Avatar upload failed ${avatarUpload}`);
+  }
+
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    username: normalizedUsername,
+    password,
+    name,
+    bio,
+    avatarUrl: !avatarUpload.url ? "" : avatarUpload.url,
+  });
+
+  if (!user) {
+    throw new apiError(500, "Something went wrong while updating the user");
+  }
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, user, "User updated successfully"));
+});
+
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken =
     req.cookies.refreshToken || req.body.refreshToken;
@@ -200,4 +232,5 @@ export {
   refreshAccessToken,
   registerUser,
   getCurrentUser,
+  editUser
 };
