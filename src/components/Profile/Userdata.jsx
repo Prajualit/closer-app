@@ -9,7 +9,10 @@ const Userdata = () => {
     return (
         <div>
             <div className="flex items-center justify-center w-full space-x-32 ">
-                <Image height={250} width={250} className="rounded-full" src={userDetails.avatarUrl} alt="" />
+                <div className='w-[250px] h-[250px] rounded-full overflow-hidden relative'>
+
+                <Image height={250} width={250} className="rounded-full object-cover w-full h-full bg-center " src={userDetails.avatarUrl} alt="" />
+                </div>
                 <div className="flex flex-col space-y-3 items-start ">
                     <div className="flex flex-col items-start justify-center">
                         <h1 className=" text-neutral-500">{userDetails.username}
