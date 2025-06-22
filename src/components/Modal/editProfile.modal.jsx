@@ -27,10 +27,10 @@ const EditModal = ({ nav, activeNav }) => {
     const {
         register,
         handleSubmit,
-        watch,
         setError: setFormError,
         clearErrors,
         formState: { errors },
+        reset,
     } = useForm();
 
     const handleImageClick = () => {
@@ -87,6 +87,7 @@ const EditModal = ({ nav, activeNav }) => {
             const response = await fetch("http://localhost:5000/api/v1/users/update-profile", {
                 method: "POST",
                 body: formData,
+                credentials: "include",
             });
 
             const responseData = await response.json();
@@ -105,6 +106,16 @@ const EditModal = ({ nav, activeNav }) => {
             setError(error.message);
         } finally {
             setPending(false);
+            setImage(null);
+            clearErrors();
+            reset({
+                username: '',
+                name: '',
+                bio: ''
+            });
+            if (inputRef.current) {
+                inputRef.current.value = null;
+            }
         }
     };
 
@@ -124,6 +135,7 @@ const EditModal = ({ nav, activeNav }) => {
                     <Card className="w-full h-full border-none shadow-none">
                         <CardHeader>
                             <CardTitle>Edit Profile</CardTitle>
+                            <p className="text-sm text-gray-500">You need to fill in at least one field to update your profile.</p>
                         </CardHeader>
                         <CardContent>
                             <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -199,7 +211,7 @@ const EditModal = ({ nav, activeNav }) => {
                     </Card>
                 </div>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }
 

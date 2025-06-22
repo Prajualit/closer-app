@@ -5,6 +5,7 @@ import { apiResponse } from "../utils/apiResponse.js";
 import path, { normalize } from "path";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
+import { access } from "fs";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -117,7 +118,11 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const options = { httpOnly: true, secure: false };
+  const options = {
+    httpOnly: true,
+    secure: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
 
   // send response
   return res
@@ -152,9 +157,20 @@ const logoutUser = asyncHandler(async (req, res) => {
 const editUser = asyncHandler(async (req, res) => {
   const { name, bio, username } = req.body;
 
-  const normalizedUsername = username.trim().toLowerCase();
+  const updateFields = {};
 
-  let avatarUrl = null;
+  if (username && username.trim()) {
+    const normalizedUsername = username.trim().toLowerCase();
+    updateFields.username = normalizedUsername;
+  }
+
+  if (name !== undefined && name !== null && name.trim()) {
+    updateFields.name = name;
+  }
+
+  if (bio !== undefined && bio !== null && bio.trim()) {
+    updateFields.bio = bio;
+  }
 
   if (req.file?.path) {
     const avatarLocalPath = path.normalize(req.file.path);
@@ -163,40 +179,55 @@ const editUser = asyncHandler(async (req, res) => {
     if (!avatarUpload || !avatarUpload.url) {
       throw new apiError(400, "Avatar upload failed");
     }
-    avatarUrl = avatarUpload.url;
+
+    updateFields.avatarUrl = avatarUpload.url;
   }
 
-  const updateFields = {};
-
-  if (username && username.trim()) {
-    updateFields.username = normalizedUsername;
+  if (Object.keys(updateFields).length === 0) {
+    throw new apiError(400, "No fields provided for update");
   }
 
-  if (name !== undefined) {
-    updateFields.name = name;
-  }
-
-  if (bio !== undefined) {
-    updateFields.bio = bio;
-  }
-
-  if (avatarUrl) {
-    updateFields.avatarUrl = avatarUrl;
-  }
-
-  const user = await User.findByIdAndUpdate(
-    req.user._id,
-    updateFields,
-    { new: true, runValidators: true }
+  const updateResult = await User.updateOne(
+    { _id: req.user._id },
+    { $set: updateFields }
   );
 
-  if (!user) {
-    throw new apiError(500, "Something went wrong while updating the user");
+  if (updateResult.matchedCount === 0) {
+    throw new apiError(404, "User not found");
   }
+
+  if (updateResult.modifiedCount === 0) {
+    throw new apiError(400, "No changes were made");
+  }
+
+  // Get the updated user
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    throw new apiError(500, "Something went wrong while fetching updated user");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    user._id
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
 
   return res
     .status(200)
-    .json(new apiResponse(200, user, "User updated successfully"));
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new apiResponse(
+        200,
+        { user, accessToken, refreshToken },
+        "User updated successfully"
+      )
+    );
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -223,7 +254,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       throw new apiError(401, "Refresh token is expired or used");
     }
 
-    const options = { httpOnly: true, secure: false };
+    const options = {
+      httpOnly: true,
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    };
 
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessAndRefreshTokens(user._id);

@@ -21,7 +21,7 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/getUser").get(verifyJWT, getCurrentUser);
 router
-  .route("/update-user")
+  .route("/update-profile")
   .post(verifyJWT, upload.single("avatarUrl"), editUser);
 
 export default router;
