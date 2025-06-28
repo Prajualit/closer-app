@@ -279,6 +279,68 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
+const verifyPassword = asyncHandler(async (req, res) => {
+  const { currentPassword } = req.body;
+
+  // Validation
+  if (!currentPassword || currentPassword.trim() === "") {
+    throw new apiError(400, "Current password is required");
+  }
+
+  // Get user from database
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new apiError(404, "User not found");
+  }
+
+  // Verify current password
+  const isPasswordValid = await user.verifyPassword(currentPassword);
+  if (!isPasswordValid) {
+    throw new apiError(401, "Current password is incorrect");
+  }
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, {}, "Password verified successfully"));
+});
+
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  // Validation
+  if (!currentPassword || !newPassword) {
+    throw new apiError(400, "Current password and new password are required");
+  }
+
+  if (currentPassword.trim() === "" || newPassword.trim() === "") {
+    throw new apiError(400, "Passwords cannot be empty");
+  }
+
+  if (currentPassword === newPassword) {
+    throw new apiError(400, "New password must be different from current password");
+  }
+
+  // Get user from database
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new apiError(404, "User not found");
+  }
+
+  // Verify current password
+  const isPasswordValid = await user.verifyPassword(currentPassword);
+  if (!isPasswordValid) {
+    throw new apiError(401, "Current password is incorrect");
+  }
+
+  // Update password
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, {}, "Password changed successfully"));
+});
+
 export {
   loginUser,
   logoutUser,
@@ -286,4 +348,6 @@ export {
   registerUser,
   getCurrentUser,
   editUser,
+  verifyPassword,
+  changePassword,
 };
