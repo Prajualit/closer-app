@@ -16,14 +16,20 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import addImage from "@/assets/addImage.png";
 import Image from "next/image";
+import { useToast } from "@/hooks/use-toast";
 
 const EditModal = ({ nav, activeNav }) => {
     const [pending, setPending] = useState(false);
     const [error, setError] = useState(null);
     const [image, setImage] = useState(null);
     const inputRef = useRef(null);
+    const [changePassword, setChangePassword] = useState(false);
+    const [passwordStep, setPasswordStep] = useState(1); // 1: current password, 2: new password
+    const [isOpen, setIsOpen] = useState(false);
+    const [currentPasswordValue, setCurrentPasswordValue] = useState(""); // Store current password
 
     const dispatch = useDispatch();
+    const { toast } = useToast();
 
     const {
         register,
@@ -32,7 +38,28 @@ const EditModal = ({ nav, activeNav }) => {
         clearErrors,
         formState: { errors },
         reset,
+        watch,
     } = useForm();
+
+    const resetModal = () => {
+        setChangePassword(false);
+        setPasswordStep(1);
+        setError(null);
+        setImage(null);
+        setCurrentPasswordValue("");
+        clearErrors();
+        reset();
+        if (inputRef.current) {
+            inputRef.current.value = null;
+        }
+    };
+
+    const handleModalOpenChange = (open) => {
+        setIsOpen(open);
+        if (!open) {
+            resetModal();
+        }
+    };
 
     const handleImageClick = () => {
         inputRef.current.click();
@@ -97,6 +124,11 @@ const EditModal = ({ nav, activeNav }) => {
             } else {
                 console.log("Profile Updated successfully");
                 dispatch(updateUser(responseData.data.user));
+                toast({
+                    title: "Profile Updated",
+                    description: "Your profile has been successfully updated.",
+                    variant: "success",
+                });
                 setImage(null);
                 if (inputRef.current) {
                     inputRef.current.value = null;
@@ -120,8 +152,70 @@ const EditModal = ({ nav, activeNav }) => {
         }
     };
 
+    const onSubmitPassword = async (data) => {
+        setPending(true);
+        setError(null);
+
+        try {
+            if (passwordStep === 1) {
+                // Verify current password
+                const response = await fetch("http://localhost:5000/api/v1/users/verify-password", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        currentPassword: data.currentPassword,
+                    }),
+                    credentials: "include",
+                });
+
+                const responseData = await response.json();
+                if (!responseData.success) {
+                    throw new Error(responseData.message);
+                } else {
+                    // Store current password and move to step 2
+                    setCurrentPasswordValue(data.currentPassword);
+                    setPasswordStep(2);
+                    reset(); // Clear form for step 2
+                }
+            } else {
+                // Change password (step 2)
+                const response = await fetch("http://localhost:5000/api/v1/users/change-password", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        currentPassword: currentPasswordValue,
+                        newPassword: data.newPassword,
+                    }),
+                    credentials: "include",
+                });
+
+                const responseData = await response.json();
+                if (!responseData.success) {
+                    throw new Error(responseData.message);
+                } else {
+                    console.log("Password changed successfully");
+                    toast({
+                        title: "Password Changed",
+                        description: "Your password has been successfully updated.",
+                        variant: "success",
+                    });
+                    resetModal();
+                }
+            }
+        } catch (error) {
+            console.log("Error during password operation:", error.message);
+            setError(error.message);
+        } finally {
+            setPending(false);
+        }
+    }
+
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={handleModalOpenChange}>
             <DialogTrigger asChild>
                 <button className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Edit Profile</button>
             </DialogTrigger>
@@ -135,84 +229,173 @@ const EditModal = ({ nav, activeNav }) => {
                 <div className="text-sm h-full">
                     <Card className="w-full h-full border-none shadow-none">
                         <CardHeader>
-                            <CardTitle>Edit Profile</CardTitle>
-                            <p className="text-sm text-gray-500">You need to fill in at least one field to update your profile.</p>
+                            <CardTitle>
+                                {changePassword 
+                                    ? (passwordStep === 1 ? "Verify Current Password" : "Set New Password")
+                                    : "Edit Profile"
+                                }
+                            </CardTitle>
+                            <p className="text-sm text-gray-500">
+                                {changePassword 
+                                    ? (passwordStep === 1 
+                                        ? "Please enter your current password to continue." 
+                                        : "Enter your new password and confirm it."
+                                    )
+                                    : "You need to fill in at least one field to update your profile."
+                                }
+                            </p>
                         </CardHeader>
                         <CardContent>
-                            <form noValidate onSubmit={handleSubmit(onSubmit)}>
-                                <div className="flex space-x-5 ">
-                                    <div className="w-full flex flex-col h-full">
-                                        {["username", "name", "bio"].map((field) => (
-                                            <div key={field} className="mb-4 flex flex-col">
-                                                <label htmlFor={field} className="block text-sm font-medium text-gray-700">
-                                                    {field.charAt(0).toUpperCase() + field.slice(1)}
-                                                </label>
-                                                <Input
-                                                    id={field}
-                                                    type={"text"}
-                                                    placeholder={`Enter your ${field}`}
-                                                    disabled={pending}
-                                                    autoFocus={field === "username"}
-                                                    {...register(field, {
-                                                        validate: (value) => {
-                                                            if (field === "username" && value && value.trim().length === 0) {
-                                                                return "Username cannot be empty spaces";
+                            {!changePassword ? (
+                                <form noValidate onSubmit={handleSubmit(onSubmit)}>
+                                    <div className="flex space-x-5 ">
+                                        <div className="w-full flex flex-col h-full">
+                                            {["username", "name", "bio"].map((field) => (
+                                                <div key={field} className="mb-4 flex flex-col">
+                                                    <label htmlFor={field} className="block text-sm font-medium text-gray-700">
+                                                        {field.charAt(0).toUpperCase() + field.slice(1)}
+                                                    </label>
+                                                    <Input
+                                                        id={field}
+                                                        type={"text"}
+                                                        placeholder={`Enter your ${field}`}
+                                                        disabled={pending}
+                                                        autoFocus={field === "username"}
+                                                        {...register(field, {
+                                                            validate: (value) => {
+                                                                if (field === "username" && value && value.trim().length === 0) {
+                                                                    return "Username cannot be empty spaces";
+                                                                }
+                                                                return true;
                                                             }
-                                                            return true;
-                                                        }
-                                                    })}
-                                                    autoComplete="off"
-                                                    className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
-                                                        }`}
-                                                />
-                                                {errors[field] && (
-                                                    <p className="text-red-500 text-sm mt-1">{errors[field].message}</p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="space-y-1 w-full flex flex-col h-full">
-                                        <label htmlFor={"avatar"} className="block text-sm font-medium text-gray-700">
-                                            Profile Photo <span className="text-gray-500 text-xs">(Optional)</span>
-                                        </label>
-                                        <div
-                                            onClick={handleImageClick}
-                                            className={`${!image ? "border-[1px]" : "border-none"
-                                                } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer p-4 `}
-                                        >
-                                            <div className='w-[166px] h-[166px] rounded-full overflow-hidden relative'>
-                                                {image ? (
-                                                    <img
-                                                        src={URL.createObjectURL(image)}
-                                                        alt="Profile Preview"
-                                                        className="w-[166px] h-[166px] object-cover rounded-full"
+                                                        })}
+                                                        autoComplete="off"
+                                                        className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
+                                                            }`}
                                                     />
-                                                ) : (
-                                                    <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[166px] h-[166px]" />
-                                                )}
-                                            </div>
-                                            <input
-                                                ref={inputRef}
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleImageChange}
-                                                style={{ display: "none" }}
-                                            />
+                                                    {errors[field] && (
+                                                        <p className="text-red-500 text-sm mt-1">{errors[field].message}</p>
+                                                    )}
+                                                </div>
+                                            ))}
                                         </div>
-                                        {errors.avatarUrl && (
-                                            <p className="text-red-500 text-sm mt-1">{errors.avatarUrl.message}</p>
+
+                                        <div className="space-y-1 w-full flex flex-col h-full">
+                                            <label htmlFor={"avatar"} className="block text-sm font-medium text-gray-700">
+                                                Profile Photo <span className="text-gray-500 text-xs">(Optional)</span>
+                                            </label>
+                                            <div
+                                                onClick={handleImageClick}
+                                                className={`${!image ? "border-[1px]" : "border-none"
+                                                    } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer p-4 `}
+                                            >
+                                                <div className='w-[166px] h-[166px] rounded-full overflow-hidden relative'>
+                                                    {image ? (
+                                                        <img
+                                                            src={URL.createObjectURL(image)}
+                                                            alt="Profile Preview"
+                                                            className="w-[166px] h-[166px] object-cover rounded-full"
+                                                        />
+                                                    ) : (
+                                                        <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[166px] h-[166px]" />
+                                                    )}
+                                                </div>
+                                                <input
+                                                    ref={inputRef}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                    style={{ display: "none" }}
+                                                />
+                                            </div>
+                                            {errors.avatarUrl && (
+                                                <p className="text-red-500 text-sm mt-1">{errors.avatarUrl.message}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+                                    <LoadingButton className="mt-3" pending={pending} disabled={pending}>
+                                        Update Profile
+                                    </LoadingButton>
+                                </form>
+                            ) : (
+                                <form noValidate onSubmit={handleSubmit(onSubmitPassword)}>
+                                    <div className="flex flex-col space-y-4">
+                                        {passwordStep === 1 ? (
+                                            // Step 1: Current Password
+                                            <>
+                                                <Input
+                                                    type="password"
+                                                    placeholder="Current Password"
+                                                    {...register("currentPassword", { required: "Current password is required" })}
+                                                    className={`mt-1 block w-full ${errors.currentPassword ? "border-red-500" : "border-gray-300"}`}
+                                                />
+                                                {errors.currentPassword && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.currentPassword.message}</p>
+                                                )}
+                                            </>
+                                        ) : (
+                                            // Step 2: New Password and Confirm
+                                            <>
+                                                <Input
+                                                    type="password"
+                                                    placeholder="New Password"
+                                                    {...register("newPassword", { required: "New password is required" })}
+                                                    className={`mt-1 block w-full ${errors.newPassword ? "border-red-500" : "border-gray-300"}`}
+                                                />
+                                                {errors.newPassword && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.newPassword.message}</p>
+                                                )}
+
+                                                <Input
+                                                    type="password"
+                                                    placeholder="Confirm New Password"
+                                                    {...register("confirmNewPassword", {
+                                                        validate: (value) => value === watch("newPassword") || "Passwords do not match",
+                                                        required: "Please confirm your new password"
+                                                    })}
+                                                    className={`mt-1 block w-full ${errors.confirmNewPassword ? "border-red-500" : "border-gray-300"}`}
+                                                />
+                                                {errors.confirmNewPassword && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.confirmNewPassword.message}</p>
+                                                )}
+                                            </>
                                         )}
                                     </div>
-                                </div>
-                                {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-                                <LoadingButton className="mt-3" pending={pending} disabled={pending}>
-                                    Update Profile
-                                </LoadingButton>
-                                <Button className="mt-3 w-full bg-[#f7f7f7] shadow-md text-black rounded-[8px] transition-colors duration-300 hover:text-white hover:bg-[#cb3a3a]" >
-                                    Change Password
+                                    {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+                                    <LoadingButton className="flex-1 mt-3" pending={pending} disabled={pending}>
+                                        {passwordStep === 1 ? "Verify Password" : "Update Password"}
+                                    </LoadingButton>
+
+                                </form>
+                            )}
+                            {changePassword && passwordStep === 2 && (
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        setPasswordStep(1);
+                                        setCurrentPasswordValue("");
+                                        reset();
+                                        clearErrors();
+                                    }}
+                                    className="mt-3 w-full bg-gray-200 text-black rounded-[8px] hover:bg-gray-300"
+                                >
+                                    Back to Current Password
                                 </Button>
-                            </form>
+                            )}
+                            <Button
+                                type="button"
+                                onClick={() => {
+                                    if (changePassword) {
+                                        resetModal();
+                                    } else {
+                                        setChangePassword(true);
+                                    }
+                                }}
+                                className="mt-3 w-full bg-[#f7f7f7] shadow-md text-black rounded-[8px] transition-colors duration-300 hover:text-white hover:bg-[#cb3a3a]"
+                            >
+                                {changePassword ? "Cancel" : "Change Password"}
+                            </Button>
                         </CardContent>
                     </Card>
                 </div>
