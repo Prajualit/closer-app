@@ -1,11 +1,31 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import UserAvatar from '../ui/UserAvatar'
 import { apiError } from '@/backend/utils/apiError'
 import { useRouter } from "next/navigation";
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
+import LoadingButton from '../Loadingbutton';
+import { Button } from '../ui/button';
 
 const UserButton = () => {
+    const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef(null)
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false)
+            }
+        }
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside)
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [isOpen])
 
 
     const router = useRouter();
@@ -31,12 +51,45 @@ const UserButton = () => {
 
     const userDetails = useSelector((state) => state.user.user);
     return (
-        <button
-            onClick={handleLogout}
-            className='hover:bg-[#efefef] transition-colors duration-300 rounded-[8px] flex space-x-2 w-full items-center px-4 py-2'>
-            {userDetails ? <Image width={32} height={32} className='rounded-full' src={userDetails.avatarUrl} alt="" /> : <UserAvatar />}
-            <span>{userDetails.name.split(" ")[0]}</span>
-        </button>
+        <div className="relative" ref={dropdownRef}>
+            <div className={`absolute bottom-full left-0 mb-2 z-50 rounded-lg transition-all duration-300 ease-in-out transform ${
+                isOpen 
+                    ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' 
+                    : 'opacity-0 scale-95 translate-y-2 pointer-events-none'
+            }`}>
+                <div className="bg-neutral-50 shadow-lg shadow-[#adadad] rounded-xl w-80 p-5 flex flex-col justify-between min-h-[300px]">
+                    <div>
+                        <div className='flex items-center space-x-3 mt-4'>
+                            <div className='flex items-center justify-center rounded-full w-[64px] h-[64px] overflow-hidden'>
+                                {userDetails && <Image width={64} height={64} className='rounded-full object-cover bg-center' src={userDetails.avatarUrl} alt="" />}
+                            </div>
+                            <div>
+                                <h3 className='text-lg font-semibold'>{userDetails.name}</h3>
+                                <p className='text-sm text-neutral-500'>{userDetails.username}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='flex flex-col space-y-3'>
+                        <LoadingButton
+                            onClick={handleLogout}
+                        >
+                            Logout
+                        </LoadingButton>
+                        <Button className='w-full py-3 shadow-lg shadow-[#adadad] rounded-[5px] !bg-red-500 text-white hover:!bg-red-600 transition-colors duration-300'>
+                            Delete Account
+                        </Button>
+                    </div>
+                </div>
+            </div>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className='hover:bg-[#efefef] transition-colors duration-300 rounded-[8px] flex space-x-2 w-full items-center px-4 py-2' >
+                <div className='flex items-center justify-center rounded-full w-[32px] h-[32px] overflow-hidden'>
+                    {userDetails ? <Image width={32} height={32} className='rounded-full object-cover bg-center ' src={userDetails.avatarUrl} alt="" /> : <UserAvatar />}
+                </div>
+                <span>{userDetails.name.split(" ")[0]}</span>
+            </button >
+        </div>
     )
 }
 
