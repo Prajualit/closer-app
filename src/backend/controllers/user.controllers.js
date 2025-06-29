@@ -363,6 +363,27 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, {}, "User account deleted successfully"));
 });
 
+const searchUsers = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || query.trim().length < 2) {
+    throw new apiError(400, "Search query must be at least 2 characters long");
+  }
+
+  const searchRegex = new RegExp(query.trim(), "i");
+
+  const users = await User.find({
+    $or: [{ username: searchRegex }, { name: searchRegex }],
+    _id: { $ne: req.user._id }, // Exclude current user
+  })
+    .select("username name avatarUrl bio")
+    .limit(20);
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, users, "Users retrieved successfully"));
+});
+
 export {
   loginUser,
   logoutUser,
@@ -373,4 +394,5 @@ export {
   verifyPassword,
   changePassword,
   deleteUserAccount,
+  searchUsers,
 };
