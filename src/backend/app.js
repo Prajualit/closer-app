@@ -17,9 +17,11 @@ app.use("/temp", express.static("temp"));
 // Routes
 import userRouter from "./Routes/user.routes.js";
 import createRouter from "./Routes/create.route.js";
+import chatRouter from "./Routes/chat.route.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1", createRouter);
+app.use("/api/v1/chat", chatRouter);
 
 
 export { app };
