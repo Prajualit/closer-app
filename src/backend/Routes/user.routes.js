@@ -9,6 +9,7 @@ import {
   verifyPassword,
   changePassword,
   deleteUserAccount,
+  searchUsers,
 } from "../controllers/user.controllers.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
@@ -23,6 +24,7 @@ router.route("/refresh-token").post(refreshAccessToken);
 // secured routes
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/getUser").get(verifyJWT, getCurrentUser);
+router.route("/search").get(verifyJWT, searchUsers);
 router
   .route("/update-profile")
   .post(verifyJWT, upload.single("avatarUrl"), editUser);
