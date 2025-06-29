@@ -317,7 +317,10 @@ const changePassword = asyncHandler(async (req, res) => {
   }
 
   if (currentPassword === newPassword) {
-    throw new apiError(400, "New password must be different from current password");
+    throw new apiError(
+      400,
+      "New password must be different from current password"
+    );
   }
 
   // Get user from database
@@ -341,6 +344,25 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, {}, "Password changed successfully"));
 });
 
+const deleteUserAccount = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndDelete(req.user._id);
+  if (!user) {
+    throw new apiError(404, "User not found");
+  }
+
+  const options = {
+    httpOnly: true,
+    secure: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+
+  res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new apiResponse(200, {}, "User account deleted successfully"));
+});
+
 export {
   loginUser,
   logoutUser,
@@ -350,4 +372,5 @@ export {
   editUser,
   verifyPassword,
   changePassword,
+  deleteUserAccount,
 };

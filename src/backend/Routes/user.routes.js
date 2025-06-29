@@ -8,6 +8,7 @@ import {
   editUser,
   verifyPassword,
   changePassword,
+  deleteUserAccount,
 } from "../controllers/user.controllers.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
@@ -27,5 +28,6 @@ router
   .post(verifyJWT, upload.single("avatarUrl"), editUser);
 router.route("/verify-password").post(verifyJWT, verifyPassword);
 router.route("/change-password").post(verifyJWT, changePassword);
+router.route("/delete-account").delete(verifyJWT, deleteUserAccount);
 
 export default router;

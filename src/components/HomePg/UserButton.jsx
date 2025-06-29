@@ -6,10 +6,12 @@ import { useSelector } from 'react-redux';
 import Image from 'next/image';
 import LoadingButton from '../Loadingbutton';
 import { Button } from '../ui/button';
+import { useToast } from "@/hooks/use-toast";
 
 const UserButton = () => {
     const [isOpen, setIsOpen] = useState(false)
     const dropdownRef = useRef(null)
+    const { toast } = useToast();
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -41,6 +43,11 @@ const UserButton = () => {
 
             if (data.success) {
                 router.push("/sign-in");
+                toast({
+                    title: "Logged Out",
+                    description: "You have been successfully logged out.",
+                    variant: "success",
+                });
             } else {
                 apiError(401, data.error);
             }
@@ -49,14 +56,42 @@ const UserButton = () => {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+            setIsOpen(false);
+            return;
+        }
+        try {
+            const response = await fetch(`http://localhost:5000/api/v1/users/delete-account`, {
+                method: "DELETE",
+                credentials: "include",
+            });
+            const data = await response.json();
+            console.log("Data:", data);
+            if (data.success) {
+                router.push("/sign-in");
+                toast({
+                    title: "Account Deleted",
+                    description: "Your account has been successfully deleted.",
+                    variant: "success",
+                });
+            } else {
+                apiError(401, data.error);
+            }
+        } catch (error) {
+            console.error("Error during account deletion:", error.message);
+        } finally {
+            setIsOpen(false);
+        }
+    }
+
     const userDetails = useSelector((state) => state.user.user);
     return (
         <div className="relative" ref={dropdownRef}>
-            <div className={`absolute bottom-full left-0 mb-2 z-50 rounded-lg transition-all duration-300 ease-in-out transform ${
-                isOpen 
-                    ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' 
-                    : 'opacity-0 scale-95 translate-y-2 pointer-events-none'
-            }`}>
+            <div className={`absolute bottom-full left-0 mb-2 z-50 rounded-lg transition-all duration-300 ease-in-out transform ${isOpen
+                ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
+                : 'opacity-0 scale-95 translate-y-2 pointer-events-none'
+                }`}>
                 <div className="bg-neutral-50 shadow-lg shadow-[#adadad] rounded-xl w-80 p-5 flex flex-col justify-between min-h-[300px]">
                     <div>
                         <div className='flex items-center space-x-3 mt-4'>
@@ -75,7 +110,9 @@ const UserButton = () => {
                         >
                             Logout
                         </LoadingButton>
-                        <Button className='w-full py-3 shadow-lg shadow-[#adadad] rounded-[5px] !bg-red-500 text-white hover:!bg-red-600 transition-colors duration-300'>
+                        <Button
+                            onClick={handleDeleteAccount}
+                            className='w-full py-3 shadow-lg shadow-[#adadad] rounded-[5px] !bg-red-500 text-white hover:!bg-red-600 transition-colors duration-300'>
                             Delete Account
                         </Button>
                     </div>
