@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSocket } from '@/lib/SocketContext';
 import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +20,7 @@ const ChatInterface = ({ chatRoom, onBack }) => {
 
     const { socket, joinChat, sendMessage, emitTyping, emitStopTyping } = useSocket();
     const userDetails = useSelector((state) => state.user.user);
+    const router = useRouter();
     const messagesEndRef = useRef(null);
     const typingTimeoutRef = useRef(null);
     const { toast } = useToast();
@@ -194,7 +196,10 @@ const ChatInterface = ({ chatRoom, onBack }) => {
                         ←
                     </Button>
                     {otherParticipant && (
-                        <>
+                        <div 
+                            className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200"
+                            onClick={() => router.push(`/profile/${otherParticipant._id}`)}
+                        >
                             <div className="w-10 h-10 rounded-full overflow-hidden">
                                 <Image
                                     src={otherParticipant.avatarUrl}
@@ -208,7 +213,7 @@ const ChatInterface = ({ chatRoom, onBack }) => {
                                 <h3 className="font-semibold">{otherParticipant.name}</h3>
                                 <p className="text-sm text-gray-500">@{otherParticipant.username}</p>
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
                 <Button variant="ghost" size="sm">

@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, MessageCircle, Plus } from 'lucide-react';
+import { Search, MessageCircle, Plus, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ChatList = ({ onSelectChat, selectedChatId }) => {
@@ -17,6 +18,7 @@ const ChatList = ({ onSelectChat, selectedChatId }) => {
     const [searchLoading, setSearchLoading] = useState(false);
 
     const userDetails = useSelector((state) => state.user.user);
+    const router = useRouter();
     const { toast } = useToast();
 
     useEffect(() => {
@@ -127,6 +129,11 @@ const ChatList = ({ onSelectChat, selectedChatId }) => {
         return participants.find(p => p._id !== userDetails?._id);
     };
 
+    const handleViewProfile = (e, userId) => {
+        e.stopPropagation(); // Prevent chat selection
+        router.push(`/profile/${userId}`);
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-full">
@@ -163,11 +170,7 @@ const ChatList = ({ onSelectChat, selectedChatId }) => {
                         <div className='flex flex-col space-y-2'>
                             {searchUsers.length > 0 ? (
                                 searchUsers.map((user) => (
-                                    <button
-                                        key={user._id}
-                                        onClick={() => startNewChat(user._id)}
-                                        className="w-full bg-white flex items-center space-x-3 p-5 hover:shadow-lg shadow-md focus:shadow-lg rounded-[10px] transition-all duration-300 "
-                                    >
+                                    <div key={user._id} className="w-full bg-white flex items-center space-x-3 p-3 hover:shadow-lg shadow-md rounded-[10px] transition-all duration-300">
                                         <div className="w-10 h-10 rounded-full overflow-hidden">
                                             <Image
                                                 src={user.avatarUrl}
@@ -181,8 +184,24 @@ const ChatList = ({ onSelectChat, selectedChatId }) => {
                                             <p className="font-medium">{user.name}</p>
                                             <p className="text-sm text-gray-500">@{user.username}</p>
                                         </div>
-                                        <Plus className="w-4 h-4 text-gray-400" />
-                                    </button>
+                                        <div className="flex space-x-2">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={(e) => handleViewProfile(e, user._id)}
+                                                className="p-2"
+                                            >
+                                                <Info className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                onClick={() => startNewChat(user._id)}
+                                                className="p-2"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
                                 ))
                             ) : !searchLoading && (
                                 <div className="text-sm text-gray-500 p-2">
@@ -203,33 +222,44 @@ const ChatList = ({ onSelectChat, selectedChatId }) => {
                             const isSelected = selectedChatId === chatRoom.chatId;
 
                             return (
-                                <button
+                                <div
                                     key={chatRoom._id}
-                                    onClick={() => onSelectChat(chatRoom)}
-                                    className={`w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-[#ededed] border-r-2' : 'hover:bg-[#f3f3f3] transition-colors duration-300'
-                                        }`}
+                                    className={`group w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-[#ededed] border-r-2' : 'hover:bg-[#f3f3f3] transition-colors duration-300'}`}
                                 >
-                                    <div className="w-12 h-12 rounded-full overflow-hidden">
-                                        <Image
-                                            src={otherParticipant?.avatarUrl || '/default-avatar.png'}
-                                            alt={otherParticipant?.name || 'User'}
-                                            width={48}
-                                            height={48}
-                                            className="object-cover bg-center rounded-full"
-                                        />
-                                    </div>
-                                    <div className="flex-1 text-left">
-                                        <div className="flex items-center justify-between">
-                                            <p className="font-medium">{otherParticipant?.name}</p>
-                                            <p className="text-xs text-gray-500">
-                                                {formatLastActivity(chatRoom.lastActivity)}
+                                    <button
+                                        onClick={() => onSelectChat(chatRoom)}
+                                        className="flex items-center space-x-3 flex-1"
+                                    >
+                                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                                            <Image
+                                                src={otherParticipant?.avatarUrl || '/default-avatar.png'}
+                                                alt={otherParticipant?.name || 'User'}
+                                                width={48}
+                                                height={48}
+                                                className="object-cover bg-center rounded-full"
+                                            />
+                                        </div>
+                                        <div className="flex-1 text-left">
+                                            <div className="flex items-center justify-between">
+                                                <p className="font-medium">{otherParticipant?.name}</p>
+                                                <p className="text-xs text-gray-500">
+                                                    {formatLastActivity(chatRoom.lastActivity)}
+                                                </p>
+                                            </div>
+                                            <p className="text-sm text-gray-500 truncate">
+                                                {chatRoom.lastMessage?.content || 'Start a conversation...'}
                                             </p>
                                         </div>
-                                        <p className="text-sm text-gray-500 truncate">
-                                            {chatRoom.lastMessage?.content || 'Start a conversation...'}
-                                        </p>
-                                    </div>
-                                </button>
+                                    </button>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={(e) => handleViewProfile(e, otherParticipant?._id)}
+                                        className="p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <Info className="w-4 h-4" />
+                                    </Button>
+                                </div>
                             );
                         })}
                     </div>
