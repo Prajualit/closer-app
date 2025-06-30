@@ -38,6 +38,14 @@ const userSchema = new Schema(
         uploadedAt: { type: Date, default: Date.now },
       },
     ],
+    followers: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }],
+    following: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }],
     refreshToken: {
       type: String,
     },
