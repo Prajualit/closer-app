@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import UserAvatar from '../ui/UserAvatar'
-import { apiError } from '@/backend/utils/apiError'
+import { apiError } from '../../../backend/utils/apiError'
 import { useRouter } from "next/navigation";
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
