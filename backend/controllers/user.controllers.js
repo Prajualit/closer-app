@@ -384,6 +384,153 @@ const searchUsers = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, users, "Users retrieved successfully"));
 });
 
+// Get user profile by ID
+const getUserProfile = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  // Validate if userId is a valid MongoDB ObjectId
+  if (!userId || !userId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new apiError(400, "Invalid user ID format");
+  }
+
+  const user = await User.findById(userId)
+    .select("-password -refreshToken")
+    .populate('followers', 'username name avatarUrl')
+    .populate('following', 'username name avatarUrl');
+
+  if (!user) {
+    throw new apiError(404, "User not found");
+  }
+
+  const userProfile = {
+    ...user.toObject(),
+    followersCount: user.followers.length,
+    followingCount: user.following.length,
+  };
+
+  return res.status(200).json(
+    new apiResponse(200, { user: userProfile }, "User profile fetched successfully")
+  );
+});
+
+// Follow a user
+const followUser = asyncHandler(async (req, res) => {
+  const { userId } = req.body;
+  const currentUserId = req.user._id;
+
+  if (userId === currentUserId.toString()) {
+    throw new apiError(400, "You cannot follow yourself");
+  }
+
+  const userToFollow = await User.findById(userId);
+  const currentUser = await User.findById(currentUserId);
+
+  if (!userToFollow) {
+    throw new apiError(404, "User not found");
+  }
+
+  // Check if already following
+  if (currentUser.following.includes(userId)) {
+    throw new apiError(400, "You are already following this user");
+  }
+
+  // Add to following/followers
+  currentUser.following.push(userId);
+  userToFollow.followers.push(currentUserId);
+
+  await currentUser.save();
+  await userToFollow.save();
+
+  return res.status(200).json(
+    new apiResponse(200, {}, "User followed successfully")
+  );
+});
+
+// Unfollow a user
+const unfollowUser = asyncHandler(async (req, res) => {
+  const { userId } = req.body;
+  const currentUserId = req.user._id;
+
+  if (userId === currentUserId.toString()) {
+    throw new apiError(400, "You cannot unfollow yourself");
+  }
+
+  const userToUnfollow = await User.findById(userId);
+  const currentUser = await User.findById(currentUserId);
+
+  if (!userToUnfollow) {
+    throw new apiError(404, "User not found");
+  }
+
+  // Check if not following
+  if (!currentUser.following.includes(userId)) {
+    throw new apiError(400, "You are not following this user");
+  }
+
+  // Remove from following/followers
+  currentUser.following = currentUser.following.filter(id => id.toString() !== userId);
+  userToUnfollow.followers = userToUnfollow.followers.filter(id => id.toString() !== currentUserId.toString());
+
+  await currentUser.save();
+  await userToUnfollow.save();
+
+  return res.status(200).json(
+    new apiResponse(200, {}, "User unfollowed successfully")
+  );
+});
+
+// Get follow status
+const getFollowStatus = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const currentUserId = req.user._id;
+
+  const currentUser = await User.findById(currentUserId);
+  const isFollowing = currentUser.following.includes(userId);
+
+  return res.status(200).json(
+    new apiResponse(200, { isFollowing }, "Follow status fetched successfully")
+  );
+});
+
+// Get user photos
+const getUserPhotos = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new apiError(404, "User not found");
+  }
+
+  const photos = user.media.filter(item => 
+    item.resource_type === 'image' || 
+    !item.resource_type || 
+    item.url.match(/\.(jpeg|jpg|gif|png)$/i)
+  );
+
+  return res.status(200).json(
+    new apiResponse(200, { photos }, "User photos fetched successfully")
+  );
+});
+
+// Get user films/videos
+const getUserFilms = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new apiError(404, "User not found");
+  }
+
+  const films = user.media.filter(item => 
+    item.resource_type === 'video' || 
+    item.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)
+  );
+
+  return res.status(200).json(
+    new apiResponse(200, { films }, "User films fetched successfully")
+  );
+});
+
 export {
   loginUser,
   logoutUser,
@@ -395,4 +542,10 @@ export {
   changePassword,
   deleteUserAccount,
   searchUsers,
+  getUserProfile,
+  followUser,
+  unfollowUser,
+  getFollowStatus,
+  getUserPhotos,
+  getUserFilms,
 };
