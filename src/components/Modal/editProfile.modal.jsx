@@ -217,7 +217,7 @@ const EditModal = ({ nav, activeNav }) => {
     return (
         <Dialog open={isOpen} onOpenChange={handleModalOpenChange}>
             <DialogTrigger asChild>
-                <button className=" rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300 ">Edit Profile</button>
+                <button className="flex items-center group justify-center border rounded-[5px] px-5 py-2 !w-fit hover:bg-neutral-100 transition-all duration-300">Edit Profile</button>
             </DialogTrigger>
 
             <DialogContent className="bg-white  w-[40%] ">
@@ -230,15 +230,15 @@ const EditModal = ({ nav, activeNav }) => {
                     <Card className="w-full h-full border-none shadow-none">
                         <CardHeader>
                             <CardTitle>
-                                {changePassword 
+                                {changePassword
                                     ? (passwordStep === 1 ? "Verify Current Password" : "Set New Password")
                                     : "Edit Profile"
                                 }
                             </CardTitle>
                             <p className="text-sm text-gray-500">
-                                {changePassword 
-                                    ? (passwordStep === 1 
-                                        ? "Please enter your current password to continue." 
+                                {changePassword
+                                    ? (passwordStep === 1
+                                        ? "Please enter your current password to continue."
                                         : "Enter your new password and confirm it."
                                     )
                                     : "You need to fill in at least one field to update your profile."

@@ -187,7 +187,6 @@ const ChatList = ({ onSelectChat, selectedChatId }) => {
                                         <div className="flex space-x-2">
                                             <Button
                                                 size="sm"
-                                                variant="outline"
                                                 onClick={(e) => handleViewProfile(e, user._id)}
                                                 className="p-2"
                                             >

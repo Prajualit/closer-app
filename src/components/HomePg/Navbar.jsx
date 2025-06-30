@@ -203,7 +203,7 @@ const Navbar = () => {
     ];
 
     return (
-        <div className='h-screen fixed bg-neutral-50 border-r flex flex-col justify-center items-start px-5 py-10 w-[15rem] space-y-14 '>
+        <div className='h-screen fixed bg-neutral-50 border-r flex flex-col justify-center items-start px-5 py-10 w-[15rem] space-y-14 z-50 '>
             <Link href='/'>
                 <Image className='w-[100px] ml-[16.67%] ' src={logo} alt="" />
             </Link>
