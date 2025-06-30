@@ -201,8 +201,8 @@ const ProfilePage = () => {
     };
 
     const handleMessage = () => {
-        // Navigate to chat with this user
-        router.push(`/${currentUser.username}/chat?user=${profile.username}`);
+        // Navigate to chat with this user using query parameters
+        router.push(`/${currentUser.username}/chat?userId=${profile._id}&username=${profile.username}`);
     };
 
     const handleBack = () => {

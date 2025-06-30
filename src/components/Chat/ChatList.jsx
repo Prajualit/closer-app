@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, MessageCircle, Plus, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const ChatList = ({ onSelectChat, selectedChatId }) => {
+const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
     const [chatRooms, setChatRooms] = useState([]);
     const [searchUsers, setSearchUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -23,7 +23,7 @@ const ChatList = ({ onSelectChat, selectedChatId }) => {
 
     useEffect(() => {
         fetchChatRooms();
-    }, []);
+    }, [refreshTrigger]); // Add refreshTrigger dependency
 
     useEffect(() => {
         if (searchQuery.trim()) {
