@@ -1,11 +1,12 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { apiError } from "../utils/apiError.js";
+import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
-import { apiResponse } from "../utils/apiResponse.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 import path, { normalize } from "path";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import { access } from "fs";
+import { notifyFollow } from "./notification.controller.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -18,7 +19,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
     return { accessToken, refreshToken };
   } catch (error) {
-    throw new apiError(
+    throw new ApiError(
       500,
       error?.message ||
         "Something went wrong while generating Access and Refresh Token"
@@ -32,13 +33,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Validation of the body
   if ([username, password, name, bio].some((field) => field?.trim() === "")) {
-    throw new apiError(400, "All fields are required");
+    throw new ApiError(400, "All fields are required");
   }
   const normalizedUsername = username.trim().toLowerCase();
   //Duplicate responses check
   const existedUser = await User.findOne({ username: normalizedUsername });
   if (existedUser) {
-    throw new apiError(409, "User already exists");
+    throw new ApiError(409, "User already exists");
   }
 
   // req.files = { ...req.files };
@@ -50,12 +51,12 @@ const registerUser = asyncHandler(async (req, res) => {
   // }
   const avatarLocalPath = path.normalize(req.file?.path);
   if (!avatarLocalPath) {
-    throw new apiError(400, `Avatar is required ${avatarLocalPath}`);
+    throw new ApiError(400, `Avatar is required ${avatarLocalPath}`);
   }
 
   const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
   if (!avatarUpload || !avatarUpload.url) {
-    throw new apiError(400, `Avatar upload failed ${avatarUpload}`);
+    throw new ApiError(400, `Avatar upload failed ${avatarUpload}`);
   }
 
   //   create user in database
@@ -72,19 +73,19 @@ const registerUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
   if (!createdUser) {
-    throw new apiError(500, "Something went wrong while registering the user");
+    throw new ApiError(500, "Something went wrong while registering the user");
   }
 
   //   return a response
   return res
     .status(201)
-    .json(new apiResponse(200, createdUser, "User Registered Successfully"));
+    .json(new ApiResponse(200, createdUser, "User Registered Successfully"));
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .json(new apiResponse(200, req.user, "User fetched successfully"));
+    .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -93,20 +94,20 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // validation of the body
   if ([username, password].some((field) => field?.trim() === "")) {
-    throw new apiError(400, "All fields are required");
+    throw new ApiError(400, "All fields are required");
   }
 
   // verify if user exists or not
   const normalisedUsername = username.trim().toLowerCase();
   const user = await User.findOne({ username: normalisedUsername });
   if (!user) {
-    throw new apiError(404, "User does not exist");
+    throw new ApiError(404, "User does not exist");
   }
 
   // verify password
   const isPasswordValid = await user.verifyPassword(password);
   if (!isPasswordValid) {
-    throw new apiError(401, "Invalid username or password");
+    throw new ApiError(401, "Invalid username or password");
   }
 
   // generate tokens
@@ -130,7 +131,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
-      new apiResponse(
+      new ApiResponse(
         200,
         { user: loggedInUser, accessToken, refreshToken },
         "User logged in successfully"
@@ -151,7 +152,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new apiResponse(200, {}, "User logged out successfully"));
+    .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
 const editUser = asyncHandler(async (req, res) => {
@@ -177,14 +178,14 @@ const editUser = asyncHandler(async (req, res) => {
 
     const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
     if (!avatarUpload || !avatarUpload.url) {
-      throw new apiError(400, "Avatar upload failed");
+      throw new ApiError(400, "Avatar upload failed");
     }
 
     updateFields.avatarUrl = avatarUpload.url;
   }
 
   if (Object.keys(updateFields).length === 0) {
-    throw new apiError(400, "No fields provided for update");
+    throw new ApiError(400, "No fields provided for update");
   }
 
   const updateResult = await User.updateOne(
@@ -193,18 +194,18 @@ const editUser = asyncHandler(async (req, res) => {
   );
 
   if (updateResult.matchedCount === 0) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   if (updateResult.modifiedCount === 0) {
-    throw new apiError(400, "No changes were made");
+    throw new ApiError(400, "No changes were made");
   }
 
   // Get the updated user
   const user = await User.findById(req.user._id);
 
   if (!user) {
-    throw new apiError(500, "Something went wrong while fetching updated user");
+    throw new ApiError(500, "Something went wrong while fetching updated user");
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
@@ -222,7 +223,7 @@ const editUser = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
-      new apiResponse(
+      new ApiResponse(
         200,
         { user, accessToken, refreshToken },
         "User updated successfully"
@@ -235,7 +236,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
-    throw new apiError(401, "unauthorized request");
+    throw new ApiError(401, "unauthorized request");
   }
 
   try {
@@ -247,11 +248,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
-      throw new apiError(401, "Invalid refresh token");
+      throw new ApiError(401, "Invalid refresh token");
     }
 
     if (incomingRefreshToken !== user?.refreshToken) {
-      throw new apiError(401, "Refresh token is expired or used");
+      throw new ApiError(401, "Refresh token is expired or used");
     }
 
     const options = {
@@ -268,14 +269,14 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", newRefreshToken, options)
       .json(
-        new apiResponse(
+        new ApiResponse(
           200,
           { accessToken, refreshToken: newRefreshToken },
           "Access token refreshed"
         )
       );
   } catch (error) {
-    throw new apiError(401, error?.message || "Invalid refresh token");
+    throw new ApiError(401, error?.message || "Invalid refresh token");
   }
 });
 
@@ -284,24 +285,24 @@ const verifyPassword = asyncHandler(async (req, res) => {
 
   // Validation
   if (!currentPassword || currentPassword.trim() === "") {
-    throw new apiError(400, "Current password is required");
+    throw new ApiError(400, "Current password is required");
   }
 
   // Get user from database
   const user = await User.findById(req.user._id);
   if (!user) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   // Verify current password
   const isPasswordValid = await user.verifyPassword(currentPassword);
   if (!isPasswordValid) {
-    throw new apiError(401, "Current password is incorrect");
+    throw new ApiError(401, "Current password is incorrect");
   }
 
   return res
     .status(200)
-    .json(new apiResponse(200, {}, "Password verified successfully"));
+    .json(new ApiResponse(200, {}, "Password verified successfully"));
 });
 
 const changePassword = asyncHandler(async (req, res) => {
@@ -309,15 +310,15 @@ const changePassword = asyncHandler(async (req, res) => {
 
   // Validation
   if (!currentPassword || !newPassword) {
-    throw new apiError(400, "Current password and new password are required");
+    throw new ApiError(400, "Current password and new password are required");
   }
 
   if (currentPassword.trim() === "" || newPassword.trim() === "") {
-    throw new apiError(400, "Passwords cannot be empty");
+    throw new ApiError(400, "Passwords cannot be empty");
   }
 
   if (currentPassword === newPassword) {
-    throw new apiError(
+    throw new ApiError(
       400,
       "New password must be different from current password"
     );
@@ -326,13 +327,13 @@ const changePassword = asyncHandler(async (req, res) => {
   // Get user from database
   const user = await User.findById(req.user._id);
   if (!user) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   // Verify current password
   const isPasswordValid = await user.verifyPassword(currentPassword);
   if (!isPasswordValid) {
-    throw new apiError(401, "Current password is incorrect");
+    throw new ApiError(401, "Current password is incorrect");
   }
 
   // Update password
@@ -341,13 +342,13 @@ const changePassword = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new apiResponse(200, {}, "Password changed successfully"));
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
 const deleteUserAccount = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndDelete(req.user._id);
   if (!user) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   const options = {
@@ -360,14 +361,14 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new apiResponse(200, {}, "User account deleted successfully"));
+    .json(new ApiResponse(200, {}, "User account deleted successfully"));
 });
 
 const searchUsers = asyncHandler(async (req, res) => {
   const { query } = req.query;
 
   if (!query || query.trim().length < 2) {
-    throw new apiError(400, "Search query must be at least 2 characters long");
+    throw new ApiError(400, "Search query must be at least 2 characters long");
   }
 
   const searchRegex = new RegExp(query.trim(), "i");
@@ -381,7 +382,7 @@ const searchUsers = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new apiResponse(200, users, "Users retrieved successfully"));
+    .json(new ApiResponse(200, users, "Users retrieved successfully"));
 });
 
 // Get user profile by ID
@@ -390,7 +391,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
   // Validate if userId is a valid MongoDB ObjectId
   if (!userId || !userId.match(/^[0-9a-fA-F]{24}$/)) {
-    throw new apiError(400, "Invalid user ID format");
+    throw new ApiError(400, "Invalid user ID format");
   }
 
   const user = await User.findById(userId)
@@ -399,7 +400,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     .populate('following', 'username name avatarUrl');
 
   if (!user) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   const userProfile = {
@@ -409,7 +410,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
   };
 
   return res.status(200).json(
-    new apiResponse(200, { user: userProfile }, "User profile fetched successfully")
+    new ApiResponse(200, { user: userProfile }, "User profile fetched successfully")
   );
 });
 
@@ -419,19 +420,19 @@ const followUser = asyncHandler(async (req, res) => {
   const currentUserId = req.user._id;
 
   if (userId === currentUserId.toString()) {
-    throw new apiError(400, "You cannot follow yourself");
+    throw new ApiError(400, "You cannot follow yourself");
   }
 
   const userToFollow = await User.findById(userId);
   const currentUser = await User.findById(currentUserId);
 
   if (!userToFollow) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   // Check if already following
   if (currentUser.following.includes(userId)) {
-    throw new apiError(400, "You are already following this user");
+    throw new ApiError(400, "You are already following this user");
   }
 
   // Add to following/followers
@@ -441,8 +442,16 @@ const followUser = asyncHandler(async (req, res) => {
   await currentUser.save();
   await userToFollow.save();
 
+  // Create follow notification
+  try {
+    await notifyFollow(currentUserId, userId);
+  } catch (error) {
+    console.error("Failed to create follow notification:", error);
+    // Don't fail the follow operation if notification fails
+  }
+
   return res.status(200).json(
-    new apiResponse(200, {}, "User followed successfully")
+    new ApiResponse(200, {}, "User followed successfully")
   );
 });
 
@@ -452,19 +461,19 @@ const unfollowUser = asyncHandler(async (req, res) => {
   const currentUserId = req.user._id;
 
   if (userId === currentUserId.toString()) {
-    throw new apiError(400, "You cannot unfollow yourself");
+    throw new ApiError(400, "You cannot unfollow yourself");
   }
 
   const userToUnfollow = await User.findById(userId);
   const currentUser = await User.findById(currentUserId);
 
   if (!userToUnfollow) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   // Check if not following
   if (!currentUser.following.includes(userId)) {
-    throw new apiError(400, "You are not following this user");
+    throw new ApiError(400, "You are not following this user");
   }
 
   // Remove from following/followers
@@ -475,7 +484,7 @@ const unfollowUser = asyncHandler(async (req, res) => {
   await userToUnfollow.save();
 
   return res.status(200).json(
-    new apiResponse(200, {}, "User unfollowed successfully")
+    new ApiResponse(200, {}, "User unfollowed successfully")
   );
 });
 
@@ -488,7 +497,7 @@ const getFollowStatus = asyncHandler(async (req, res) => {
   const isFollowing = currentUser.following.includes(userId);
 
   return res.status(200).json(
-    new apiResponse(200, { isFollowing }, "Follow status fetched successfully")
+    new ApiResponse(200, { isFollowing }, "Follow status fetched successfully")
   );
 });
 
@@ -498,7 +507,7 @@ const getUserPhotos = asyncHandler(async (req, res) => {
 
   const user = await User.findById(userId);
   if (!user) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   const photos = user.media.filter(item => 
@@ -508,7 +517,7 @@ const getUserPhotos = asyncHandler(async (req, res) => {
   );
 
   return res.status(200).json(
-    new apiResponse(200, { photos }, "User photos fetched successfully")
+    new ApiResponse(200, { photos }, "User photos fetched successfully")
   );
 });
 
@@ -518,7 +527,7 @@ const getUserFilms = asyncHandler(async (req, res) => {
 
   const user = await User.findById(userId);
   if (!user) {
-    throw new apiError(404, "User not found");
+    throw new ApiError(404, "User not found");
   }
 
   const films = user.media.filter(item => 
@@ -527,7 +536,7 @@ const getUserFilms = asyncHandler(async (req, res) => {
   );
 
   return res.status(200).json(
-    new apiResponse(200, { films }, "User films fetched successfully")
+    new ApiResponse(200, { films }, "User films fetched successfully")
   );
 });
 
@@ -549,3 +558,4 @@ export {
   getUserPhotos,
   getUserFilms,
 };
+

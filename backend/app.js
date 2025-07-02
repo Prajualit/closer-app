@@ -18,10 +18,12 @@ app.use("/temp", express.static("temp"));
 import userRouter from "./Routes/user.routes.js";
 import createRouter from "./Routes/create.route.js";
 import chatRouter from "./Routes/chat.route.js";
+import notificationRouter from "./Routes/notification.route.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1", createRouter);
 app.use("/api/v1/chat", chatRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 
 export { app };
