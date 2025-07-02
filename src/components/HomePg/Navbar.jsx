@@ -5,6 +5,7 @@ import Link from 'next/link'
 import logo from "@/assets/logo.png"
 import Navsearch from '@/components/HomePg/Navsearch'
 import UserButton from '@/components/HomePg/UserButton'
+import NotificationBadge from '@/components/Notifications/NotificationBadge'
 import { useSelector } from "react-redux";
 import { useNavigation } from '@/hooks/useNavigation'
 import CreateModal from '../Modal/create.modal'
@@ -227,7 +228,13 @@ const Navbar = () => {
                                         }`}
                                         aria-current={navIsActive ? "page" : undefined}
                                     >
-                                        {nav.icon}
+                                        {nav.name === "Notifications" ? (
+                                            <NotificationBadge>
+                                                {nav.icon}
+                                            </NotificationBadge>
+                                        ) : (
+                                            nav.icon
+                                        )}
                                         <span>{nav.name}</span>
                                     </button>
                                 </Link>
