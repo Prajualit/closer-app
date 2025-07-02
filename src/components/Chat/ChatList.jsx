@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -9,21 +9,87 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, MessageCircle, Plus, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
+import { useSocket } from '@/lib/SocketContext';
 
-const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
+const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChatId }) => {
     const [chatRooms, setChatRooms] = useState([]);
     const [searchUsers, setSearchUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [searchLoading, setSearchLoading] = useState(false);
+    const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
     const userDetails = useSelector((state) => state.user.user);
     const router = useRouter();
     const { toast } = useToast();
+    const { socket } = useSocket();
 
     useEffect(() => {
         fetchChatRooms();
-    }, [refreshTrigger]); // Add refreshTrigger dependency
+    }, [refreshTrigger]); // Only depend on refreshTrigger, not fetchChatRooms
+
+    // Listen for real-time message updates to update chat list
+    useEffect(() => {
+        if (socket) {
+            const handleChatUpdate = (messageData) => {
+                // Only update if the message is for a chat that exists in our list
+                setChatRooms(prev => {
+                    const roomExists = prev.some(room => room.chatId === messageData.chatId);
+                    if (!roomExists) {
+                        return prev; // Don't update if chat doesn't exist in our list
+                    }
+                    
+                    console.log('Updating chat list for message:', messageData.chatId);
+                    const updatedRooms = prev.map(room => {
+                        if (room.chatId === messageData.chatId) {
+                            // Check if this message is from another user (not current user)
+                            const isFromOtherUser = messageData.sender._id !== userDetails?._id;
+                            return {
+                                ...room,
+                                lastMessage: {
+                                    content: messageData.message,
+                                    timestamp: messageData.timestamp
+                                },
+                                lastActivity: messageData.timestamp,
+                                // Increment unread count only if message is from another user and this chat is not currently selected
+                                unreadCount: isFromOtherUser && selectedChatId !== messageData.chatId 
+                                    ? (room.unreadCount || 0) + 1 
+                                    : (room.unreadCount || 0)
+                            };
+                        }
+                        return room;
+                    });
+                    // Sort by last activity (most recent first)
+                    return updatedRooms.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+                });
+            };
+
+            socket.on('receive-message', handleChatUpdate);
+            
+            return () => {
+                socket.off('receive-message', handleChatUpdate);
+            };
+        }
+    }, [socket, userDetails, selectedChatId]);
+
+    // Auto-select chat when chatRooms are loaded and we have an autoSelectChatId
+    // Only run this once per autoSelectChatId to prevent loops
+    useEffect(() => {
+        if (autoSelectChatId && chatRooms.length > 0 && !hasAutoSelected && selectedChatId !== autoSelectChatId) {
+            const chatToSelect = chatRooms.find(room => room.chatId === autoSelectChatId);
+            if (chatToSelect && onSelectChat) {
+                console.log('Auto-selecting chat:', autoSelectChatId);
+                onSelectChat(chatToSelect);
+                setHasAutoSelected(true);
+            }
+        }
+    }, [chatRooms, autoSelectChatId, selectedChatId, hasAutoSelected]); // Removed onSelectChat from dependencies
+
+    // Reset hasAutoSelected when autoSelectChatId changes (new chat to auto-select)
+    useEffect(() => {
+        setHasAutoSelected(false);
+    }, [autoSelectChatId]);
 
     useEffect(() => {
         if (searchQuery.trim()) {
@@ -33,16 +99,16 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
         }
     }, [searchQuery]);
 
-    const fetchChatRooms = async () => {
+    const fetchChatRooms = useCallback(async () => {
         try {
+            console.log('Fetching chat rooms...');
             setLoading(true);
-            const response = await fetch('http://localhost:5000/api/v1/chat/rooms', {
-                credentials: 'include',
-            });
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHAT_ROOMS);
             const data = await response.json();
 
             if (data.success) {
                 setChatRooms(data.data || []);
+                console.log('Chat rooms fetched:', data.data?.length || 0);
             }
         } catch (error) {
             console.error('Error fetching chat rooms:', error);
@@ -54,14 +120,12 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
 
     const searchUsersFunction = async () => {
         try {
             setSearchLoading(true);
-            const response = await fetch(`http://localhost:5000/api/v1/users/search?query=${searchQuery}`, {
-                credentials: 'include',
-            });
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.USER_SEARCH(searchQuery));
             const data = await response.json();
 
             if (data.success) {
@@ -86,17 +150,23 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
 
     const startNewChat = async (userId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/v1/chat/room/${userId}`, {
-                credentials: 'include',
-            });
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHAT_ROOM(userId));
             const data = await response.json();
 
             if (data.success) {
                 onSelectChat(data.data);
                 setSearchQuery('');
                 setSearchUsers([]);
-                // Refresh chat rooms to include the new one
-                fetchChatRooms();
+                
+                // Instead of refetching all chat rooms, just add the new one if it doesn't exist
+                setChatRooms(prev => {
+                    const exists = prev.some(room => room.chatId === data.data.chatId);
+                    if (!exists) {
+                        console.log('Adding new chat room to list:', data.data.chatId);
+                        return [data.data, ...prev]; // Add to beginning of list
+                    }
+                    return prev;
+                });
             }
         } catch (error) {
             console.error('Error starting new chat:', error);
@@ -105,6 +175,26 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
                 description: 'Failed to start new chat',
                 variant: 'destructive',
             });
+        }
+    };
+
+    // Function to mark messages as read when chat is selected
+    const markChatAsRead = async (chatId) => {
+        try {
+            await makeAuthenticatedRequest(API_ENDPOINTS.MARK_MESSAGES_READ(chatId), {
+                method: 'POST'
+            });
+            
+            // Update local state to reset unread count
+            setChatRooms(prev => 
+                prev.map(room => 
+                    room.chatId === chatId 
+                        ? { ...room, unreadCount: 0 }
+                        : room
+                )
+            );
+        } catch (error) {
+            console.error('Error marking messages as read:', error);
         }
     };
 
@@ -219,6 +309,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
                         {chatRooms.map((chatRoom) => {
                             const otherParticipant = getOtherParticipant(chatRoom.participants);
                             const isSelected = selectedChatId === chatRoom.chatId;
+                            const unreadCount = chatRoom.unreadCount || 0;
 
                             return (
                                 <div
@@ -226,10 +317,16 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
                                     className={`group w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-[#ededed] border-r-2' : 'hover:bg-[#f3f3f3] transition-colors duration-300'}`}
                                 >
                                     <button
-                                        onClick={() => onSelectChat(chatRoom)}
+                                        onClick={() => {
+                                            onSelectChat(chatRoom);
+                                            // Mark messages as read when chat is selected and has unread messages
+                                            if (unreadCount > 0) {
+                                                markChatAsRead(chatRoom.chatId);
+                                            }
+                                        }}
                                         className="flex items-center space-x-3 flex-1"
                                     >
-                                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                                        <div className="relative w-12 h-12 rounded-full overflow-hidden">
                                             <Image
                                                 src={otherParticipant?.avatarUrl || '/default-avatar.png'}
                                                 alt={otherParticipant?.name || 'User'}
@@ -237,15 +334,30 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger }) => {
                                                 height={48}
                                                 className="object-cover bg-center rounded-full"
                                             />
+                                            {/* Unread count badge on avatar */}
+                                            {unreadCount > 0 && (
+                                                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                                                    {unreadCount > 99 ? '99+' : unreadCount}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="flex-1 text-left">
                                             <div className="flex items-center justify-between">
-                                                <p className="font-medium">{otherParticipant?.name}</p>
+                                                <div className="flex items-center space-x-2">
+                                                    <p className={`font-medium ${unreadCount > 0 ? 'text-black' : 'text-gray-700'}`}>
+                                                        {otherParticipant?.name}
+                                                    </p>
+                                                    {unreadCount > 0 && (
+                                                        <div className="bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
+                                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 <p className="text-xs text-gray-500">
                                                     {formatLastActivity(chatRoom.lastActivity)}
                                                 </p>
                                             </div>
-                                            <p className="text-sm text-gray-500 truncate">
+                                            <p className={`text-sm truncate ${unreadCount > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
                                                 {chatRoom.lastMessage?.content || 'Start a conversation...'}
                                             </p>
                                         </div>

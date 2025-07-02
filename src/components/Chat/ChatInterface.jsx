@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, MoreVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
 
 const ChatInterface = ({ chatRoom, onBack }) => {
     const [messages, setMessages] = useState([]);
@@ -30,10 +31,11 @@ const ChatInterface = ({ chatRoom, onBack }) => {
 
     useEffect(() => {
         if (chatRoom?.chatId) {
+            console.log('Joining chat and fetching messages for:', chatRoom.chatId);
             joinChat(chatRoom.chatId);
             fetchMessages();
         }
-    }, [chatRoom]);
+    }, [chatRoom?.chatId]); // Only depend on chatId, not the whole chatRoom object
 
     useEffect(() => {
         if (socket) {
@@ -55,13 +57,13 @@ const ChatInterface = ({ chatRoom, onBack }) => {
 
     const fetchMessages = async () => {
         try {
+            console.log('Fetching messages for chat:', chatRoom.chatId);
             setLoading(true);
-            const response = await fetch(`http://localhost:5000/api/v1/chat/messages/${chatRoom.chatId}`, {
-                credentials: 'include',
-            });
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHAT_MESSAGES(chatRoom.chatId));
             const data = await response.json();
 
             if (data.success) {
+                console.log('Fetched messages:', data.data.messages?.length || 0);
                 setMessages(data.data.messages || []);
             }
         } catch (error) {
@@ -77,7 +79,27 @@ const ChatInterface = ({ chatRoom, onBack }) => {
     };
 
     const handleReceiveMessage = (messageData) => {
-        setMessages(prev => [...prev, messageData]);
+        // Check if message already exists (to prevent duplicates from optimistic updates)
+        setMessages(prev => {
+            // Use a more robust check for duplicates
+            const messageExists = prev.some(msg => {
+                // Check for exact same message content, sender, and timestamp within 1 second
+                const timeDiff = Math.abs(new Date(msg.timestamp) - new Date(messageData.timestamp));
+                return (
+                    msg.sender._id === messageData.sender._id &&
+                    msg.message === messageData.message &&
+                    timeDiff < 1000 // Within 1 second
+                );
+            });
+            
+            if (messageExists) {
+                console.log('Duplicate message detected, skipping:', messageData);
+                return prev; // Don't add duplicate
+            }
+            
+            console.log('Adding new message:', messageData);
+            return [...prev, messageData];
+        });
     };
 
     const handleUserTyping = (data) => {
@@ -93,9 +115,17 @@ const ChatInterface = ({ chatRoom, onBack }) => {
     const handleSendMessage = async () => {
         if (!newMessage.trim()) return;
 
+        console.log('Sending message:', newMessage.trim());
+
+        const messageText = newMessage.trim();
+        
+        // Clear input immediately for better UX
+        setNewMessage('');
+        handleStopTyping();
+
         const messageData = {
             chatId: chatRoom.chatId,
-            message: newMessage.trim(),
+            message: messageText,
             sender: {
                 _id: userDetails._id,
                 username: userDetails.username,
@@ -105,28 +135,35 @@ const ChatInterface = ({ chatRoom, onBack }) => {
             timestamp: new Date().toISOString()
         };
 
+        // Optimistically add message to local state immediately
+        setMessages(prev => {
+            console.log('Adding optimistic message to state');
+            return [...prev, messageData];
+        });
+
         // Send via socket
         sendMessage(messageData);
 
         // Save to database
         try {
-            await fetch('http://localhost:5000/api/v1/chat/message', {
+            console.log('Saving message to database...');
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHAT_MESSAGE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include',
                 body: JSON.stringify({
                     chatId: chatRoom.chatId,
-                    content: newMessage.trim()
+                    content: messageText
                 })
             });
+            console.log('Message saved successfully');
         } catch (error) {
             console.error('Error saving message:', error);
+            // If saving fails, remove the optimistic message and restore the input
+            setMessages(prev => prev.filter(msg => msg !== messageData));
+            setNewMessage(messageText); // Restore the message to input if save failed
         }
-
-        setNewMessage('');
-        handleStopTyping();
     };
 
     const handleInputChange = (e) => {
@@ -172,6 +209,35 @@ const ChatInterface = ({ chatRoom, onBack }) => {
             hour: '2-digit',
             minute: '2-digit'
         });
+    };
+
+    const formatDate = (timestamp) => {
+        const date = new Date(timestamp);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (date.toDateString() === today.toDateString()) {
+            return 'Today';
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return 'Yesterday';
+        } else {
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+    };
+
+    const shouldShowDateSeparator = (currentMessage, previousMessage) => {
+        if (!previousMessage) return true;
+        
+        const currentDate = new Date(currentMessage.timestamp).toDateString();
+        const previousDate = new Date(previousMessage.timestamp).toDateString();
+        
+        return currentDate !== previousDate;
     };
 
     if (loading) {
@@ -222,43 +288,53 @@ const ChatInterface = ({ chatRoom, onBack }) => {
             </div>
 
             {/* Messages Area */}
-            <ScrollArea className="flex-1 p-4 bg-[#eeeeee] ">
+            <ScrollArea className="flex-1 p-4 bg-[#eeeeee] !scrollbar-hide ">
                 <div className="space-y-4">
                     {messages.map((message, index) => {
                         const isOwnMessage = message.sender._id === userDetails?._id;
                         const showAvatar = index === 0 ||
                             messages[index - 1].sender._id !== message.sender._id;
+                        const showDateSeparator = shouldShowDateSeparator(message, messages[index - 1]);
 
                         return (
-                            <div
-                                key={message._id || index}
-                                className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
-                            >
-                                <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                                    {!isOwnMessage && showAvatar && (
-                                        <div className="w-8 h-8 rounded-full overflow-hidden">
-                                            <Image
-                                                src={message.sender.avatarUrl}
-                                                alt={message.sender.name}
-                                                width={32}
-                                                height={32}
-                                                className="object-cover"
-                                            />
+                            <div key={message._id || index}>
+                                {/* Date Separator */}
+                                {showDateSeparator && (
+                                    <div className="flex justify-center my-6">
+                                        <div className="bg-gray-300 text-gray-600 text-xs px-3 py-1 rounded-full">
+                                            {formatDate(message.timestamp)}
                                         </div>
-                                    )}
-                                    {!isOwnMessage && !showAvatar && (
-                                        <div className="w-8 h-8" />
-                                    )}
-                                    <div
-                                        className={`px-4 py-2 flex space-x-3 shadow-lg rounded-[10px] ${isOwnMessage
-                                                ? 'bg-white text-black'
-                                                : 'bg-black text-white'
-                                            }`}
-                                    >
-                                        <p className="text-sm">{message.content || message.message}</p>
-                                        <p className={`text-xs mt-1 ${isOwnMessage ? 'text-gray-500' : 'text-gray-500'}`}>
-                                            {formatTime(message.timestamp)}
-                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Message */}
+                                <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                                        {!isOwnMessage && showAvatar && (
+                                            <div className="w-8 h-8 rounded-full overflow-hidden">
+                                                <Image
+                                                    src={message.sender.avatarUrl}
+                                                    alt={message.sender.name}
+                                                    width={32}
+                                                    height={32}
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        )}
+                                        {!isOwnMessage && !showAvatar && (
+                                            <div className="w-8 h-8" />
+                                        )}
+                                        <div
+                                            className={`px-4 py-2 flex space-x-3 shadow-lg rounded-[10px] ${isOwnMessage
+                                                    ? 'bg-white text-black'
+                                                    : 'bg-black text-white'
+                                                }`}
+                                        >
+                                            <p className="text-sm">{message.content || message.message}</p>
+                                            <p className={`text-xs mt-1 ${isOwnMessage ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                {formatTime(message.timestamp)}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
