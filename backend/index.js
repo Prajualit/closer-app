@@ -3,25 +3,19 @@ dotenv.config();
 import mongoDB from "./db/index.js";
 import { app } from "./app.js";
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { initializeSocket } from "./utils/socket.js";
 
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true
-  }
-});
 
-// Socket.IO connection handling
+// Initialize Socket.IO with authentication and notification support
+const io = initializeSocket(server);
+
+// Additional chat-specific Socket.IO handlers
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-
   // Join a chat room
   socket.on('join-chat', (chatId) => {
     socket.join(chatId);
-    console.log(`User ${socket.id} joined chat ${chatId}`);
+    console.log(`User ${socket.user.username} joined chat ${chatId}`);
   });
 
   // Handle sending messages
@@ -50,11 +44,6 @@ io.on('connection', (socket) => {
     socket.to(data.chatId).emit('user-stop-typing', {
       userId: data.userId
     });
-  });
-
-  // Handle disconnection
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
   });
 });
 
