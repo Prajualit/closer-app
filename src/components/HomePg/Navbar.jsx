@@ -1,18 +1,17 @@
 "use client"
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import logo from "@/assets/logo.png"
 import Navsearch from '@/components/HomePg/Navsearch'
 import UserButton from '@/components/HomePg/UserButton'
-import { useSelector, useDispatch } from "react-redux";
-import { setActiveNav } from '@/redux/slice/navbarSlice'
+import { useSelector } from "react-redux";
+import { useNavigation } from '@/hooks/useNavigation'
 import CreateModal from '../Modal/create.modal'
 
 const Navbar = () => {
     const userDetails = useSelector((state) => state.user.user);
-    const activeNav = useSelector((state) => state.navbar.activeNav);
-    const dispatch = useDispatch();
+    const { activeNav, navigateTo, isActive, getNavUrl } = useNavigation();
 
     const HomeIcon = ({ size = 24, color = "currentColor" }) => {
         return (
@@ -209,15 +208,30 @@ const Navbar = () => {
             </Link>
             <div className='flex flex-col items-start justify-start h-full space-y-5 w-full '>
                 {navComp.map((nav) => {
+                    const navKey = nav.name.toLowerCase();
+                    const navIsActive = isActive(navKey);
+                    
                     return (
-                        nav.name === "Create" ? <CreateModal key={nav.name} nav={nav} activeNav={activeNav} /> : (
-                            <Link className='w-full' key={nav.name} href={`/${userDetails.username}/${nav.name.toLowerCase()}`}>
-                                <button onClick={() => dispatch(setActiveNav(nav.name.toLowerCase()))} className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-[#efefef] focus:bg-neutral-100 focus:text-black w-full ${activeNav === nav.name.toLowerCase() ? "text-black" : "text-neutral-500"}`}>
-                                    {nav.icon}
-                                    <span>{nav.name}</span>
-                                </button>
-                            </Link>
-                        )
+                        nav.name === "Create" ? 
+                            <CreateModal key={nav.name} nav={nav} activeNav={activeNav} /> : 
+                            (
+                                <Link 
+                                    className='w-full' 
+                                    key={nav.name} 
+                                    href={getNavUrl(navKey)}
+                                >
+                                    <button 
+                                        onClick={() => navigateTo(navKey)} 
+                                        className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-[#efefef] focus:bg-neutral-100 focus:text-black w-full ${
+                                            navIsActive ? "text-black bg-neutral-100" : "text-neutral-500"
+                                        }`}
+                                        aria-current={navIsActive ? "page" : undefined}
+                                    >
+                                        {nav.icon}
+                                        <span>{nav.name}</span>
+                                    </button>
+                                </Link>
+                            )
                     )
                 })}
             </div>
