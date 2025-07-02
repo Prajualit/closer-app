@@ -4,7 +4,8 @@ import {
     getOrCreateChatRoom,
     getChatMessages,
     saveMessage,
-    getUserChatRooms
+    getUserChatRooms,
+    markMessagesAsRead
 } from "../controllers/chat.controller.js";
 
 const router = Router();
@@ -23,5 +24,8 @@ router.route("/messages/:chatId").get(getChatMessages);
 
 // Save a message
 router.route("/message").post(saveMessage);
+
+// Mark messages as read
+router.route("/read/:chatId").post(markMessagesAsRead);
 
 export default router;

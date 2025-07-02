@@ -1,8 +1,9 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { apiError } from "../utils/apiError.js";
-import { apiResponse } from "../utils/apiResponse.js";
+import { ApiError } from "../utils/apiError.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 import { Message, ChatRoom } from "../models/chat.model.js";
 import { User } from "../models/user.model.js";
+import { notifyMessage } from "./notification.controller.js";
 
 // Get or create a chat room between two users
 const getOrCreateChatRoom = asyncHandler(async (req, res) => {
@@ -10,7 +11,7 @@ const getOrCreateChatRoom = asyncHandler(async (req, res) => {
     const currentUserId = req.user._id;
 
     if (!participantId) {
-        throw new apiError(400, "Participant ID is required");
+        throw new ApiError(400, "Participant ID is required");
     }
 
     // Create a consistent chatId for both users
@@ -24,7 +25,7 @@ const getOrCreateChatRoom = asyncHandler(async (req, res) => {
         // Verify that the participant exists
         const participant = await User.findById(participantId);
         if (!participant) {
-            throw new apiError(404, "User not found");
+            throw new ApiError(404, "User not found");
         }
 
         chatRoom = await ChatRoom.create({
@@ -38,7 +39,7 @@ const getOrCreateChatRoom = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(
-        new apiResponse(200, chatRoom, "Chat room retrieved successfully")
+        new ApiResponse(200, chatRoom, "Chat room retrieved successfully")
     );
 });
 
@@ -48,7 +49,7 @@ const getChatMessages = asyncHandler(async (req, res) => {
     const { page = 1, limit = 50 } = req.query;
 
     if (!chatId) {
-        throw new apiError(400, "Chat ID is required");
+        throw new ApiError(400, "Chat ID is required");
     }
 
     // Verify user is part of this chat
@@ -58,7 +59,7 @@ const getChatMessages = asyncHandler(async (req, res) => {
     });
 
     if (!chatRoom) {
-        throw new apiError(403, "Access denied to this chat");
+        throw new ApiError(403, "Access denied to this chat");
     }
 
     const messages = await Message.find({ chatId })
@@ -70,7 +71,7 @@ const getChatMessages = asyncHandler(async (req, res) => {
     const totalMessages = await Message.countDocuments({ chatId });
 
     return res.status(200).json(
-        new apiResponse(200, {
+        new ApiResponse(200, {
             messages: messages.reverse(), // Reverse to show oldest first
             pagination: {
                 currentPage: page,
@@ -89,7 +90,7 @@ const saveMessage = asyncHandler(async (req, res) => {
     const senderId = req.user._id;
 
     if (!chatId || !content) {
-        throw new apiError(400, "Chat ID and content are required");
+        throw new ApiError(400, "Chat ID and content are required");
     }
 
     // Verify user is part of this chat
@@ -99,7 +100,7 @@ const saveMessage = asyncHandler(async (req, res) => {
     });
 
     if (!chatRoom) {
-        throw new apiError(403, "Access denied to this chat");
+        throw new ApiError(403, "Access denied to this chat");
     }
 
     const message = await Message.create({
@@ -117,8 +118,19 @@ const saveMessage = asyncHandler(async (req, res) => {
         lastActivity: new Date()
     });
 
+    // Create message notification for the recipient
+    try {
+        const recipient = chatRoom.participants.find(p => p.toString() !== senderId.toString());
+        if (recipient) {
+            await notifyMessage(senderId, recipient, message._id, chatRoom._id);
+        }
+    } catch (error) {
+        console.error("Failed to create message notification:", error);
+        // Don't fail the message operation if notification fails
+    }
+
     return res.status(201).json(
-        new apiResponse(201, populatedMessage, "Message saved successfully")
+        new ApiResponse(201, populatedMessage, "Message saved successfully")
     );
 });
 
@@ -133,8 +145,71 @@ const getUserChatRooms = asyncHandler(async (req, res) => {
     .populate('lastMessage')
     .sort({ lastActivity: -1 });
 
+    // Calculate unread counts for each chat room
+    const chatRoomsWithUnreadCounts = await Promise.all(
+        chatRooms.map(async (chatRoom) => {
+            const unreadCount = await Message.countDocuments({
+                chatId: chatRoom.chatId,
+                sender: { $ne: userId }, // Messages not sent by current user
+                $or: [
+                    { readBy: { $exists: false } }, // No readBy field
+                    { readBy: { $not: { $elemMatch: { user: userId } } } } // User hasn't read
+                ]
+            });
+
+            return {
+                ...chatRoom.toObject(),
+                unreadCount
+            };
+        })
+    );
+
     return res.status(200).json(
-        new apiResponse(200, chatRooms, "Chat rooms retrieved successfully")
+        new ApiResponse(200, chatRoomsWithUnreadCounts, "Chat rooms retrieved successfully")
+    );
+});
+
+// Mark messages as read
+const markMessagesAsRead = asyncHandler(async (req, res) => {
+    const { chatId } = req.params;
+    const userId = req.user._id;
+
+    if (!chatId) {
+        throw new ApiError(400, "Chat ID is required");
+    }
+
+    // Verify user is part of this chat
+    const chatRoom = await ChatRoom.findOne({ 
+        chatId,
+        participants: userId 
+    });
+
+    if (!chatRoom) {
+        throw new ApiError(403, "Access denied to this chat");
+    }
+
+    // Mark all unread messages as read
+    await Message.updateMany(
+        {
+            chatId,
+            sender: { $ne: userId }, // Messages not sent by current user
+            $or: [
+                { readBy: { $exists: false } }, // No readBy field
+                { readBy: { $not: { $elemMatch: { user: userId } } } } // User hasn't read
+            ]
+        },
+        {
+            $push: {
+                readBy: {
+                    user: userId,
+                    readAt: new Date()
+                }
+            }
+        }
+    );
+
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Messages marked as read")
     );
 });
 
@@ -142,5 +217,6 @@ export {
     getOrCreateChatRoom,
     getChatMessages,
     saveMessage,
-    getUserChatRooms
+    getUserChatRooms,
+    markMessagesAsRead
 };

@@ -25,7 +25,17 @@ const messageSchema = new Schema({
     },
     editedAt: {
         type: Date
-    }
+    },
+    readBy: [{
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+        },
+        readAt: {
+            type: Date,
+            default: Date.now
+        }
+    }]
 }, {
     timestamps: true
 });
