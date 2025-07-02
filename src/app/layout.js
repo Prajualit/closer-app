@@ -4,6 +4,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import dotenv from "dotenv";
 import ReduxProvider from "@/redux/reduxProvider";
 import AuthWrapper from "@/lib/AuthWrapper"; // client wrapper
+import { SocketProvider } from "@/lib/SocketContext";
 import { Toaster } from "@/components/ui/toaster";
 
 dotenv.config();
@@ -31,8 +32,10 @@ export default function RootLayout({ children }) {
       >
         <GoogleOAuthProvider clientId={`${process.env.GOOGLE_CLIENT_ID}`}>
           <ReduxProvider>
-            <AuthWrapper>{children}</AuthWrapper>
-            <Toaster />
+            <SocketProvider>
+              <AuthWrapper>{children}</AuthWrapper>
+              <Toaster />
+            </SocketProvider>
           </ReduxProvider>
         </GoogleOAuthProvider>
       </body>
