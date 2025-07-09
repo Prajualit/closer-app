@@ -65,49 +65,58 @@ const SuggestedUsers = () => {
         <div className="w-full bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-gray-900">Suggested for you</h3>
-                <button 
-                    className="text-xs font-medium text-black hover:text-gray-600 transition-colors"
-                    onClick={() => setIsModalOpen(true)}
-                >
-                    See All
-                </button>
             </div>
 
             <div className="">
-                {suggestedUsers.slice(0, 3).map((user) => (
-                    <div key={user._id} className="flex items-center justify-between hover:bg-gray-100 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer ">
-                        <div
-                            className="flex items-center space-x-3 flex-1 cursor-pointer rounded-lg p-2 transition-colors"
-                            onClick={() => handleProfileClick(user._id)}
-                        >
-                            <div className="relative w-10 h-10">
-                                <Image
-                                    src={user.avatarUrl || '/default-avatar.svg'}
-                                    alt={user.name}
-                                    fill
-                                    className="rounded-full object-cover"
-                                />
+                {suggestedUsers.length === 0 ? (
+                    <div>
+                        <p className="text-sm text-gray-500">No suggestions available.</p>
+                    </div>
+                ) : (
+                    suggestedUsers.slice(0, 3).map((user) => (
+                        <div key={user._id} className="flex items-center justify-between hover:bg-gray-100 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer ">
+                            <div
+                                className="flex items-center space-x-3 flex-1 cursor-pointer rounded-lg p-2 transition-colors"
+                                onClick={() => handleProfileClick(user._id)}
+                            >
+                                <div className="relative w-10 h-10">
+                                    <Image
+                                        src={user.avatarUrl || '/default-avatar.svg'}
+                                        alt={user.name}
+                                        fill
+                                        className="rounded-full object-cover"
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                                        {user.username}
+                                    </h4>
+                                    <p className="text-xs text-gray-500">
+                                        {user.followersCount || 0} followers
+                                    </p>
+                                </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <h4 className="text-sm font-medium text-gray-900 truncate">
-                                    {user.username}
-                                </h4>
-                                <p className="text-xs text-gray-500">
-                                    {user.followersCount || 0} followers
-                                </p>
-                            </div>
+                            <LoadingButton
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleFollow(user._id)
+                                }}
+                                className="px-5 text-xs font-medium !w-fit !h-fit transition-colors"
+                            >
+                                Follow
+                            </LoadingButton>
                         </div>
+                    )))}
+                {suggestedUsers.length > 3 && (
+                    < div className="text-center mt-4">
                         <LoadingButton
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                handleFollow(user._id)
-                            }}
-                            className="px-5 text-xs font-medium !w-fit !h-fit transition-colors"
+                            onClick={() => setIsModalOpen(true)}
+                            className="!bg-white hover:!bg-gray-50 !text-black"
                         >
-                            Follow
+                            Show More
                         </LoadingButton>
                     </div>
-                ))}
+                )}
             </div>
 
             <SuggestedUsersModal
@@ -117,17 +126,7 @@ const SuggestedUsers = () => {
                 onFollow={handleFollow}
             />
 
-            <div className="mt-6 pt-4 border-t border-gray-100">
-                <div className="text-xs text-gray-500 space-y-1">
-                    <div className="flex flex-wrap gap-2">
-                        <a href="#" className="hover:underline">About</a>
-                        <a href="#" className="hover:underline">Help</a>
-                        <a href="#" className="hover:underline">Privacy</a>
-                        <a href="#" className="hover:underline">Terms</a>
-                    </div>
-                    <p>© 2025 Closer | No rights reserved</p>
-                </div>
-            </div>
+
         </div>
     )
 }
