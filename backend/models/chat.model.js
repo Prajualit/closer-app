@@ -9,7 +9,27 @@ const messageSchema = new Schema({
     sender: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        required: function() {
+            return !this.isAiMessage; // sender is only required if it's not an AI message
+        }
+    },
+    isAiMessage: {
+        type: Boolean,
+        default: false
+    },
+    aiSenderInfo: {
+        name: {
+            type: String,
+            default: 'Your AI Friend'
+        },
+        avatarUrl: {
+            type: String,
+            default: '/chatbot.png'
+        },
+        id: {
+            type: String,
+            default: 'ai-assistant'
+        }
     },
     chatId: {
         type: String,
@@ -57,6 +77,10 @@ const chatRoomSchema = new Schema({
     lastActivity: {
         type: Date,
         default: Date.now
+    },
+    isChatbot: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

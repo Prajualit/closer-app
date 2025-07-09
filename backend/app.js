@@ -20,12 +20,14 @@ import createRouter from "./Routes/create.route.js";
 import chatRouter from "./Routes/chat.route.js";
 import notificationRouter from "./Routes/notification.route.js";
 import postsRouter from "./Routes/posts.route.js";
+import chatbotRouter from "./Routes/chatbot.route.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1", createRouter);
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1/posts", postsRouter);
+app.use("/api/v1/chatbot", chatbotRouter);
 
 
 export { app };
