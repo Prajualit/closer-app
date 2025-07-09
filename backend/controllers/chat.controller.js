@@ -148,19 +148,34 @@ const getUserChatRooms = asyncHandler(async (req, res) => {
     // Calculate unread counts for each chat room
     const chatRoomsWithUnreadCounts = await Promise.all(
         chatRooms.map(async (chatRoom) => {
-            const unreadCount = await Message.countDocuments({
-                chatId: chatRoom.chatId,
-                sender: { $ne: userId }, // Messages not sent by current user
-                $or: [
-                    { readBy: { $exists: false } }, // No readBy field
-                    { readBy: { $not: { $elemMatch: { user: userId } } } } // User hasn't read
-                ]
-            });
+            if (chatRoom.isChatbot) {
+                // For chatbot rooms, don't calculate unread counts - AI responses don't need notifications
+                return {
+                    ...chatRoom.toObject(),
+                    unreadCount: 0, // Always 0 for AI chats
+                    isChatbot: true,
+                    participants: [{
+                        _id: 'ai-assistant',
+                        name: 'Your AI Friend',
+                        avatarUrl: '/chatbot.png'
+                    }]
+                };
+            } else {
+                // For regular chats
+                const unreadCount = await Message.countDocuments({
+                    chatId: chatRoom.chatId,
+                    sender: { $ne: userId }, // Messages not sent by current user
+                    $or: [
+                        { readBy: { $exists: false } }, // No readBy field
+                        { readBy: { $not: { $elemMatch: { user: userId } } } } // User hasn't read
+                    ]
+                });
 
-            return {
-                ...chatRoom.toObject(),
-                unreadCount
-            };
+                return {
+                    ...chatRoom.toObject(),
+                    unreadCount
+                };
+            }
         })
     );
 
