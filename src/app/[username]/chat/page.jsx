@@ -13,6 +13,7 @@ const ChatPage = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [isInitializing, setIsInitializing] = useState(true);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [chatRooms, setChatRooms] = useState([]);
     const hasProcessedInitialParams = useRef(false);
 
     const searchParams = useSearchParams();
@@ -113,6 +114,24 @@ const ChatPage = () => {
         }
     }, [searchParams]);
 
+    // Function to update chatbot last message in chat list
+    const updateChatbotLastMessage = useCallback((message) => {
+        setChatRooms(prev => 
+            prev.map(room => 
+                room.chatId === 'chatbot' 
+                    ? { 
+                        ...room, 
+                        lastMessage: {
+                            content: message,
+                            timestamp: new Date().toISOString()
+                        },
+                        lastActivity: new Date().toISOString()
+                    }
+                    : room
+            )
+        );
+    }, []);
+
     const handleBackToList = useCallback(() => {
         console.log('Going back to chat list');
         setSelectedChat(null);
@@ -151,6 +170,8 @@ const ChatPage = () => {
                                 selectedChatId={selectedChat?.chatId}
                                 refreshTrigger={refreshTrigger}
                                 autoSelectChatId={searchParams.get('chatId')}
+                                chatRooms={chatRooms}
+                                setChatRooms={setChatRooms}
                             />
                         </div>
 
@@ -170,6 +191,7 @@ const ChatPage = () => {
                                 <ChatInterface
                                     chatRoom={selectedChat}
                                     onBack={handleBackToList}
+                                    onUpdateChatList={updateChatbotLastMessage}
                                 />) : (
                                 !isInitializing && (
                                     <div className="flex items-center justify-center h-full bg-gray-50">

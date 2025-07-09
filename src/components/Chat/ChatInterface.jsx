@@ -12,12 +12,13 @@ import { Send, MoreVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
 
-const ChatInterface = ({ chatRoom, onBack }) => {
+const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [typingUsers, setTypingUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [aiTyping, setAiTyping] = useState(false);
 
     const { socket, joinChat, sendMessage, emitTyping, emitStopTyping } = useSocket();
     const userDetails = useSelector((state) => state.user.user);
@@ -28,12 +29,30 @@ const ChatInterface = ({ chatRoom, onBack }) => {
 
     // Get the other participant
     const otherParticipant = chatRoom?.participants?.find(p => p._id !== userDetails?._id);
+    const isChatbot = chatRoom?.isChatbot || chatRoom?.chatId === 'chatbot';
 
     useEffect(() => {
         if (chatRoom?.chatId) {
             console.log('Joining chat and fetching messages for:', chatRoom.chatId);
-            joinChat(chatRoom.chatId);
-            fetchMessages();
+            if (!isChatbot) {
+                joinChat(chatRoom.chatId);
+                fetchMessages();
+            } else {
+                // For chatbot, initialize with welcome message
+                setMessages([
+                    {
+                        _id: 'welcome',
+                        content: 'Hey there! 😊 I\'m so happy you decided to chat with me! I\'m here to be your friend, companion, or whatever you need me to be. Whether you want to talk about your day, dive deep into what\'s on your mind, share your dreams, or just have a meaningful conversation - I\'m all ears! What\'s going on with you today? How are you really feeling?',
+                        sender: {
+                            _id: 'ai-assistant',
+                            name: 'Your AI Friend',
+                            avatarUrl: '/chatbot.png'
+                        },
+                        timestamp: new Date().toISOString()
+                    }
+                ]);
+                setLoading(false);
+            }
         }
     }, [chatRoom?.chatId]); // Only depend on chatId, not the whole chatRoom object
 
@@ -78,6 +97,73 @@ const ChatInterface = ({ chatRoom, onBack }) => {
         }
     };
 
+    const handleChatbotMessage = async (userMessage) => {
+        try {
+            setAiTyping(true);
+
+            // Add a delay to simulate AI thinking
+            setTimeout(async () => {
+                try {
+                    const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHATBOT_MESSAGE, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: userMessage
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const aiMessage = {
+                            _id: Date.now().toString(),
+                            content: data.data.message,
+                            sender: {
+                                _id: 'ai-assistant',
+                                name: 'Your AI Friend',
+                                avatarUrl: '/chatbot.png'
+                            },
+                            timestamp: data.data.timestamp
+                        };
+
+                        setMessages(prev => [...prev, aiMessage]);
+
+                        // Update chat list with AI response
+                        if (onUpdateChatList) {
+                            onUpdateChatList(data.data.message);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error getting AI response:', error);
+                    // Fallback response
+                    const fallbackMessage = {
+                        _id: Date.now().toString(),
+                        content: 'Aw, I\'m having a bit of trouble thinking right now! 😅 Could you try asking me that again? I really want to help!',
+                        sender: {
+                            _id: 'ai-assistant',
+                            name: 'Your AI Friend',
+                            avatarUrl: '/chatbot.png'
+                        },
+                        timestamp: new Date().toISOString()
+                    };
+                    setMessages(prev => [...prev, fallbackMessage]);
+
+                    // Update chat list with fallback message
+                    if (onUpdateChatList) {
+                        onUpdateChatList('Aw, I\'m having a bit of trouble thinking right now! 😅 Could you try asking me that again? I really want to help!');
+                    }
+                } finally {
+                    setAiTyping(false);
+                }
+            }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+        } catch (error) {
+            console.error('Error in chatbot message handler:', error);
+            setAiTyping(false);
+        }
+    };
+
     const handleReceiveMessage = (messageData) => {
         // Check if message already exists (to prevent duplicates from optimistic updates)
         setMessages(prev => {
@@ -91,12 +177,12 @@ const ChatInterface = ({ chatRoom, onBack }) => {
                     timeDiff < 1000 // Within 1 second
                 );
             });
-            
+
             if (messageExists) {
                 console.log('Duplicate message detected, skipping:', messageData);
                 return prev; // Don't add duplicate
             }
-            
+
             console.log('Adding new message:', messageData);
             return [...prev, messageData];
         });
@@ -118,7 +204,7 @@ const ChatInterface = ({ chatRoom, onBack }) => {
         console.log('Sending message:', newMessage.trim());
 
         const messageText = newMessage.trim();
-        
+
         // Clear input immediately for better UX
         setNewMessage('');
         handleStopTyping();
@@ -141,28 +227,38 @@ const ChatInterface = ({ chatRoom, onBack }) => {
             return [...prev, messageData];
         });
 
-        // Send via socket
-        sendMessage(messageData);
+        if (isChatbot) {
+            // Handle chatbot conversation
+            handleChatbotMessage(messageText);
+            // Update chat list with the user's message
+            if (onUpdateChatList) {
+                onUpdateChatList(messageText);
+            }
+        } else {
+            // Handle regular chat
+            // Send via socket
+            sendMessage(messageData);
 
-        // Save to database
-        try {
-            console.log('Saving message to database...');
-            const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHAT_MESSAGE, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chatId: chatRoom.chatId,
-                    content: messageText
-                })
-            });
-            console.log('Message saved successfully');
-        } catch (error) {
-            console.error('Error saving message:', error);
-            // If saving fails, remove the optimistic message and restore the input
-            setMessages(prev => prev.filter(msg => msg !== messageData));
-            setNewMessage(messageText); // Restore the message to input if save failed
+            // Save to database
+            try {
+                console.log('Saving message to database...');
+                const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHAT_MESSAGE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chatId: chatRoom.chatId,
+                        content: messageText
+                    })
+                });
+                console.log('Message saved successfully');
+            } catch (error) {
+                console.error('Error saving message:', error);
+                // If saving fails, remove the optimistic message and restore the input
+                setMessages(prev => prev.filter(msg => msg !== messageData));
+                setNewMessage(messageText); // Restore the message to input if save failed
+            }
         }
     };
 
@@ -222,21 +318,21 @@ const ChatInterface = ({ chatRoom, onBack }) => {
         } else if (date.toDateString() === yesterday.toDateString()) {
             return 'Yesterday';
         } else {
-            return date.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
         }
     };
 
     const shouldShowDateSeparator = (currentMessage, previousMessage) => {
         if (!previousMessage) return true;
-        
+
         const currentDate = new Date(currentMessage.timestamp).toDateString();
         const previousDate = new Date(previousMessage.timestamp).toDateString();
-        
+
         return currentDate !== previousDate;
     };
 
@@ -262,9 +358,9 @@ const ChatInterface = ({ chatRoom, onBack }) => {
                         ←
                     </Button>
                     {otherParticipant && (
-                        <div 
-                            className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200"
-                            onClick={() => router.push(`/profile/${otherParticipant._id}`)}
+                        <div
+                            className={`flex items-center space-x-3 ${!isChatbot ? 'cursor-pointer hover:bg-gray-50' : ''} rounded-lg p-2 transition-colors duration-200`}
+                            onClick={() => !isChatbot && router.push(`/profile/${otherParticipant._id}`)}
                         >
                             <div className="w-10 h-10 rounded-full overflow-hidden">
                                 <Image
@@ -277,7 +373,9 @@ const ChatInterface = ({ chatRoom, onBack }) => {
                             </div>
                             <div>
                                 <h3 className="font-semibold">{otherParticipant.name}</h3>
-                                <p className="text-sm text-gray-500">@{otherParticipant.username}</p>
+                                <p className="text-sm text-gray-500">
+                                    {isChatbot ? 'Your caring companion' : `@${otherParticipant.username}`}
+                                </p>
                             </div>
                         </div>
                     )}
@@ -311,23 +409,23 @@ const ChatInterface = ({ chatRoom, onBack }) => {
                                 <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                                         {!isOwnMessage && showAvatar && (
-                                            <div className="w-8 h-8 rounded-full overflow-hidden">
+                                            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                                                 <Image
                                                     src={message.sender.avatarUrl}
                                                     alt={message.sender.name}
                                                     width={32}
                                                     height={32}
-                                                    className="object-cover"
+                                                    className="object-cover w-full h-full"
                                                 />
                                             </div>
                                         )}
                                         {!isOwnMessage && !showAvatar && (
-                                            <div className="w-8 h-8" />
+                                            <div className="w-8 h-8 flex-shrink-0" />
                                         )}
                                         <div
-                                            className={`px-4 py-2 flex space-x-3 shadow-lg rounded-[10px] ${isOwnMessage
-                                                    ? 'bg-white text-black'
-                                                    : 'bg-black text-white'
+                                            className={`px-4 py-2 flex flex-col items-start space-y-1 shadow-lg rounded-[10px] ${isOwnMessage
+                                                ? 'bg-white text-black'
+                                                : 'bg-black text-white'
                                                 }`}
                                         >
                                             <p className="text-sm">{message.content || message.message}</p>
@@ -342,12 +440,12 @@ const ChatInterface = ({ chatRoom, onBack }) => {
                     })}
 
                     {/* Typing Indicator */}
-                    {typingUsers.length > 0 && (
+                    {(typingUsers.length > 0 || aiTyping) && (
                         <div className="flex items-center space-x-2">
                             <div className="w-8 h-8 rounded-full overflow-hidden">
                                 <Image
-                                    src={otherParticipant?.avatarUrl}
-                                    alt={otherParticipant?.name}
+                                    src={aiTyping ? '/chatbot.png' : otherParticipant?.avatarUrl}
+                                    alt={aiTyping ? 'Your AI Friend' : otherParticipant?.name}
                                     width={32}
                                     height={32}
                                     className="object-cover"
@@ -374,7 +472,7 @@ const ChatInterface = ({ chatRoom, onBack }) => {
                         value={newMessage}
                         onChange={handleInputChange}
                         onKeyPress={handleKeyPress}
-                        placeholder={`Message ${otherParticipant?.name}...`}
+                        placeholder={isChatbot ? "Ask me anything..." : `Message ${otherParticipant?.name}...`}
                         className="py-2 outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white"
                     />
                     <Button

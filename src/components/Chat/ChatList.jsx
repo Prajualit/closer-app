@@ -7,13 +7,13 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, MessageCircle, Plus, Info } from 'lucide-react';
+import { Search, MessageCircle, Plus, Info, Bot } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
 import { useSocket } from '@/lib/SocketContext';
+import LoadingButton from '../Loadingbutton';
 
-const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChatId }) => {
-    const [chatRooms, setChatRooms] = useState([]);
+const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChatId, chatRooms, setChatRooms }) => {
     const [searchUsers, setSearchUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
@@ -25,6 +25,11 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
     const { toast } = useToast();
     const { socket } = useSocket();
 
+    // Initialize chatRooms if not provided externally
+    const [internalChatRooms, setInternalChatRooms] = useState([]);
+    const actualChatRooms = chatRooms || internalChatRooms;
+    const actualSetChatRooms = setChatRooms || setInternalChatRooms;
+
     useEffect(() => {
         fetchChatRooms();
     }, [refreshTrigger]); // Only depend on refreshTrigger, not fetchChatRooms
@@ -34,12 +39,12 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
         if (socket) {
             const handleChatUpdate = (messageData) => {
                 // Only update if the message is for a chat that exists in our list
-                setChatRooms(prev => {
+                actualSetChatRooms(prev => {
                     const roomExists = prev.some(room => room.chatId === messageData.chatId);
                     if (!roomExists) {
                         return prev; // Don't update if chat doesn't exist in our list
                     }
-                    
+
                     console.log('Updating chat list for message:', messageData.chatId);
                     const updatedRooms = prev.map(room => {
                         if (room.chatId === messageData.chatId) {
@@ -53,8 +58,8 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                 },
                                 lastActivity: messageData.timestamp,
                                 // Increment unread count only if message is from another user and this chat is not currently selected
-                                unreadCount: isFromOtherUser && selectedChatId !== messageData.chatId 
-                                    ? (room.unreadCount || 0) + 1 
+                                unreadCount: isFromOtherUser && selectedChatId !== messageData.chatId
+                                    ? (room.unreadCount || 0) + 1
                                     : (room.unreadCount || 0)
                             };
                         }
@@ -66,7 +71,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
             };
 
             socket.on('receive-message', handleChatUpdate);
-            
+
             return () => {
                 socket.off('receive-message', handleChatUpdate);
             };
@@ -76,15 +81,15 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
     // Auto-select chat when chatRooms are loaded and we have an autoSelectChatId
     // Only run this once per autoSelectChatId to prevent loops
     useEffect(() => {
-        if (autoSelectChatId && chatRooms.length > 0 && !hasAutoSelected && selectedChatId !== autoSelectChatId) {
-            const chatToSelect = chatRooms.find(room => room.chatId === autoSelectChatId);
+        if (autoSelectChatId && actualChatRooms.length > 0 && !hasAutoSelected && selectedChatId !== autoSelectChatId) {
+            const chatToSelect = actualChatRooms.find(room => room.chatId === autoSelectChatId);
             if (chatToSelect && onSelectChat) {
                 console.log('Auto-selecting chat:', autoSelectChatId);
                 onSelectChat(chatToSelect);
                 setHasAutoSelected(true);
             }
         }
-    }, [chatRooms, autoSelectChatId, selectedChatId, hasAutoSelected]); // Removed onSelectChat from dependencies
+    }, [actualChatRooms, autoSelectChatId, selectedChatId, hasAutoSelected]); // Removed onSelectChat from dependencies
 
     // Reset hasAutoSelected when autoSelectChatId changes (new chat to auto-select)
     useEffect(() => {
@@ -107,7 +112,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
             const data = await response.json();
 
             if (data.success) {
-                setChatRooms(data.data || []);
+                actualSetChatRooms(data.data || []);
                 console.log('Chat rooms fetched:', data.data?.length || 0);
             }
         } catch (error) {
@@ -130,7 +135,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
 
             if (data.success) {
                 // Filter out current user and users already in chat rooms
-                const existingChatUserIds = chatRooms.flatMap(room =>
+                const existingChatUserIds = actualChatRooms.flatMap(room =>
                     room.participants.map(p => p._id)
                 );
 
@@ -157,9 +162,9 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                 onSelectChat(data.data);
                 setSearchQuery('');
                 setSearchUsers([]);
-                
+
                 // Instead of refetching all chat rooms, just add the new one if it doesn't exist
-                setChatRooms(prev => {
+                actualSetChatRooms(prev => {
                     const exists = prev.some(room => room.chatId === data.data.chatId);
                     if (!exists) {
                         console.log('Adding new chat room to list:', data.data.chatId);
@@ -184,11 +189,11 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
             await makeAuthenticatedRequest(API_ENDPOINTS.MARK_MESSAGES_READ(chatId), {
                 method: 'POST'
             });
-            
+
             // Update local state to reset unread count
-            setChatRooms(prev => 
-                prev.map(room => 
-                    room.chatId === chatId 
+            actualSetChatRooms(prev =>
+                prev.map(room =>
+                    room.chatId === chatId
                         ? { ...room, unreadCount: 0 }
                         : room
                 )
@@ -196,6 +201,24 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
         } catch (error) {
             console.error('Error marking messages as read:', error);
         }
+    };
+
+    // Function to update chatbot last message in chat list
+    const updateChatbotLastMessage = (message) => {
+        actualSetChatRooms(prev => 
+            prev.map(room => 
+                room.chatId === 'chatbot' 
+                    ? { 
+                        ...room, 
+                        lastMessage: {
+                            content: message,
+                            timestamp: new Date().toISOString()
+                        },
+                        lastActivity: new Date().toISOString()
+                    }
+                    : room
+            )
+        );
     };
 
     const formatLastActivity = (timestamp) => {
@@ -222,6 +245,40 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
     const handleViewProfile = (e, userId) => {
         e.stopPropagation(); // Prevent chat selection
         router.push(`/profile/${userId}`);
+    };
+
+    const startChatbotConversation = () => {
+        // Create a mock chatbot room object
+        const chatbotRoom = {
+            chatId: 'chatbot',
+            _id: 'chatbot',
+            participants: [
+                {
+                    _id: 'ai-assistant',
+                    name: 'Your AI Friend',
+                    username: 'ai_companion',
+                    avatarUrl: '/chatbot.png'
+                }
+            ],
+            lastMessage: {
+                content: 'Hey there! 😊 I\'m so happy you decided to chat with me! How are you really feeling?',
+                timestamp: new Date().toISOString()
+            },
+            lastActivity: new Date().toISOString(),
+            unreadCount: 0,
+            isChatbot: true
+        };
+
+        // Add chatbot room to chat list if it doesn't already exist
+        actualSetChatRooms(prev => {
+            const chatbotExists = prev.some(room => room.chatId === 'chatbot');
+            if (!chatbotExists) {
+                return [chatbotRoom, ...prev]; // Add to beginning of list
+            }
+            return prev;
+        });
+
+        onSelectChat(chatbotRoom);
     };
 
     if (loading) {
@@ -304,9 +361,46 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
 
             {/* Chat List */}
             <ScrollArea className="flex-1 mt-3">
-                {chatRooms.length > 0 ? (
+                {actualChatRooms.length > 0 ? (
                     <div className="divide-y">
-                        {chatRooms.map((chatRoom) => {
+                        {/* AI Chatbot Option - Only show at top when chatbot is NOT already in the chat list */}
+                        {!searchQuery && !actualChatRooms.some(room => room.chatId === 'chatbot') && (
+                            <div className="group w-full rounded-l-xl flex items-center space-x-3 p-4 hover:bg-[#f3f3f3] transition-colors duration-300 border-b border-gray-100">
+                                <button
+                                    onClick={startChatbotConversation}
+                                    className="flex items-center space-x-3 flex-1"
+                                >
+                                    <div className="relative w-12 h-12 rounded-full overflow-hidden">
+                                        <Image
+                                            src="/chatbot.png"
+                                            alt="AI Assistant"
+                                            width={48}
+                                            height={48}
+                                            className="object-cover bg-center rounded-full"
+                                        />
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-2">
+                                                <p className="font-medium text-gray-700">Your AI Friend</p>
+                                                <div className="bg-blue-500 text-white text-xs rounded-full px-2 py-1">
+                                                    AI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="text-sm text-blue-600 truncate">
+                                            Your friendly companion →
+                                        </p>
+                                    </div>
+                                </button>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Bot className="w-4 h-4 text-blue-500" />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Regular chat rooms */}
+                        {actualChatRooms.map((chatRoom) => {
                             const otherParticipant = getOtherParticipant(chatRoom.participants);
                             const isSelected = selectedChatId === chatRoom.chatId;
                             const unreadCount = chatRoom.unreadCount || 0;
@@ -379,7 +473,36 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                         <div className="flex flex-col items-center justify-center h-full p-8 text-center">
                             <MessageCircle className="w-16 h-16 text-gray-300 mb-4" />
                             <h3 className="text-lg font-medium text-gray-600 mb-2">No conversations yet</h3>
-                            <p className="text-gray-500">Search for users above to start a new conversation</p>
+                            <p className="text-gray-500 mb-6">Search for users above to start a new conversation</p>
+
+                            {/* AI Chatbot Call-to-Action for empty state */}
+                            <div className="w-full max-w-sm  ">
+                                <div className="bg-white rounded-[15px] shadow-md p-6">
+                                    <div className="flex items-center justify-center mb-4">
+                                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                                            <Image
+                                                src="/chatbot.png"
+                                                alt="AI Assistant"
+                                                width={48}
+                                                height={48}
+                                                className="object-cover bg-center rounded-full"
+                                            />
+                                        </div>
+                                    </div>
+                                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                        Have no one to chat with?
+                                    </h4>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        I'm here to be your friend! Let's talk about anything - your day, your dreams, your thoughts, or just have a deep conversation like close friends do!
+                                    </p>
+                                    <LoadingButton
+                                        onClick={startChatbotConversation}
+                                        size="md"
+                                    >
+                                        Let's be friends!
+                                    </LoadingButton>
+                                </div>
+                            </div>
                         </div>
                     )
                 )}
