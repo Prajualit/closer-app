@@ -16,6 +16,15 @@ export const API_ENDPOINTS = {
   FOLLOW: `${API_BASE_URL}/api/v1/users/follow`,
   UNFOLLOW: `${API_BASE_URL}/api/v1/users/unfollow`,
   
+  // Posts endpoints
+  POSTS: `${API_BASE_URL}/api/v1/posts`,
+  LIKE_POST: `${API_BASE_URL}/api/v1/posts/like`,
+  UNLIKE_POST: `${API_BASE_URL}/api/v1/posts/unlike`,
+  ADD_COMMENT: `${API_BASE_URL}/api/v1/posts/comment`,
+  GET_COMMENTS: (postId, mediaId) => `${API_BASE_URL}/api/v1/posts/comments/${postId}/${mediaId}`,
+  SUGGESTED_USERS: `${API_BASE_URL}/api/v1/posts/suggested-users`,
+  USER_ACTIVITY: `${API_BASE_URL}/api/v1/posts/user-activity`,
+  
   // Chat endpoints
   CHAT_ROOM: (userId) => `${API_BASE_URL}/api/v1/chat/room/${userId}`,
   CHAT_ROOMS: `${API_BASE_URL}/api/v1/chat/rooms`,
