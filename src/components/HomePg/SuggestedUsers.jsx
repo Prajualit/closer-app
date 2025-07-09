@@ -1,13 +1,18 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api'
 import { useSelector } from 'react-redux'
+import LoadingButton from '../Loadingbutton'
+import SuggestedUsersModal from '../Modal/suggestedUsers.modal'
 
 const SuggestedUsers = () => {
     const [suggestedUsers, setSuggestedUsers] = useState([])
     const [loading, setLoading] = useState(true)
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const currentUser = useSelector((state) => state.user.user)
+    const router = useRouter()
 
     useEffect(() => {
         const fetchSuggestedUsers = async () => {
@@ -16,7 +21,7 @@ const SuggestedUsers = () => {
                     API_ENDPOINTS.SUGGESTED_USERS,
                     { method: 'GET' }
                 )
-                
+
                 if (response.ok) {
                     const data = await response.json()
                     if (data.success && data.data.users) {
@@ -52,19 +57,29 @@ const SuggestedUsers = () => {
         }
     }
 
+    const handleProfileClick = (userId) => {
+        router.push(`/profile/${userId}`)
+    }
+
     return (
         <div className="w-full bg-white rounded-xl p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-gray-900">Suggested for you</h3>
-                <button className="text-xs font-medium text-blue-500 hover:text-blue-600">
+                <button 
+                    className="text-xs font-medium text-black hover:text-gray-600 transition-colors"
+                    onClick={() => setIsModalOpen(true)}
+                >
                     See All
                 </button>
             </div>
-            
-            <div className="space-y-3">
-                {suggestedUsers.map((user) => (
-                    <div key={user._id} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
+
+            <div className="">
+                {suggestedUsers.slice(0, 3).map((user) => (
+                    <div key={user._id} className="flex items-center justify-between hover:bg-gray-100 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer ">
+                        <div
+                            className="flex items-center space-x-3 flex-1 cursor-pointer rounded-lg p-2 transition-colors"
+                            onClick={() => handleProfileClick(user._id)}
+                        >
                             <div className="relative w-10 h-10">
                                 <Image
                                     src={user.avatarUrl || '/default-avatar.svg'}
@@ -78,29 +93,39 @@ const SuggestedUsers = () => {
                                     {user.username}
                                 </h4>
                                 <p className="text-xs text-gray-500">
-                                    {user.mutualFollowers} mutual followers
+                                    {user.followersCount || 0} followers
                                 </p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => handleFollow(user._id)}
-                            className="px-3 py-1 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+                        <LoadingButton
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                handleFollow(user._id)
+                            }}
+                            className="px-5 text-xs font-medium !w-fit !h-fit transition-colors"
                         >
                             Follow
-                        </button>
+                        </LoadingButton>
                     </div>
                 ))}
             </div>
 
+            <SuggestedUsersModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                suggestedUsers={suggestedUsers}
+                onFollow={handleFollow}
+            />
+
             <div className="mt-6 pt-4 border-t border-gray-100">
                 <div className="text-xs text-gray-500 space-y-1">
-                    <p>© 2024 Closer from NITH</p>
                     <div className="flex flex-wrap gap-2">
                         <a href="#" className="hover:underline">About</a>
                         <a href="#" className="hover:underline">Help</a>
                         <a href="#" className="hover:underline">Privacy</a>
                         <a href="#" className="hover:underline">Terms</a>
                     </div>
+                    <p>© 2025 Closer | No rights reserved</p>
                 </div>
             </div>
         </div>
