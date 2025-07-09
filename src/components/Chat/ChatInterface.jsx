@@ -38,20 +38,8 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                 joinChat(chatRoom.chatId);
                 fetchMessages();
             } else {
-                // For chatbot, initialize with welcome message
-                setMessages([
-                    {
-                        _id: 'welcome',
-                        content: 'Hey there! 😊 I\'m so happy you decided to chat with me! I\'m here to be your friend, companion, or whatever you need me to be. Whether you want to talk about your day, dive deep into what\'s on your mind, share your dreams, or just have a meaningful conversation - I\'m all ears! What\'s going on with you today? How are you really feeling?',
-                        sender: {
-                            _id: 'ai-assistant',
-                            name: 'Your AI Friend',
-                            avatarUrl: '/chatbot.png'
-                        },
-                        timestamp: new Date().toISOString()
-                    }
-                ]);
-                setLoading(false);
+                // For chatbot, fetch persisted messages from database
+                fetchChatbotMessages();
             }
         }
     }, [chatRoom?.chatId]); // Only depend on chatId, not the whole chatRoom object
@@ -92,6 +80,55 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                 description: 'Failed to load messages',
                 variant: 'destructive',
             });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchChatbotMessages = async () => {
+        try {
+            console.log('Fetching chatbot messages');
+            setLoading(true);
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHATBOT_MESSAGES);
+            const data = await response.json();
+
+            if (data.success) {
+                console.log('Fetched chatbot messages:', data.data.messages?.length || 0);
+                const messages = data.data.messages || [];
+                
+                // If no messages exist, show welcome message
+                if (messages.length === 0) {
+                    setMessages([
+                        {
+                            _id: 'welcome',
+                            content: 'Hey there! 😊 I\'m so happy you decided to chat with me! I\'m here to be your friend, companion, or whatever you need me to be. Whether you want to talk about your day, dive deep into what\'s on your mind, share your dreams, or just have a meaningful conversation - I\'m all ears! What\'s going on with you today? How are you really feeling?',
+                            sender: {
+                                _id: 'ai-assistant',
+                                name: 'Your AI Friend',
+                                avatarUrl: '/chatbot.png'
+                            },
+                            timestamp: new Date().toISOString()
+                        }
+                    ]);
+                } else {
+                    setMessages(messages);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching chatbot messages:', error);
+            // Show welcome message if fetching fails
+            setMessages([
+                {
+                    _id: 'welcome',
+                    content: 'Hey there! 😊 I\'m so happy you decided to chat with me! I\'m here to be your friend, companion, or whatever you need me to be. Whether you want to talk about your day, dive deep into what\'s on your mind, share your dreams, or just have a meaningful conversation - I\'m all ears! What\'s going on with you today? How are you really feeling?',
+                    sender: {
+                        _id: 'ai-assistant',
+                        name: 'Your AI Friend',
+                        avatarUrl: '/chatbot.png'
+                    },
+                    timestamp: new Date().toISOString()
+                }
+            ]);
         } finally {
             setLoading(false);
         }
