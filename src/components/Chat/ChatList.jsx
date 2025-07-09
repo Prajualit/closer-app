@@ -205,11 +205,11 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
 
     // Function to update chatbot last message in chat list
     const updateChatbotLastMessage = (message) => {
-        actualSetChatRooms(prev => 
-            prev.map(room => 
-                room.chatId === 'chatbot' 
-                    ? { 
-                        ...room, 
+        actualSetChatRooms(prev =>
+            prev.map(room =>
+                room.isChatbot
+                    ? {
+                        ...room,
                         lastMessage: {
                             content: message,
                             timestamp: new Date().toISOString()
@@ -247,38 +247,45 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
         router.push(`/profile/${userId}`);
     };
 
-    const startChatbotConversation = () => {
-        // Create a mock chatbot room object
-        const chatbotRoom = {
-            chatId: 'chatbot',
-            _id: 'chatbot',
-            participants: [
-                {
-                    _id: 'ai-assistant',
-                    name: 'Your AI Friend',
-                    username: 'ai_companion',
-                    avatarUrl: '/chatbot.png'
-                }
-            ],
-            lastMessage: {
-                content: 'Hey there! 😊 I\'m so happy you decided to chat with me! How are you really feeling?',
-                timestamp: new Date().toISOString()
-            },
-            lastActivity: new Date().toISOString(),
-            unreadCount: 0,
-            isChatbot: true
-        };
+    const startChatbotConversation = async () => {
+        try {
+            // Get or create chatbot room from backend
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHATBOT_ROOM);
+            const data = await response.json();
 
-        // Add chatbot room to chat list if it doesn't already exist
-        actualSetChatRooms(prev => {
-            const chatbotExists = prev.some(room => room.chatId === 'chatbot');
-            if (!chatbotExists) {
-                return [chatbotRoom, ...prev]; // Add to beginning of list
+            if (data.success) {
+                const chatbotRoom = {
+                    ...data.data,
+                    participants: [
+                        {
+                            _id: 'ai-assistant',
+                            name: 'Your AI Friend',
+                            username: 'ai_companion',
+                            avatarUrl: '/chatbot.png'
+                        }
+                    ],
+                    isChatbot: true
+                };
+
+                // Update chat list to include the chatbot room if it doesn't exist
+                actualSetChatRooms(prev => {
+                    const chatbotExists = prev.some(room => room.isChatbot);
+                    if (!chatbotExists) {
+                        return [chatbotRoom, ...prev]; // Add to beginning of list
+                    }
+                    return prev;
+                });
+
+                onSelectChat(chatbotRoom);
             }
-            return prev;
-        });
-
-        onSelectChat(chatbotRoom);
+        } catch (error) {
+            console.error('Error starting chatbot conversation:', error);
+            toast({
+                title: 'Error',
+                description: 'Failed to start conversation with AI friend',
+                variant: 'destructive',
+            });
+        }
     };
 
     if (loading) {
@@ -363,44 +370,67 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
             <ScrollArea className="flex-1 mt-3">
                 {actualChatRooms.length > 0 ? (
                     <div className="divide-y">
-                        {/* AI Chatbot Option - Only show at top when chatbot is NOT already in the chat list */}
-                        {!searchQuery && !actualChatRooms.some(room => room.chatId === 'chatbot') && (
-                            <div className="group w-full rounded-l-xl flex items-center space-x-3 p-4 hover:bg-[#f3f3f3] transition-colors duration-300 border-b border-gray-100">
-                                <button
-                                    onClick={startChatbotConversation}
-                                    className="flex items-center space-x-3 flex-1"
-                                >
-                                    <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                                        <Image
-                                            src="/chatbot.png"
-                                            alt="AI Assistant"
-                                            width={48}
-                                            height={48}
-                                            className="object-cover bg-center rounded-full"
-                                        />
-                                    </div>
-                                    <div className="flex-1 text-left">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center space-x-2">
-                                                <p className="font-medium text-gray-700">Your AI Friend</p>
-                                                <div className="bg-blue-500 text-white text-xs rounded-full px-2 py-1">
-                                                    AI
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p className="text-sm text-blue-600 truncate">
-                                            Your friendly companion →
-                                        </p>
-                                    </div>
-                                </button>
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Bot className="w-4 h-4 text-blue-500" />
-                                </div>
-                            </div>
-                        )}
-
                         {/* Regular chat rooms */}
                         {actualChatRooms.map((chatRoom) => {
+                            // Handle chatbot rooms specially
+                            if (chatRoom.isChatbot) {
+                                const isSelected = selectedChatId === chatRoom.chatId;
+
+                                return (
+                                    <div
+                                        key={chatRoom._id}
+                                        className={`group w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-[#ededed] border-r-2' : 'hover:bg-[#f3f3f3] transition-colors duration-300'}`}
+                                    >
+                                        <button
+                                            onClick={() => {
+                                                // Ensure chatbot room has correct structure
+                                                const chatbotRoomWithCorrectStructure = {
+                                                    ...chatRoom,
+                                                    participants: [
+                                                        {
+                                                            _id: 'ai-assistant',
+                                                            name: 'Your AI Friend',
+                                                            username: 'ai_companion',
+                                                            avatarUrl: '/chatbot.png'
+                                                        }
+                                                    ],
+                                                    isChatbot: true
+                                                };
+                                                onSelectChat(chatbotRoomWithCorrectStructure);
+                                            }}
+                                            className="flex items-center space-x-3 flex-1"
+                                        >
+                                            <div className="relative w-12 h-12 rounded-full overflow-hidden">
+                                                <Image
+                                                    src="/chatbot.png"
+                                                    alt="Your AI Friend"
+                                                    width={48}
+                                                    height={48}
+                                                    className="object-cover bg-center rounded-full"
+                                                />
+                                            </div>
+                                            <div className="flex-1 text-left">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-2">
+                                                        <p className="font-medium text-gray-700">
+                                                            Your AI Friend
+                                                        </p>
+                                                        <Bot className="w-4 h-4 text-black" />
+                                                    </div>
+                                                    <p className="text-xs text-gray-500">
+                                                        {formatLastActivity(chatRoom.lastActivity)}
+                                                    </p>
+                                                </div>
+                                                <p className="text-sm truncate text-gray-500">
+                                                    {chatRoom.lastMessage?.content || 'Start a conversation...'}
+                                                </p>
+                                            </div>
+                                        </button>
+                                    </div>
+                                );
+                            }
+
+                            // Handle regular chat rooms
                             const otherParticipant = getOtherParticipant(chatRoom.participants);
                             const isSelected = selectedChatId === chatRoom.chatId;
                             const unreadCount = chatRoom.unreadCount || 0;
@@ -467,6 +497,43 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                 </div>
                             );
                         })}
+
+                        {/* AI Chatbot Call-to-Action Card - Show at bottom when chatbot is NOT already in the chat list */}
+                        {!searchQuery && !actualChatRooms.some(room => room.isChatbot) && (
+                            <div className="p-4 border-t border-gray-100">
+                                <div className="bg-white rounded-[15px] shadow-md p-4">
+                                    <div className="flex items-center mb-3">
+                                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                                            <Image
+                                                src="/chatbot.png"
+                                                alt="AI Assistant"
+                                                width={48}
+                                                height={48}
+                                                className="object-cover bg-center rounded-full"
+                                            />
+                                        </div>
+                                        <div className="ml-3 flex-1">
+                                            <div className="flex items-center space-x-2">
+                                                <h4 className="font-semibold text-gray-800">Your AI Friend</h4>
+                                                <div className="bg-blue-500 text-white text-xs rounded-full px-2 py-1">
+                                                    AI
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mb-3">
+                                        I'm here to be your friend! Let's talk about anything - your day, your dreams, your thoughts, or just have a deep conversation like close friends do!
+                                    </p>
+                                    <LoadingButton
+                                        onClick={startChatbotConversation}
+                                        size="sm"
+                                        className="w-full"
+                                    >
+                                        Let's be friends!
+                                    </LoadingButton>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     !searchQuery && (

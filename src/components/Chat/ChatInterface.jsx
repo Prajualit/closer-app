@@ -31,9 +31,21 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
     const otherParticipant = chatRoom?.participants?.find(p => p._id !== userDetails?._id);
     const isChatbot = chatRoom?.isChatbot || chatRoom?.chatId === 'chatbot';
 
+    // Debug logging for chatbot detection
+    useEffect(() => {
+        if (chatRoom) {
+            console.log('ChatInterface - chatRoom:', {
+                chatId: chatRoom.chatId,
+                isChatbot: chatRoom.isChatbot,
+                participants: chatRoom.participants,
+                detectedAsChatbot: isChatbot
+            });
+        }
+    }, [chatRoom, isChatbot]);
+
     useEffect(() => {
         if (chatRoom?.chatId) {
-            console.log('Joining chat and fetching messages for:', chatRoom.chatId);
+            console.log('Joining chat and fetching messages for:', chatRoom.chatId, 'isChatbot:', isChatbot);
             if (!isChatbot) {
                 joinChat(chatRoom.chatId);
                 fetchMessages();
@@ -90,45 +102,31 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
             console.log('Fetching chatbot messages');
             setLoading(true);
             const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHATBOT_MESSAGES);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
 
             if (data.success) {
                 console.log('Fetched chatbot messages:', data.data.messages?.length || 0);
                 const messages = data.data.messages || [];
-                
-                // If no messages exist, show welcome message
-                if (messages.length === 0) {
-                    setMessages([
-                        {
-                            _id: 'welcome',
-                            content: 'Hey there! 😊 I\'m so happy you decided to chat with me! I\'m here to be your friend, companion, or whatever you need me to be. Whether you want to talk about your day, dive deep into what\'s on your mind, share your dreams, or just have a meaningful conversation - I\'m all ears! What\'s going on with you today? How are you really feeling?',
-                            sender: {
-                                _id: 'ai-assistant',
-                                name: 'Your AI Friend',
-                                avatarUrl: '/chatbot.png'
-                            },
-                            timestamp: new Date().toISOString()
-                        }
-                    ]);
-                } else {
-                    setMessages(messages);
-                }
+                setMessages(messages);
+            } else {
+                throw new Error(data.message || 'Failed to fetch messages');
             }
         } catch (error) {
             console.error('Error fetching chatbot messages:', error);
-            // Show welcome message if fetching fails
-            setMessages([
-                {
-                    _id: 'welcome',
-                    content: 'Hey there! 😊 I\'m so happy you decided to chat with me! I\'m here to be your friend, companion, or whatever you need me to be. Whether you want to talk about your day, dive deep into what\'s on your mind, share your dreams, or just have a meaningful conversation - I\'m all ears! What\'s going on with you today? How are you really feeling?',
-                    sender: {
-                        _id: 'ai-assistant',
-                        name: 'Your AI Friend',
-                        avatarUrl: '/chatbot.png'
-                    },
-                    timestamp: new Date().toISOString()
-                }
-            ]);
+            
+            toast({
+                title: 'Error',
+                description: 'Failed to load conversation history',
+                variant: 'destructive',
+            });
+            
+            // Set empty messages on error
+            setMessages([]);
         } finally {
             setLoading(false);
         }
@@ -154,8 +152,9 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                     const data = await response.json();
 
                     if (data.success) {
+                        // Add AI response directly to messages (real-time, no refresh)
                         const aiMessage = {
-                            _id: Date.now().toString(),
+                            _id: data.data.messageId || Date.now().toString(),
                             content: data.data.message,
                             sender: {
                                 _id: 'ai-assistant',
@@ -174,7 +173,8 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                     }
                 } catch (error) {
                     console.error('Error getting AI response:', error);
-                    // Fallback response
+                    
+                    // Add fallback message directly (no database refresh)
                     const fallbackMessage = {
                         _id: Date.now().toString(),
                         content: 'Aw, I\'m having a bit of trouble thinking right now! 😅 Could you try asking me that again? I really want to help!',
@@ -189,7 +189,7 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
 
                     // Update chat list with fallback message
                     if (onUpdateChatList) {
-                        onUpdateChatList('Aw, I\'m having a bit of trouble thinking right now! 😅 Could you try asking me that again? I really want to help!');
+                        onUpdateChatList(fallbackMessage.content);
                     }
                 } finally {
                     setAiTyping(false);
@@ -246,33 +246,44 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
         setNewMessage('');
         handleStopTyping();
 
-        const messageData = {
-            chatId: chatRoom.chatId,
-            message: messageText,
-            sender: {
-                _id: userDetails._id,
-                username: userDetails.username,
-                name: userDetails.name,
-                avatarUrl: userDetails.avatarUrl
-            },
-            timestamp: new Date().toISOString()
-        };
-
-        // Optimistically add message to local state immediately
-        setMessages(prev => {
-            console.log('Adding optimistic message to state');
-            return [...prev, messageData];
-        });
-
         if (isChatbot) {
-            // Handle chatbot conversation
+            // Handle chatbot conversation - show user message immediately, backend handles persistence
+            const userMessageData = {
+                _id: Date.now().toString(),
+                content: messageText,
+                sender: {
+                    _id: userDetails._id,
+                    username: userDetails.username,
+                    name: userDetails.name,
+                    avatarUrl: userDetails.avatarUrl
+                },
+                timestamp: new Date().toISOString()
+            };
+
+            // Add user message immediately for better UX
+            setMessages(prev => [...prev, userMessageData]);
+            
             handleChatbotMessage(messageText);
-            // Update chat list with the user's message
-            if (onUpdateChatList) {
-                onUpdateChatList(messageText);
-            }
         } else {
-            // Handle regular chat
+            // Handle regular chat with optimistic updates
+            const messageData = {
+                chatId: chatRoom.chatId,
+                message: messageText,
+                sender: {
+                    _id: userDetails._id,
+                    username: userDetails.username,
+                    name: userDetails.name,
+                    avatarUrl: userDetails.avatarUrl
+                },
+                timestamp: new Date().toISOString()
+            };
+
+            // Optimistically add message to local state immediately
+            setMessages(prev => {
+                console.log('Adding optimistic message to state');
+                return [...prev, messageData];
+            });
+
             // Send via socket
             sendMessage(messageData);
 
