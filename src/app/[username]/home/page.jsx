@@ -11,8 +11,8 @@ const page = () => {
     return (
         <div className='flex min-h-screen bg-gray-50'>
             <Navbar />
-            <div className='ml-[15rem] flex items-start justify-center w-full p-6 overflow-y-auto'>
-                <div className='w-full max-w-6xl flex flex-col lg:flex-row gap-8'>
+            <div className='ml-[15rem] w-full'>
+                <div className='w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-8 p-6'>
                     {/* Main Feed */}
                     <div className='flex-1 flex flex-col items-center max-w-lg mx-auto lg:mx-0'>
                         <div className='w-full mb-6'>
@@ -21,14 +21,13 @@ const page = () => {
                         <PostsFeed />
                     </div>
                     
-                    {/* Sidebar */}
-                    <div className='w-full lg:w-80 xl:w-96'>
-                        <div className='sticky top-6 space-y-6'>
-                            <SuggestedUsers />
+                    {/* Sidebar - Sticky Position */}
+                    <div className='w-full lg:w-80 xl:w-96 space-y-6'>
+                        <SuggestedUsers />
+                        <div className='sticky top-0'>
                             <UserActivity />
-
                             {/* Trending Hashtags */}
-                            <div className='bg-white rounded-xl p-6 shadow-sm border border-gray-100'>
+                            <div className='bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6'>
                                 <h3 className='text-lg font-semibold text-gray-900 mb-4'>Trending</h3>
                                 <div className='space-y-2'>
                                     {['#photography', '#travel', '#food', '#art', '#nature'].map((tag, index) => (

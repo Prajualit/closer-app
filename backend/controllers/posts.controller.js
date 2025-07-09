@@ -14,25 +14,25 @@ const getAllPosts = asyncHandler(async (req, res) => {
   // Get all users with their media, sorted by upload date
   const posts = await User.aggregate([
     {
-      $unwind: "$media"
+      $unwind: "$media",
     },
     {
       $lookup: {
         from: "users",
         localField: "_id",
         foreignField: "_id",
-        as: "userInfo"
-      }
+        as: "userInfo",
+      },
     },
     {
-      $unwind: "$userInfo"
+      $unwind: "$userInfo",
     },
     {
       $lookup: {
         from: "likes",
-        let: { 
-          postId: "$userInfo._id", 
-          mediaId: { $toString: "$media._id" }
+        let: {
+          postId: "$userInfo._id",
+          mediaId: { $toString: "$media._id" },
         },
         pipeline: [
           {
@@ -40,21 +40,21 @@ const getAllPosts = asyncHandler(async (req, res) => {
               $expr: {
                 $and: [
                   { $eq: ["$postId", "$$postId"] },
-                  { $eq: ["$mediaId", "$$mediaId"] }
-                ]
-              }
-            }
-          }
+                  { $eq: ["$mediaId", "$$mediaId"] },
+                ],
+              },
+            },
+          },
         ],
-        as: "likes"
-      }
+        as: "likes",
+      },
     },
     {
       $lookup: {
         from: "comments",
-        let: { 
-          postId: "$userInfo._id", 
-          mediaId: { $toString: "$media._id" }
+        let: {
+          postId: "$userInfo._id",
+          mediaId: { $toString: "$media._id" },
         },
         pipeline: [
           {
@@ -62,48 +62,48 @@ const getAllPosts = asyncHandler(async (req, res) => {
               $expr: {
                 $and: [
                   { $eq: ["$postId", "$$postId"] },
-                  { $eq: ["$mediaId", "$$mediaId"] }
-                ]
-              }
-            }
+                  { $eq: ["$mediaId", "$$mediaId"] },
+                ],
+              },
+            },
           },
           {
             $lookup: {
               from: "users",
               localField: "userId",
               foreignField: "_id",
-              as: "user"
-            }
+              as: "user",
+            },
           },
           {
-            $unwind: "$user"
+            $unwind: "$user",
           },
           {
             $project: {
               text: 1,
               createdAt: 1,
               "user.username": 1,
-              "user.avatarUrl": 1
-            }
+              "user.avatarUrl": 1,
+            },
           },
           {
-            $sort: { createdAt: -1 }
+            $sort: { createdAt: -1 },
           },
           {
-            $limit: 3
-          }
+            $limit: 3,
+          },
         ],
-        as: "comments"
-      }
+        as: "comments",
+      },
     },
     {
       $addFields: {
         likesCount: { $size: "$likes" },
         commentsCount: { $size: "$comments" },
         isLikedByCurrentUser: {
-          $in: [currentUserId, "$likes.userId"]
-        }
-      }
+          $in: [currentUserId, "$likes.userId"],
+        },
+      },
     },
     {
       $project: {
@@ -117,31 +117,35 @@ const getAllPosts = asyncHandler(async (req, res) => {
           url: "$media.url",
           caption: "$media.caption",
           resource_type: "$media.resource_type",
-          uploadedAt: "$media.uploadedAt"
+          uploadedAt: "$media.uploadedAt",
         },
         likesCount: 1,
         commentsCount: 1,
         isLikedByCurrentUser: 1,
-        comments: 1
-      }
+        comments: 1,
+      },
     },
     {
-      $sort: { "media.uploadedAt": -1 }
+      $sort: { "media.uploadedAt": -1 },
     },
     {
-      $skip: parseInt(skip)
+      $skip: parseInt(skip),
     },
     {
-      $limit: parseInt(limit)
-    }
+      $limit: parseInt(limit),
+    },
   ]);
 
   return res.status(200).json(
-    new ApiResponse(200, { 
-      posts, 
-      currentPage: parseInt(page), 
-      hasMore: posts.length === parseInt(limit) 
-    }, "Posts fetched successfully")
+    new ApiResponse(
+      200,
+      {
+        posts,
+        currentPage: parseInt(page),
+        hasMore: posts.length === parseInt(limit),
+      },
+      "Posts fetched successfully"
+    )
   );
 });
 
@@ -157,7 +161,7 @@ const likePost = asyncHandler(async (req, res) => {
   try {
     // Check if already liked
     const existingLike = await Like.findOne({ userId, postId, mediaId });
-    
+
     if (existingLike) {
       throw new ApiError(400, "Post already liked");
     }
@@ -168,9 +172,15 @@ const likePost = asyncHandler(async (req, res) => {
     // Get updated likes count
     const likesCount = await Like.countDocuments({ postId, mediaId });
 
-    return res.status(200).json(
-      new ApiResponse(200, { likesCount, liked: true }, "Post liked successfully")
-    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { likesCount, liked: true },
+          "Post liked successfully"
+        )
+      );
   } catch (error) {
     if (error.code === 11000) {
       throw new ApiError(400, "Post already liked");
@@ -189,7 +199,7 @@ const unlikePost = asyncHandler(async (req, res) => {
   }
 
   const deletedLike = await Like.findOneAndDelete({ userId, postId, mediaId });
-  
+
   if (!deletedLike) {
     throw new ApiError(404, "Like not found");
   }
@@ -197,9 +207,15 @@ const unlikePost = asyncHandler(async (req, res) => {
   // Get updated likes count
   const likesCount = await Like.countDocuments({ postId, mediaId });
 
-  return res.status(200).json(
-    new ApiResponse(200, { likesCount, liked: false }, "Post unliked successfully")
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { likesCount, liked: false },
+        "Post unliked successfully"
+      )
+    );
 });
 
 // Add comment to post
@@ -219,22 +235,26 @@ const addComment = asyncHandler(async (req, res) => {
     userId,
     postId,
     mediaId,
-    text: text.trim()
+    text: text.trim(),
   });
 
   // Populate the comment with user info
   const populatedComment = await Comment.findById(newComment._id)
-    .populate('userId', 'username avatarUrl')
+    .populate("userId", "username avatarUrl")
     .lean();
 
   // Get updated comments count
   const commentsCount = await Comment.countDocuments({ postId, mediaId });
 
   return res.status(200).json(
-    new ApiResponse(200, { 
-      comment: populatedComment, 
-      commentsCount 
-    }, "Comment added successfully")
+    new ApiResponse(
+      200,
+      {
+        comment: populatedComment,
+        commentsCount,
+      },
+      "Comment added successfully"
+    )
   );
 });
 
@@ -245,7 +265,7 @@ const getComments = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
 
   const comments = await Comment.find({ postId, mediaId })
-    .populate('userId', 'username avatarUrl')
+    .populate("userId", "username avatarUrl")
     .sort({ createdAt: -1 })
     .skip(parseInt(skip))
     .limit(parseInt(limit))
@@ -254,11 +274,15 @@ const getComments = asyncHandler(async (req, res) => {
   const totalComments = await Comment.countDocuments({ postId, mediaId });
 
   return res.status(200).json(
-    new ApiResponse(200, { 
-      comments, 
-      totalComments,
-      hasMore: skip + comments.length < totalComments
-    }, "Comments fetched successfully")
+    new ApiResponse(
+      200,
+      {
+        comments,
+        totalComments,
+        hasMore: skip + comments.length < totalComments,
+      },
+      "Comments fetched successfully"
+    )
   );
 });
 
@@ -272,23 +296,29 @@ const getSuggestedUsers = asyncHandler(async (req, res) => {
 
   // Get users not followed by current user and exclude current user
   const suggestedUsers = await User.find({
-    _id: { 
-      $nin: [...followingIds, currentUserId] 
-    }
+    _id: {
+      $nin: [...followingIds, currentUserId],
+    },
   })
-  .select('username name avatarUrl bio')
-  .limit(parseInt(limit))
-  .lean();
+    .select("username name avatarUrl bio followers")
+    .limit(parseInt(limit))
+    .lean();
 
-  // Add mutual followers count (simplified)
-  const usersWithMutuals = suggestedUsers.map(user => ({
+  // Add followers count to each user
+  const usersWithFollowersCount = suggestedUsers.map((user) => ({
     ...user,
-    mutualFollowers: Math.floor(Math.random() * 10) // Mock data for now
+    followersCount: user.followers ? user.followers.length : 0,
   }));
 
-  return res.status(200).json(
-    new ApiResponse(200, { users: usersWithMutuals }, "Suggested users fetched successfully")
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { users: usersWithFollowersCount },
+        "Suggested users fetched successfully"
+      )
+    );
 });
 
 // Get user activity stats
@@ -296,16 +326,16 @@ const getUserActivity = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const user = await User.findById(userId);
-  
+
   const stats = {
     postsCount: user.media ? user.media.length : 0,
     followersCount: user.followers ? user.followers.length : 0,
-    followingCount: user.following ? user.following.length : 0
+    followingCount: user.following ? user.following.length : 0,
   };
 
-  return res.status(200).json(
-    new ApiResponse(200, stats, "User activity fetched successfully")
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, stats, "User activity fetched successfully"));
 });
 
 export {
@@ -315,5 +345,5 @@ export {
   addComment,
   getComments,
   getSuggestedUsers,
-  getUserActivity
+  getUserActivity,
 };

@@ -211,7 +211,7 @@ const Post = ({ post, onLike, onComment }) => {
     }
 
     return (
-        <div className='w-full max-w-md bg-white rounded-lg shadow-sm border border-gray-100 mb-6 hover-lift fade-in'>
+        <div className='w-full max-w-md bg-white rounded-lg shadow-sm border border-gray-100 mb-6'>
             {/* Post Header */}
             <div className='p-4 flex items-center justify-start space-x-3'>
                 <div className="relative w-10 h-10">
@@ -240,7 +240,7 @@ const Post = ({ post, onLike, onComment }) => {
             <div className='relative w-full aspect-square bg-gray-100'>
                 {isVideo(post.media.url) ? (
                     <video
-                        className='w-full h-full object-cover'
+                        className='w-full h-full object-contain'
                         controls
                         playsInline
                         preload="metadata"
@@ -255,7 +255,7 @@ const Post = ({ post, onLike, onComment }) => {
                 ) : (
                     <Image 
                         fill
-                        className='object-cover' 
+                        className='object-contain' 
                         src={post.media.url || '/placeholder-image.svg'} 
                         alt={post.media.caption || 'Post media'}
                         onError={(e) => {
