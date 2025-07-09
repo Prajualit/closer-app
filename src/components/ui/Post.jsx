@@ -211,14 +211,14 @@ const Post = ({ post, onLike, onComment }) => {
     }
 
     return (
-        <div className='w-full max-w-md bg-white rounded-lg shadow-sm border border-gray-100 mb-6'>
+        <div className='w-full max-w-[470px] bg-white rounded-lg shadow-sm border border-gray-100'>
             {/* Post Header */}
             <div className='p-4 flex items-center justify-start space-x-3'>
                 <div className="relative w-10 h-10">
-                    <Image 
+                    <Image
                         fill
-                        className='rounded-full object-cover' 
-                        src={post.avatarUrl || '/default-avatar.svg'} 
+                        className='rounded-full object-cover'
+                        src={post.avatarUrl || '/default-avatar.svg'}
                         alt={`${post.username}'s avatar`}
                         onError={(e) => {
                             e.target.src = '/default-avatar.svg'
@@ -253,10 +253,10 @@ const Post = ({ post, onLike, onComment }) => {
                         Your browser does not support the video tag.
                     </video>
                 ) : (
-                    <Image 
+                    <Image
                         fill
-                        className='object-contain' 
-                        src={post.media.url || '/placeholder-image.svg'} 
+                        className='object-contain'
+                        src={post.media.url || '/placeholder-image.svg'}
                         alt={post.media.caption || 'Post media'}
                         onError={(e) => {
                             e.target.src = '/placeholder-image.svg'
@@ -279,9 +279,9 @@ const Post = ({ post, onLike, onComment }) => {
                 <div className='flex items-center justify-between mb-3'>
                     <div className='flex items-center space-x-4'>
                         <button onClick={handleLike} className='scale-animation'>
-                            <FavouriteIcon 
-                                size={24} 
-                                color={isLiked ? "#ef4444" : "#000000"} 
+                            <FavouriteIcon
+                                size={24}
+                                color={isLiked ? "#ef4444" : "#000000"}
                                 filled={isLiked}
                             />
                         </button>
@@ -292,16 +292,12 @@ const Post = ({ post, onLike, onComment }) => {
                             <ShareIcon />
                         </button>
                     </div>
-                    <button className="scale-animation">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16a2 2 0 01-2 2H7a2 2 0 01-2-2V5z" />
-                        </svg>
-                    </button>
                 </div>
 
                 {/* Likes Count */}
-                <div className='mb-2'>
-                    <span className='font-semibold text-sm'>{likesCount.toLocaleString()} likes</span>
+                <div className='mb-2 flex space-x-2'>
+                    <span className='font-semibold text-sm'>{likesCount.toLocaleString()} like{likesCount === 1 ? "" : "s"}</span>
+                    <span className='font-semibold text-sm'>{commentsCount.toLocaleString()} comment{commentsCount === 1 ? "" : "s"}</span>
                 </div>
 
                 {/* Caption */}
@@ -313,7 +309,7 @@ const Post = ({ post, onLike, onComment }) => {
                 )}
 
                 {/* View Comments */}
-                <button 
+                <button
                     onClick={() => setShowComments(!showComments)}
                     className="text-sm text-gray-500 hover:text-gray-700 transition-colors mb-2"
                 >
@@ -351,7 +347,7 @@ const Post = ({ post, onLike, onComment }) => {
                                 }}
                                 disabled={loading}
                             />
-                            <button 
+                            <button
                                 onClick={handleAddComment}
                                 disabled={!newComment.trim() || loading}
                                 className='text-blue-500 text-sm font-semibold hover:text-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'

@@ -56,15 +56,15 @@ const UserActivity = () => {
             <div className='space-y-3'>
                 <div className='flex justify-between items-center'>
                     <span className='text-gray-600 text-sm'>Posts shared</span>
-                    <span className='font-semibold text-blue-500'>{activityData.postsCount}</span>
+                    <span className='font-semibold text-neutral-500'>{activityData.postsCount}</span>
                 </div>
                 <div className='flex justify-between items-center'>
                     <span className='text-gray-600 text-sm'>Followers</span>
-                    <span className='font-semibold text-green-500'>{activityData.followersCount}</span>
+                    <span className='font-semibold text-neutral-500'>{activityData.followersCount}</span>
                 </div>
                 <div className='flex justify-between items-center'>
                     <span className='text-gray-600 text-sm'>Following</span>
-                    <span className='font-semibold text-purple-500'>{activityData.followingCount}</span>
+                    <span className='font-semibold text-neutral-500'>{activityData.followingCount}</span>
                 </div>
             </div>
         </div>

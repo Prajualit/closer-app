@@ -4,7 +4,6 @@ import Navsearch from '@/components/HomePg/Navsearch.jsx'
 import PostsFeed from '@/components/HomePg/PostsFeed.jsx'
 import SuggestedUsers from '@/components/HomePg/SuggestedUsers.jsx'
 import UserActivity from '@/components/HomePg/UserActivity.jsx'
-import FloatingActionButton from '@/components/ui/FloatingActionButton.jsx'
 import BackToTop from '@/components/ui/BackToTop.jsx'
 
 const page = () => {
@@ -14,17 +13,15 @@ const page = () => {
             <div className='ml-[15rem] w-full'>
                 <div className='w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-8 p-6'>
                     {/* Main Feed */}
-                    <div className='flex-1 flex flex-col items-center max-w-lg mx-auto lg:mx-0'>
-                        <div className='w-full mb-6'>
-                            <Navsearch />
-                        </div>
+                    <div className='flex-1 flex flex-col items-center space-y-6 max-w-lg mx-auto lg:mx-0'>
+                        <Navsearch />
                         <PostsFeed />
                     </div>
-                    
+
                     {/* Sidebar - Sticky Position */}
-                    <div className='w-full lg:w-80 xl:w-96 space-y-6'>
-                        <SuggestedUsers />
-                        <div className='sticky top-0'>
+                    <div className='w-full lg:w-80 xl:w-96 pt-16'>
+                        <div className='sticky top-3 space-y-6'>
+                            <SuggestedUsers />
                             <UserActivity />
                             {/* Trending Hashtags */}
                             <div className='bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6'>
@@ -46,7 +43,6 @@ const page = () => {
                     </div>
                 </div>
             </div>
-            <FloatingActionButton />
             <BackToTop />
         </div>
     )

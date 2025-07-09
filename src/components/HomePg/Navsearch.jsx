@@ -70,8 +70,8 @@ const Navsearch = () => {
     };
 
     return (
-        <div ref={searchRef} className="relative w-[75%]">
-            <div className="border border-[#cacaca] transition-all duration-300 hover:shadow-md focus-within:shadow-md flex items-center rounded-full px-3 py-2 bg-[#f7f7f7] space-x-2">
+        <div ref={searchRef} className="relative w-full max-w-md mx-auto">
+            <div className="transition-all duration-300 hover:shadow-lg focus-within:shadow-lg flex items-center rounded-[8px] px-3 py-2 bg-white space-x-2 shadow-md ">
                 <Image src={search} alt="Search" />
                 <input
                     placeholder="Search for users..."

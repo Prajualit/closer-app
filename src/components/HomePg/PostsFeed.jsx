@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api'
 import Post from '@/components/ui/Post'
 import { Skeleton } from '@/components/ui/skeleton'
+import LoadingButton from '../Loadingbutton'
 
 const PostsFeed = () => {
     const [posts, setPosts] = useState([])
@@ -157,18 +158,18 @@ const PostsFeed = () => {
             {/* Refresh Button */}
             {!refreshing && (
                 <div className="w-full max-w-md mb-4">
-                    <button
+                    <LoadingButton
                         onClick={handleRefresh}
                         disabled={loading}
-                        className="w-full py-3 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-all disabled:opacity-50 border border-gray-200"
+                        className="!bg-white hover:!bg-gray-50 !text-black  "
                     >
                         {loading && posts.length === 0 ? 'Loading...' : '↻ Refresh Feed'}
-                    </button>
+                    </LoadingButton>
                 </div>
             )}
 
             {/* Posts */}
-            <div className="space-y-6">
+            <div className="">
                 {posts.map((post, index) => (
                     <div key={`${post._id}-${post.media._id}-${index}`} className="fade-in">
                         <Post

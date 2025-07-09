@@ -45,13 +45,14 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                 )}
                 <div className="flex flex-col w-full rounded-r-lg overflow-hidden">
                     <DialogTitle className="w-full h-[3rem] flex space-x-2 items-center px-3 bg-white border-[#0000003c] rounded-tr-lg">
-                        <NextImage
-                            src={user?.avatarUrl}
-                            width={28}
-                            height={28}
-                            className='rounded-full'
-                            alt=""
-                        />
+                        <div className='relative w-[32px] h-[32px]'>
+                            <NextImage
+                                src={user?.avatarUrl}
+                                fill
+                                className='rounded-full object-cover'
+                                alt=""
+                            />
+                        </div>
                         <span>{user?.name || 'Unknown User'}</span>
                     </DialogTitle>
                     <DialogDescription className="bg-white w-full flex-1 p-3 flex flex-col gap-2 rounded-br-lg">

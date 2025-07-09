@@ -95,8 +95,8 @@ const UserButton = () => {
                 <div className="bg-neutral-50 shadow-lg shadow-[#adadad] rounded-xl w-80 p-5 flex flex-col justify-between min-h-[300px]">
                     <div>
                         <div className='flex items-center space-x-3 mt-4'>
-                            <div className='flex items-center justify-center rounded-full w-[64px] h-[64px] overflow-hidden'>
-                                {userDetails && <Image width={64} height={64} className='rounded-full object-cover bg-center' src={userDetails.avatarUrl} alt="" />}
+                            <div className='flex items-center justify-center rounded-full w-[64px] h-[64px] overflow-hidden relative'>
+                                {userDetails && <Image fill className='rounded-full object-cover' src={userDetails.avatarUrl} alt="" />}
                             </div>
                             <div>
                                 <h3 className='text-lg font-semibold'>{userDetails.name}</h3>
@@ -121,8 +121,8 @@ const UserButton = () => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className='hover:bg-[#efefef] transition-colors duration-300 rounded-[8px] flex space-x-2 w-full items-center px-4 py-2' >
-                <div className='flex items-center justify-center rounded-full w-[32px] h-[32px] overflow-hidden'>
-                    {userDetails ? <Image width={32} height={32} className='rounded-full object-cover bg-center ' src={userDetails.avatarUrl} alt="" /> : <UserAvatar />}
+                <div className='flex items-center justify-center rounded-full w-[32px] h-[32px] overflow-hidden relative'>
+                    {userDetails ? <Image fill className='rounded-full object-cover ' src={userDetails.avatarUrl} alt="" /> : <UserAvatar />}
                 </div>
                 <span>{userDetails.name.split(" ")[0]}</span>
             </button >
