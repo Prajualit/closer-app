@@ -33,6 +33,11 @@ export const API_ENDPOINTS = {
   MARK_MESSAGES_READ: (chatId) => `${API_BASE_URL}/api/v1/chat/read/${chatId}`,
   USER_SEARCH: (query) => `${API_BASE_URL}/api/v1/users/search?query=${query}`,
   
+  // Chatbot endpoints
+  CHATBOT_MESSAGE: `${API_BASE_URL}/api/v1/chatbot/message`,
+  CHATBOT_ROOM: `${API_BASE_URL}/api/v1/chatbot/room`,
+  CHATBOT_MESSAGES: `${API_BASE_URL}/api/v1/chatbot/messages`,
+  
   // Create endpoints
   CREATE_MEDIA: `${API_BASE_URL}/api/v1/create`,
   
