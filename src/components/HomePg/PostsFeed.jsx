@@ -161,7 +161,7 @@ const PostsFeed = () => {
                     <LoadingButton
                         onClick={handleRefresh}
                         disabled={loading}
-                        className="!bg-white hover:!bg-neutral-50 !text-black  "
+                        className="!bg-white dark:!bg-neutral-800 hover:!bg-neutral-50 dark:hover:!bg-neutral-700 !text-black dark:!text-white"
                     >
                         {loading && posts.length === 0 ? 'Loading...' : '↻ Refresh Feed'}
                     </LoadingButton>
@@ -215,11 +215,11 @@ const PostsFeed = () => {
             {!loading && posts.length === 0 && !error && !refreshing && (
                 <div className="w-full max-w-md text-center py-16">
                     <div className="text-neutral-400 text-6xl mb-4">📸</div>
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">No posts yet</h3>
-                    <p className="text-neutral-600 mb-4">Be the first to share something amazing!</p>
+                    <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2">No posts yet</h3>
+                    <p className="text-neutral-600 dark:text-neutral-400 mb-4">Be the first to share something amazing!</p>
                     <button
                         onClick={handleRefresh}
-                        className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                        className="px-6 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors font-medium"
                     >
                         Refresh
                     </button>

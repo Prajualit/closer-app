@@ -24,15 +24,15 @@ const page = () => {
                             <SuggestedUsers />
                             <UserActivity />
                             {/* Trending Hashtags */}
-                            <div className='bg-white rounded-xl p-6 shadow-sm border border-neutral-100 mt-6'>
-                                <h3 className='text-lg font-semibold text-neutral-900 mb-4'>Trending</h3>
+                            <div className='bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-sm border border-neutral-100 dark:border-neutral-700 mt-6'>
+                                <h3 className='text-lg font-semibold text-neutral-900 dark:text-white mb-4'>Trending</h3>
                                 <div className='space-y-2'>
                                     {['#photography', '#travel', '#food', '#art', '#nature'].map((tag, index) => (
                                         <div key={tag} className='flex items-center justify-between'>
-                                            <span className='text-blue-500 text-sm font-medium cursor-pointer hover:text-blue-600 transition-colors'>
+                                            <span className='text-blue-500 dark:text-blue-400 text-sm font-medium cursor-pointer hover:text-blue-600 dark:hover:text-blue-300 transition-colors'>
                                                 {tag}
                                             </span>
-                                            <span className='text-xs text-neutral-400'>
+                                            <span className='text-xs text-neutral-400 dark:text-neutral-500'>
                                                 {Math.floor(Math.random() * 100) + 10}K posts
                                             </span>
                                         </div>

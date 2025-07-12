@@ -92,7 +92,7 @@ const Post = ({ post, onLike, onComment }) => {
         }
     }
 
-    const FavouriteIcon = ({ size = 24, color = "#000000", filled = false }) => {
+    const FavouriteIcon = ({ size = 24, color = "currentColor", filled = false }) => {
         return (
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +101,7 @@ const Post = ({ post, onLike, onComment }) => {
                 viewBox="0 0 24 24"
                 fill={filled ? color : "none"}
                 role="img"
-                className="cursor-pointer transition-colors hover:text-red-500"
+                className="cursor-pointer transition-colors hover:text-red-500 text-neutral-900 dark:text-white"
             >
                 <path
                     d="M2 9.24835C2 5.90905 4.16367 2.99998 7.68 2.99998C9.64299 2.99998 11 3.99861 12 5.49861C13 3.99861 14.357 2.99998 16.32 2.99998C19.8363 2.99998 22 5.90905 22 9.24835C22 15.0599 16.6416 18.6767 12 20.9986C7.35839 18.6767 2 15.0599 2 9.24835Z"
@@ -113,7 +113,7 @@ const Post = ({ post, onLike, onComment }) => {
         );
     };
 
-    const CommentIcon = ({ size = 24, color = "#000000" }) => {
+    const CommentIcon = ({ size = 24, color = "currentColor" }) => {
         return (
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +121,7 @@ const Post = ({ post, onLike, onComment }) => {
                 height={size}
                 viewBox="0 0 24 24"
                 fill="none"
-                className="cursor-pointer transition-colors hover:text-blue-500"
+                className="cursor-pointer transition-colors hover:text-blue-500 text-neutral-900 dark:text-white"
             >
                 <path
                     d="M8.5 19H8C4 19 2 17 2 13V8C2 4 4 2 8 2H16C20 2 22 4 22 8V13C22 17 20 19 16 19H15.5C15.19 19 14.89 19.15 14.7 19.4L13.2 21.4C12.54 22.28 11.46 22.28 10.8 21.4L9.3 19.4C9.14 19.18 8.77 19 8.5 19Z"
@@ -156,7 +156,7 @@ const Post = ({ post, onLike, onComment }) => {
         );
     };
 
-    const ShareIcon = ({ size = 24, color = "#000000" }) => {
+    const ShareIcon = ({ size = 24, color = "currentColor" }) => {
         return (
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -164,7 +164,7 @@ const Post = ({ post, onLike, onComment }) => {
                 height={size}
                 viewBox="0 0 24 24"
                 fill="none"
-                className="cursor-pointer transition-colors hover:text-green-500"
+                className="cursor-pointer transition-colors hover:text-green-500 text-neutral-900 dark:text-white"
             >
                 <path
                     d="M16.96 6.17004C18.96 7.56004 20.34 9.77004 20.62 12.32"
@@ -229,7 +229,7 @@ const Post = ({ post, onLike, onComment }) => {
                     <h2 className='font-semibold text-sm text-neutral-900 dark:text-white'>{post.username}</h2>
                     <p className='text-xs text-neutral-500 dark:text-neutral-400'>{formatUploadDate(post.media.uploadedAt)}</p>
                 </div>
-                <button className="text-neutral-400 hover:text-neutral-600 transition-colors">
+                <button className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                     </svg>
@@ -237,7 +237,7 @@ const Post = ({ post, onLike, onComment }) => {
             </div>
 
             {/* Post Media */}
-            <div className='relative w-full aspect-square bg-neutral-100'>
+            <div className='relative w-full aspect-square bg-neutral-100 dark:bg-neutral-900'>
                 {isVideo(post.media.url) ? (
                     <video
                         className='w-full h-full object-contain'
@@ -264,7 +264,7 @@ const Post = ({ post, onLike, onComment }) => {
                     />
                 )}
                 {/* Video error fallback */}
-                <div className="hidden w-full h-full items-center justify-center bg-neutral-200">
+                <div className="hidden w-full h-full items-center justify-center bg-neutral-200 dark:bg-neutral-900">
                     <div className="text-center text-neutral-500 dark:text-neutral-400">
                         <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
@@ -281,7 +281,7 @@ const Post = ({ post, onLike, onComment }) => {
                         <button onClick={handleLike} className='scale-animation'>
                             <FavouriteIcon
                                 size={24}
-                                color={isLiked ? "#ef4444" : "#000000"}
+                                color={isLiked ? "#ef4444" : "currentColor"}
                                 filled={isLiked}
                             />
                         </button>
@@ -323,10 +323,10 @@ const Post = ({ post, onLike, onComment }) => {
                             {comments.length > 0 ? (
                                 comments.map((comment, index) => (
                                     <div key={comment._id || index} className="text-sm">
-                                        <span className="font-semibold mr-2">
+                                        <span className="font-semibold mr-2 text-neutral-900 dark:text-white">
                                             {comment.userId?.username || comment.user?.username}
                                         </span>
-                                        <span className="text-neutral-800">{comment.text}</span>
+                                        <span className="text-neutral-800 dark:text-neutral-200">{comment.text}</span>
                                     </div>
                                 ))
                             ) : (
@@ -339,7 +339,7 @@ const Post = ({ post, onLike, onComment }) => {
                                 placeholder="Add a comment..."
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
-                                className='flex-1 text-sm border-none outline-none bg-transparent placeholder-neutral-400'
+                                className='flex-1 text-sm border-none outline-none bg-transparent placeholder-neutral-400 dark:placeholder-neutral-500 text-neutral-900 dark:text-white'
                                 onKeyPress={(e) => {
                                     if (e.key === 'Enter') {
                                         handleAddComment()
@@ -350,7 +350,7 @@ const Post = ({ post, onLike, onComment }) => {
                             <button
                                 onClick={handleAddComment}
                                 disabled={!newComment.trim() || loading}
-                                className='text-blue-500 text-sm font-semibold hover:text-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                                className='text-blue-500 dark:text-blue-400 text-sm font-semibold hover:text-blue-600 dark:hover:text-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
                             >
                                 {loading ? 'Posting...' : 'Post'}
                             </button>
