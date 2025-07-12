@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { User } from "../models/user.model.js";
 import { Like } from "../models/like.model.js";
 import { Comment } from "../models/comment.model.js";
+import { notifyLike, notifyComment } from "./notification.controller.js";
 
 // Get all posts from all users with pagination
 const getAllPosts = asyncHandler(async (req, res) => {
@@ -169,6 +170,15 @@ const likePost = asyncHandler(async (req, res) => {
     // Create new like
     const newLike = await Like.create({ userId, postId, mediaId });
 
+    // Send notification to post owner (if not liking own post)
+    if (userId.toString() !== postId.toString()) {
+      try {
+        await notifyLike(userId, postId, postId);
+      } catch (error) {
+        console.warn('Failed to send like notification:', error.message);
+      }
+    }
+
     // Get updated likes count
     const likesCount = await Like.countDocuments({ postId, mediaId });
 
@@ -237,6 +247,15 @@ const addComment = asyncHandler(async (req, res) => {
     mediaId,
     text: text.trim(),
   });
+
+  // Send notification to post owner (if not commenting on own post)
+  if (userId.toString() !== postId.toString()) {
+    try {
+      await notifyComment(userId, postId, postId, newComment._id);
+    } catch (error) {
+      console.warn('Failed to send comment notification:', error.message);
+    }
+  }
 
   // Populate the comment with user info
   const populatedComment = await Comment.findById(newComment._id)

@@ -72,6 +72,39 @@ export const simulateNotification = (type = 'follow') => {
       createdAt: new Date().toISOString(),
       data: {},
     },
+    like: {
+      _id: `mock-like-${Date.now()}`,
+      sender: {
+        _id: 'mock-sender-3',
+        username: 'alexsmith',
+        name: 'Alex Smith',
+        avatarUrl: null,
+      },
+      type: 'like',
+      message: 'Alex Smith (@alexsmith) liked your post',
+      read: false,
+      createdAt: new Date().toISOString(),
+      data: {
+        postId: 'mock-post-id',
+      },
+    },
+    comment: {
+      _id: `mock-comment-${Date.now()}`,
+      sender: {
+        _id: 'mock-sender-4',
+        username: 'sarahwilson',
+        name: 'Sarah Wilson',
+        avatarUrl: null,
+      },
+      type: 'comment',
+      message: 'Sarah Wilson (@sarahwilson) commented on your post',
+      read: false,
+      createdAt: new Date().toISOString(),
+      data: {
+        postId: 'mock-post-id',
+        commentId: 'mock-comment-id',
+      },
+    },
     message: {
       _id: `mock-${Date.now()}`,
       sender: {

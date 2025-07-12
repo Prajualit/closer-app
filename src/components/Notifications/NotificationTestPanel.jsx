@@ -14,6 +14,16 @@ const NotificationTestPanel = () => {
     dispatch(addNewNotification(notification));
   };
 
+  const handleSimulateLike = () => {
+    const notification = simulateNotification('like');
+    dispatch(addNewNotification(notification));
+  };
+
+  const handleSimulateComment = () => {
+    const notification = simulateNotification('comment');
+    dispatch(addNewNotification(notification));
+  };
+
   const handleSimulateMessage = () => {
     const notification = simulateNotification('message');
     dispatch(addNewNotification(notification));
@@ -51,6 +61,18 @@ const NotificationTestPanel = () => {
           className="w-full px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
         >
           Simulate Follow
+        </button>
+        <button
+          onClick={handleSimulateLike}
+          className="w-full px-3 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+        >
+          Simulate Like
+        </button>
+        <button
+          onClick={handleSimulateComment}
+          className="w-full px-3 py-2 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-colors"
+        >
+          Simulate Comment
         </button>
         <button
           onClick={handleSimulateMessage}

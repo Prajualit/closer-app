@@ -222,6 +222,32 @@ const notifyFollow = async (followerId, followedUserId) => {
   );
 };
 
+const notifyLike = async (likerId, postOwnerId, postId) => {
+  const liker = await User.findById(likerId).select('username name');
+  if (!liker) return null;
+
+  return createNotification(
+    postOwnerId,
+    likerId,
+    'like',
+    `${liker.name} (@${liker.username}) liked your post`,
+    { postId }
+  );
+};
+
+const notifyComment = async (commenterId, postOwnerId, postId, commentId) => {
+  const commenter = await User.findById(commenterId).select('username name');
+  if (!commenter) return null;
+
+  return createNotification(
+    postOwnerId,
+    commenterId,
+    'comment',
+    `${commenter.name} (@${commenter.username}) commented on your post`,
+    { postId, commentId }
+  );
+};
+
 const notifyMessage = async (senderId, recipientId, messageId, chatId) => {
   const sender = await User.findById(senderId).select('username name');
   if (!sender) return null;
@@ -243,5 +269,7 @@ export {
   createNotification,
   getUnreadCount,
   notifyFollow,
+  notifyLike,
+  notifyComment,
   notifyMessage,
 };
