@@ -4,12 +4,13 @@ import storage from "redux-persist/lib/storage"; // defaults to localStorage for
 import userReducer from "./slice/userSlice";
 import navReducer, { migrateState } from "./slice/navbarSlice";
 import notificationReducer from "./slice/notificationSlice";
+import filmsReducer from "./slice/filmsSlice";
 
 const persistConfig = {
   key: "root",
   storage,
   version: 1, // Add version for migration
-  // Only persist user and navbar data, not notifications (they should be fresh)
+  // Only persist user and navbar data, not notifications or films (they should be fresh)
   whitelist: ['user', 'navbar'],
   migrate: (state) => {
     // Handle navbar state migration
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   navbar: navReducer,
   notifications: notificationReducer,
+  films: filmsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
