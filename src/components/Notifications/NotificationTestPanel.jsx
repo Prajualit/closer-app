@@ -42,11 +42,11 @@ const NotificationTestPanel = () => {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50 max-w-xs">
-      <h3 className="text-sm font-medium text-gray-900 mb-3">Test Notifications</h3>
+    <div className="fixed bottom-4 right-4 bg-white border border-neutral-200 rounded-lg shadow-lg p-4 z-50 max-w-xs">
+      <h3 className="text-sm font-medium text-neutral-900 mb-3">Test Notifications</h3>
       
       {/* Connection Status */}
-      <div className="mb-3 p-2 rounded bg-gray-50">
+      <div className="mb-3 p-2 rounded bg-neutral-50">
         <div className="flex items-center space-x-2">
           <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
           <span className="text-xs">

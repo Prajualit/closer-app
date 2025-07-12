@@ -119,7 +119,7 @@ const Films = () => {
                   onClick={() => setActiveVideoUrl(m.url)}
                 >
                   <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
-                  <div className="bg-[#181818] h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
+                  <div className="bg-[#181818] dark:bg-black h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
                     <video
                       ref={videoRef}
                       className={`w-full h-full ${videoClass}`}
@@ -142,7 +142,7 @@ const Films = () => {
       ) : (
         <div className="flex flex-col items-center justify-center space-y-5">
           <FilmIcon size={100} color="black" />
-          <h1 className="text-2xl font-semibold">No Films Yet</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">No Films Yet</h1>
           <p className="text-neutral-500">When you share films, they will appear on your profile.</p>
           <LoadingButton 
             onClick={() => setIsCreateModalOpen(true)} 

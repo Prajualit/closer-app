@@ -9,10 +9,10 @@ const LoadingSpinner = ({ size = 'md', color = 'white' }) => {
   };
 
   const colorClasses = {
-    white: 'border-white',
-    black: 'border-black',
-    gray: 'border-gray-400',
-    blue: 'border-blue-500'
+    white: 'border-white dark:border-neutral-300',
+    black: 'border-black dark:border-neutral-600',
+    gray: 'border-neutral-400 dark:border-neutral-500',
+    blue: 'border-blue-500 dark:border-blue-400'
   };
 
   return (

@@ -62,19 +62,19 @@ const SuggestedUsers = () => {
     }
 
     return (
-        <div className="w-full bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div className="w-full bg-white dark:bg-neutral-800 rounded-xl p-4 shadow-sm border border-neutral-100 dark:border-neutral-700">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-gray-900">Suggested for you</h3>
+                <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Suggested for you</h3>
             </div>
 
             <div className="">
                 {suggestedUsers.length === 0 ? (
                     <div>
-                        <p className="text-sm text-gray-500">No suggestions available.</p>
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">No suggestions available.</p>
                     </div>
                 ) : (
                     suggestedUsers.slice(0, 3).map((user) => (
-                        <div key={user._id} className="flex items-center justify-between hover:bg-gray-100 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer ">
+                        <div key={user._id} className="flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-neutral-700 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer ">
                             <div
                                 className="flex items-center space-x-3 flex-1 cursor-pointer rounded-lg p-2 transition-colors"
                                 onClick={() => handleProfileClick(user._id)}
@@ -88,10 +88,10 @@ const SuggestedUsers = () => {
                                     />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                                    <h4 className="text-sm font-medium text-neutral-900 dark:text-white truncate">
                                         {user.username}
                                     </h4>
-                                    <p className="text-xs text-gray-500">
+                                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
                                         {user.followersCount || 0} followers
                                     </p>
                                 </div>
@@ -111,7 +111,7 @@ const SuggestedUsers = () => {
                     < div className="text-center mt-4">
                         <LoadingButton
                             onClick={() => setIsModalOpen(true)}
-                            className="!bg-white hover:!bg-gray-50 !text-black"
+                            className="!bg-white dark:!bg-neutral-700 hover:!bg-neutral-50 dark:hover:!bg-neutral-600 !text-black dark:!text-white"
                         >
                             Show More
                         </LoadingButton>

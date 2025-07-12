@@ -56,17 +56,17 @@ const page = () => {
 
   return (
 
-    <div className="h-screen flex justify-center items-center">
-      <Card className="w-full max-w-md rounded-xl shadow-md">
+    <div className="h-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-900">
+      <Card className="w-full max-w-md rounded-xl shadow-md bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
         <CardHeader>
-          <CardTitle>Sign In</CardTitle>
-          <CardDescription>Log Into Your Account</CardDescription>
+          <CardTitle className="text-neutral-900 dark:text-white">Sign In</CardTitle>
+          <CardDescription className="text-neutral-600 dark:text-neutral-400">Log Into Your Account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             {["username", "password"].map((field) => (
               <div key={field} className="mb-4">
-                <label htmlFor={field} className="block text-sm font-medium text-gray-700">
+                <label htmlFor={field} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   {field.charAt(0).toUpperCase() + field.slice(1)}
                 </label>
                 <Input
@@ -117,7 +117,7 @@ const page = () => {
             /> */}
           </form>
           <div className="mt-4 text-center text-sm">
-            <Link href="/sign-up" className="text-primary hover:underline">
+            <Link href="/sign-up" className="text-blue-600 dark:text-blue-400 hover:underline">
               Don't have an account? Sign up
             </Link>
           </div>

@@ -341,7 +341,7 @@ const FilmItem = ({
               <span key={index} className="text-xs text-blue-300">#{tag}</span>
             ))}
             {film.hashtags.length > 3 && (
-              <span className="text-xs text-gray-400">+{film.hashtags.length - 3} more</span>
+              <span className="text-xs text-neutral-400">+{film.hashtags.length - 3} more</span>
             )}
           </div>
         )}

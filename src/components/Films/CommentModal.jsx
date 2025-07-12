@@ -68,7 +68,7 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
                 if (reset) {
                     setComments(newComments);
                     setPage(2);
-                    
+
                     // Update initial comment count if available
                     if (onCommentUpdate && data.data?.totalComments !== undefined) {
                         onCommentUpdate(data.data.totalComments);
@@ -203,17 +203,17 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
         >
             <div
                 ref={modalRef}
-                className="w-full max-w-lg bg-white rounded-t-3xl max-h-[80vh] flex flex-col animate-slide-up"
+                className="w-full max-w-lg bg-white dark:bg-neutral-900 rounded-t-3xl max-h-[80vh] flex flex-col animate-slide-up"
                 onClick={handleModalClick}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                    <h3 className="font-semibold text-lg">Comments</h3>
+                <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
+                    <h3 className="font-semibold text-lg text-neutral-900 dark:text-white">Comments</h3>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                        className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-5 h-5 text-neutral-600 dark:text-neutral-300" />
                     </button>
                 </div>
 
@@ -224,7 +224,7 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
                         </div>
                     ) : comments.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-neutral-500">
                             <p>No comments yet</p>
                             <p className="text-sm mt-1">Be the first to comment!</p>
                         </div>
@@ -245,13 +245,13 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
                                     </div>
 
                                     <div className="flex-1 min-w-0">
-                                        <div className="bg-gray-100 rounded-2xl px-3 py-2">
+                                        <div className="bg-neutral-100 dark:bg-neutral-800 rounded-2xl px-3 py-2">
                                             <p className="font-semibold text-sm">{comment.userId?.username}</p>
-                                            <p className="text-sm text-gray-900 break-words">{comment.text}</p>
+                                            <p className="text-sm text-neutral-900 break-words dark:text-white">{comment.text}</p>
                                         </div>
 
                                         <div className="flex items-center space-x-4 mt-1 px-3">
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-neutral-500">
                                                 {formatTimeAgo(comment.createdAt)}
                                             </span>
                                         </div>
@@ -264,7 +264,7 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
                                 <button
                                     onClick={() => loadComments(false)}
                                     disabled={loadingComments}
-                                    className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50"
+                                    className="w-full py-2 text-sm text-neutral-500 hover:text-neutral-700 disabled:opacity-50"
                                 >
                                     {loadingComments ? 'Loading...' : 'Load more comments'}
                                 </button>
@@ -274,8 +274,8 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
                 </div>
 
                 {/* Comment Input */}
-                <div className="border-t border-gray-200 p-4">
-                    <div className="flex items-end space-x-3">
+                <div className="border-t border-neutral-200 p-4 dark:border-neutral-600">
+                    <div className="flex items-center space-x-3">
                         <div className="relative w-8 h-8 flex-shrink-0">
                             <Image
                                 fill
@@ -288,7 +288,7 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
                             />
                         </div>
 
-                        <div className="flex-1 relative">
+                        <div className="flex-1 relative items-center justify-center">
                             <textarea
                                 ref={textareaRef}
                                 value={newComment}
@@ -298,7 +298,8 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
                                 onFocus={handleTextareaFocus}
                                 onClick={handleTextareaClick}
                                 placeholder="Add a comment..."
-                                className="w-full bg-gray-100 rounded-full px-4 py-2 pr-12 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-colors"
+                                className="w-full bg-neutral-100 rounded-full px-4 py-2 pr-12 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-black focus:bg-white transition-colors
+                                dark:bg-neutral-800 dark:ring-neutral-600 dark:text-white dark:focus:bg-neutral-700"
                                 rows={1}
                                 style={{ minHeight: '40px', maxHeight: '120px' }}
                             />
@@ -306,7 +307,7 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
                             <button
                                 onClick={handleAddComment}
                                 disabled={!newComment.trim() || loading}
-                                className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-black text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors"
+                                className="absolute right-2 top-[10%] transform  w-8 h-8 rounded-full bg-black text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800 transition-colors"
                             >
                                 {loading ? (
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

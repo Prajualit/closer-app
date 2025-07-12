@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api'
 import Post from '@/components/ui/Post'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -15,33 +15,33 @@ const PostsFeed = () => {
     const scrollPositionRef = useRef(0)
 
     const LoadingSkeleton = () => (
-        <div className="w-full max-w-md bg-white rounded-lg shadow-sm border border-gray-100 mb-6 animate-pulse">
+        <div className="w-full max-w-md bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700 mb-6 animate-pulse">
             <div className="p-4 flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                <div className="w-10 h-10 bg-neutral-200 dark:bg-neutral-600 rounded-full"></div>
                 <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-24 mb-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-16"></div>
+                    <div className="h-4 bg-neutral-200 dark:bg-neutral-600 rounded w-24 mb-1"></div>
+                    <div className="h-3 bg-neutral-200 dark:bg-neutral-600 rounded w-16"></div>
                 </div>
             </div>
-            <div className="w-full aspect-square bg-gray-200"></div>
+            <div className="w-full aspect-square bg-neutral-200 dark:bg-neutral-600"></div>
             <div className="p-4">
-                <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-neutral-200 dark:bg-neutral-600 rounded w-32 mb-2"></div>
+                <div className="h-4 bg-neutral-200 dark:bg-neutral-600 rounded w-full mb-1"></div>
+                <div className="h-4 bg-neutral-200 dark:bg-neutral-600 rounded w-3/4"></div>
             </div>
         </div>
     )
 
     const fetchPosts = useCallback(async (pageNum = 1, reset = false) => {
         if (loading && !reset) return
-        
+
         if (reset) {
             setRefreshing(true)
         } else {
             setLoading(true)
         }
         setError(null)
-        
+
         try {
             const response = await makeAuthenticatedRequest(
                 `${API_ENDPOINTS.POSTS}?page=${pageNum}&limit=10`,
@@ -49,13 +49,13 @@ const PostsFeed = () => {
                     method: 'GET',
                 }
             )
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
-            
+
             const data = await response.json()
-            
+
             if (data.success && data.data.posts) {
                 setPosts(prev => reset ? data.data.posts : [...prev, ...data.data.posts])
                 setHasMore(data.data.hasMore)
@@ -85,7 +85,7 @@ const PostsFeed = () => {
     useEffect(() => {
         const handleScroll = () => {
             scrollPositionRef.current = window.pageYOffset
-            
+
             if (
                 window.innerHeight + document.documentElement.scrollTop
                 >= document.documentElement.offsetHeight - 1000
@@ -127,8 +127,8 @@ const PostsFeed = () => {
             <div className="w-full flex flex-col items-center justify-center py-12">
                 <div className="text-center">
                     <div className="text-4xl mb-4">😔</div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to load posts</h3>
-                    <p className="text-gray-600 mb-4">{error}</p>
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">Unable to load posts</h3>
+                    <p className="text-neutral-600 mb-4">{error}</p>
                     <button
                         onClick={handleRefresh}
                         className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
@@ -141,11 +141,11 @@ const PostsFeed = () => {
     }
 
     return (
-        <div className="w-full flex flex-col items-center">
+        <div className="w-full flex flex-col items-center bg-neutral-50 dark:bg-neutral-900 min-h-screen">
             {/* Refresh Indicator */}
             {refreshing && (
                 <div className="w-full max-w-md mb-4 text-center">
-                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
+                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium">
                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -161,7 +161,7 @@ const PostsFeed = () => {
                     <LoadingButton
                         onClick={handleRefresh}
                         disabled={loading}
-                        className="!bg-white hover:!bg-gray-50 !text-black  "
+                        className="!bg-white hover:!bg-neutral-50 !text-black  "
                     >
                         {loading && posts.length === 0 ? 'Loading...' : '↻ Refresh Feed'}
                     </LoadingButton>
@@ -206,17 +206,17 @@ const PostsFeed = () => {
             {!loading && !hasMore && posts.length > 0 && (
                 <div className="w-full max-w-md text-center py-8">
                     <div className="text-2xl mb-2">🎉</div>
-                    <p className="text-gray-500 text-sm">You've reached the end!</p>
-                    <p className="text-gray-400 text-xs mt-1">Check back later for new posts</p>
+                    <p className="text-neutral-500 text-sm">You've reached the end!</p>
+                    <p className="text-neutral-400 text-xs mt-1">Check back later for new posts</p>
                 </div>
             )}
 
             {/* No Posts Message */}
             {!loading && posts.length === 0 && !error && !refreshing && (
                 <div className="w-full max-w-md text-center py-16">
-                    <div className="text-gray-400 text-6xl mb-4">📸</div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No posts yet</h3>
-                    <p className="text-gray-600 mb-4">Be the first to share something amazing!</p>
+                    <div className="text-neutral-400 text-6xl mb-4">📸</div>
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">No posts yet</h3>
+                    <p className="text-neutral-600 mb-4">Be the first to share something amazing!</p>
                     <button
                         onClick={handleRefresh}
                         className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"

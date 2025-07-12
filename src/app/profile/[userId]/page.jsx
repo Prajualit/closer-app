@@ -398,7 +398,7 @@ const ProfilePage = () => {
         return (
             <div className="flex">
                 <div className="flex flex-col items-center justify-center w-full h-screen">
-                    <p className="text-gray-500">Loading user info...</p>
+                    <p className="text-neutral-500">Loading user info...</p>
                 </div>
             </div>
         );
@@ -409,7 +409,7 @@ const ProfilePage = () => {
             <div className="flex">
                 <div className="flex flex-col items-center justify-center w-full h-screen">
                     <div className="text-center">
-                        <div className="text-gray-500 mb-4">Profile not found</div>
+                        <div className="text-neutral-500 mb-4">Profile not found</div>
                         <Button onClick={handleBack} variant="outline">
                             Go Back
                         </Button>
@@ -434,7 +434,7 @@ const ProfilePage = () => {
         }, [src]);
 
         return (
-            <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] flex items-center justify-center overflow-hidden ${containerClass}`}>
+            <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] dark:bg-black flex items-center justify-center overflow-hidden ${containerClass}`}>
                 <Image
                     src={src}
                     alt={alt}
@@ -450,23 +450,23 @@ const ProfilePage = () => {
     const hasFilms = films.length > 0;
 
     return (
-        <div className="flex">
+        <div className="flex bg-neutral-100 dark:bg-neutral-900 min-h-screen">
             <Navbar />
             {/* Header with back button */}
-            <div className="fixed top-0 left-0 right-0 ml-[15rem] bg-white border-b z-10">
+            <div className="fixed top-0 left-0 right-0 ml-[15rem] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 z-10">
                 <div className="p-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-20">
                             <Button
                                 onClick={handleBack}
-                                className="flex items-center group justify-center border rounded-[5px] px-5 !w-fit hover:bg-neutral-100 transition-all duration-300"
+                                className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-5 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                             >
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-all duration-300 " />
                                 <span>Back</span>
                             </Button>
-                            <h1 className="text-xl font-semibold">{profile.name}</h1>
+                            <h1 className="text-xl font-semibold text-neutral-900 dark:text-white">{profile.name}</h1>
                         </div>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800">
                             <MoreVertical className="w-4 h-4" />
                         </Button>
                     </div>
@@ -474,7 +474,7 @@ const ProfilePage = () => {
             </div>
 
             {/* Main content - exact copy from original profile page */}
-            <div className="flex flex-col items-center justify-center w-full h-full p-20 pt-32">
+            <div className="flex flex-col items-center justify-center w-full h-full p-20 pt-32 ml-[15rem] ">
                 {/* Profile section - Userdata component style */}
                 <div className="flex items-center justify-center w-full space-x-32">
                     <div className='w-[250px] h-[250px] rounded-full overflow-hidden relative'>
@@ -489,7 +489,7 @@ const ProfilePage = () => {
                     <div className="flex flex-col space-y-3 items-start">
                         <div className="flex flex-col items-start justify-center">
                             <h1 className="text-neutral-500">@{profile.username}</h1>
-                            <h1 className="text-[32px]">{profile.name}</h1>
+                            <h1 className="text-[32px] text-neutral-900 dark:text-white">{profile.name}</h1>
                             <p className="italic text-neutral-500">{profile.bio}</p>
                         </div>
                         {/* Action Buttons for other users */}
@@ -498,14 +498,14 @@ const ProfilePage = () => {
                                 <LoadingButton
                                     onClick={handleFollow}
                                     variant={isFollowing ? "outline" : "default"}
-                                    className="flex items-center space-x-2"
+                                    className="flex items-center space-x-2 dark:!bg-neutral-800 dark:!text-white dark:hover:!bg-neutral-700 transition-all "
                                 >
                                     {isFollowing ? <UserMinus className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
                                     <span>{isFollowing ? 'Unfollow' : 'Follow'}</span>
                                 </LoadingButton>
                                 <Button
                                     onClick={handleMessage}
-                                    className="flex items-center group justify-center border rounded-[5px] px-5 !w-fit hover:bg-neutral-100 transition-all duration-300" 
+                                    className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-5 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white" 
                                 >
                                     <MessageCircle className="w-4 h-4" />
                                     <span>Message</span>
@@ -516,27 +516,27 @@ const ProfilePage = () => {
                         {/* Stats */}
                         <div className="flex space-x-8">
                             <div className="text-center">
-                                <div className="text-2xl font-bold">{photos.length}</div>
-                                <div className="text-gray-500">Photos</div>
+                                <div className="text-2xl font-bold text-neutral-900 dark:text-white">{photos.length}</div>
+                                <div className="text-neutral-500">Photos</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-2xl font-bold">{films.length}</div>
-                                <div className="text-gray-500">Films</div>
+                                <div className="text-2xl font-bold text-neutral-900 dark:text-white">{films.length}</div>
+                                <div className="text-neutral-500">Films</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-2xl font-bold">{profile.followersCount || 0}</div>
-                                <div className="text-gray-500">Followers</div>
+                                <div className="text-2xl font-bold text-neutral-900 dark:text-white">{profile.followersCount || 0}</div>
+                                <div className="text-neutral-500">Followers</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-2xl font-bold">{profile.followingCount || 0}</div>
-                                <div className="text-gray-500">Following</div>
+                                <div className="text-2xl font-bold text-neutral-900 dark:text-white">{profile.followingCount || 0}</div>
+                                <div className="text-neutral-500">Following</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Divider */}
-                <div className="w-[75%] border mt-20"></div>
+                <div className="w-[75%] border border-neutral-200 dark:border-neutral-700 mt-20"></div>
 
                 {/* Navigation - exact copy from original profile page */}
                 <div className="flex justify-center items-center space-x-32 relative w-full mb-20">
@@ -546,7 +546,7 @@ const ProfilePage = () => {
                                 className={`h-[1px] w-[120%] bg-neutral-500 transition-all duration-300 ${activeNav === nav.name ? "block" : "hidden"}`}
                             ></div>
                             <button
-                                className={`transition-all duration-300 text-[14px] flex items-center space-x-2 ${activeNav === nav.name ? "text-black" : "text-neutral-500"}`}
+                                className={`transition-all duration-300 text-[14px] flex items-center space-x-2 ${activeNav === nav.name ? "text-neutral-900 dark:text-white" : "text-neutral-500 dark:text-neutral-400"}`}
                                 onClick={() => setActiveNav(nav.name)}
                             >
                                 {nav.icon}
@@ -567,7 +567,7 @@ const ProfilePage = () => {
                                         className='group relative h-[12.5rem] w-[12.5rem]'
                                     >
                                         <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
-                                        <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200'>
+                                        <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
                                             <SmartImage src={photo.url || photo} alt={`image-${i}`} />
                                         </div>
                                     </div>
@@ -575,9 +575,9 @@ const ProfilePage = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center space-y-5">
-                                <ProfileShareIcon size={100} color="black" />
-                                <h1 className="text-2xl font-semibold">No Photos Yet</h1>
-                                <p className="text-neutral-500">
+                                <ProfileShareIcon size={100} color="currentColor" />
+                                <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">No Photos Yet</h1>
+                                <p className="text-neutral-500 dark:text-neutral-400">
                                     When {profile.name} shares photos, they will appear here.
                                 </p>
                             </div>
@@ -632,9 +632,9 @@ const ProfilePage = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center space-y-5">
-                                <FilmIcon size={100} color="black" />
-                                <h1 className="text-2xl font-semibold">No Films Yet</h1>
-                                <p className="text-neutral-500">When {profile.name} shares films, they will appear here.</p>
+                                <FilmIcon size={100} color="currentColor" />
+                                <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">No Films Yet</h1>
+                                <p className="text-neutral-500 dark:text-neutral-400">When {profile.name} shares films, they will appear here.</p>
                             </div>
                         )}
                     </>

@@ -80,7 +80,7 @@ const Photos = () => {
 
 
                 return (
-                  <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] flex items-center justify-center overflow-hidden ${containerClass}`}>
+                  <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] dark:bg-black flex items-center justify-center overflow-hidden ${containerClass}`}>
                     <NextImage
                       src={src}
                       alt={alt}
@@ -98,7 +98,7 @@ const Photos = () => {
                   onClick={() => setActiveImageUrl(m.url)}
                 >
                   <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
-                  <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200 '>
+                  <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200 '>
                     <SmartImage src={m.url} alt={`image-${i}`} />
                   </div>
                 </div>
@@ -112,9 +112,9 @@ const Photos = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center space-y-5">
-          <ProfileShareIcon size={100} color="black" />
-          <h1 className="text-2xl font-semibold">No Photos Yet</h1>
-          <p className="text-neutral-500">
+          <ProfileShareIcon size={100} color="currentColor" />
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">No Photos Yet</h1>
+          <p className="text-neutral-500 dark:text-neutral-400">
             When you share photos, they will appear on your profile.
           </p>
           <LoadingButton

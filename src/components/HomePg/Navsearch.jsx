@@ -71,11 +71,11 @@ const Navsearch = () => {
 
     return (
         <div ref={searchRef} className="relative w-full max-w-md mx-auto">
-            <div className="transition-all duration-300 hover:shadow-lg focus-within:shadow-lg flex items-center rounded-[8px] px-3 py-2 bg-white space-x-2 shadow-md ">
+            <div className="transition-all duration-300 hover:shadow-lg focus-within:shadow-lg flex items-center rounded-[8px] px-3 py-2 bg-white dark:bg-neutral-800 space-x-2 shadow-md border border-neutral-200 dark:border-neutral-700">
                 <Image src={search} alt="Search" />
                 <input
                     placeholder="Search for users..."
-                    className="bg-transparent outline-none w-full"
+                    className="bg-transparent outline-none w-full text-neutral-900 dark:text-white placeholder-neutral-500 dark:placeholder-neutral-400"
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -85,16 +85,16 @@ const Navsearch = () => {
 
             {/* Search Results Dropdown */}
             {showResults && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
                     {isSearching ? (
-                        <div className="p-4 text-center text-gray-500">
+                        <div className="p-4 text-center text-neutral-500 dark:text-neutral-400">
                             Searching...
                         </div>
                     ) : searchResults.length > 0 ? (
                         searchResults.map((user) => (
                             <div
                                 key={user._id}
-                                className="flex items-center space-x-3 p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                                className="flex items-center space-x-3 p-3 hover:bg-neutral-50 dark:hover:bg-neutral-700 cursor-pointer border-b dark:border-neutral-600 last:border-b-0"
                                 onClick={() => handleUserClick(user)}
                             >
                                 <div className="w-10 h-10 rounded-full overflow-hidden">
@@ -107,13 +107,13 @@ const Navsearch = () => {
                                     />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="font-medium">{user.name}</div>
-                                    <div className="text-sm text-gray-500">@{user.username}</div>
+                                    <div className="font-medium dark:text-white">{user.name}</div>
+                                    <div className="text-sm text-neutral-500 dark:text-neutral-400">@{user.username}</div>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <div className="p-4 text-center text-gray-500">
+                        <div className="p-4 text-center text-neutral-500 dark:text-neutral-400">
                             No users found
                         </div>
                     )}

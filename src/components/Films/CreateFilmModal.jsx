@@ -229,12 +229,12 @@ const CreateFilmModal = ({ isOpen, onClose }) => {
         className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-neutral-200">
           <h2 className="text-xl font-bold">Create Film</h2>
           <button
             onClick={handleClose}
             disabled={uploading}
-            className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
+            className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors disabled:opacity-50"
           >
             <X className="w-5 h-5" />
           </button>
@@ -245,10 +245,10 @@ const CreateFilmModal = ({ isOpen, onClose }) => {
           {!file ? (
             // File selection
             <div className="text-center">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 hover:border-gray-400 transition-colors">
-                <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <div className="border-2 border-dashed border-neutral-300 rounded-lg p-12 hover:border-neutral-400 transition-colors">
+                <Upload className="w-12 h-12 mx-auto mb-4 text-neutral-400" />
                 <p className="text-lg font-medium mb-2">Select a video to share</p>
-                <p className="text-gray-500 mb-6">
+                <p className="text-neutral-500 mb-6">
                   Choose a video file from your device (max 100MB)
                 </p>
                 
@@ -262,7 +262,7 @@ const CreateFilmModal = ({ isOpen, onClose }) => {
                 
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors"
+                  className="bg-black text-white px-6 py-3 rounded-full hover:bg-neutral-800 transition-colors"
                 >
                   Select Video
                 </button>
@@ -307,26 +307,26 @@ const CreateFilmModal = ({ isOpen, onClose }) => {
 
               {/* Caption Input */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-neutral-700">
                   Caption
                 </label>
                 <textarea
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}
                   placeholder="Write a caption... Use #hashtags to make your film discoverable"
-                  className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full p-3 border border-neutral-300 rounded-lg resize-none focus:ring-2 focus:ring-black focus:border-transparent"
                   rows={4}
                   maxLength={500}
                 />
-                <p className="text-xs text-gray-500 text-right">
+                <p className="text-xs text-neutral-500 text-right">
                   {caption.length}/500
                 </p>
               </div>
 
               {/* File Info */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-neutral-50 rounded-lg p-4">
                 <h4 className="font-medium mb-2">File Details</h4>
-                <div className="text-sm text-gray-600 space-y-1">
+                <div className="text-sm text-neutral-600 space-y-1">
                   <p>Name: {file.name}</p>
                   <p>Size: {(file.size / (1024 * 1024)).toFixed(2)} MB</p>
                   <p>Duration: {formatTime(duration)}</p>
@@ -341,7 +341,7 @@ const CreateFilmModal = ({ isOpen, onClose }) => {
                     setPreviewUrl(null);
                   }}
                   disabled={uploading}
-                  className="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  className="flex-1 py-3 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors disabled:opacity-50"
                 >
                   Change Video
                 </button>
@@ -349,7 +349,7 @@ const CreateFilmModal = ({ isOpen, onClose }) => {
                 <button
                   onClick={handleUpload}
                   disabled={uploading}
-                  className="flex-1 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
+                  className="flex-1 py-3 bg-black text-white rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
                 >
                   {uploading ? (
                     <>

@@ -144,16 +144,16 @@ const ChatPage = () => {
     }, [searchParams]);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
             {/* Show navbar only on desktop or when no chat is selected on mobile */}
             {(!isMobile || !selectedChat) && <Navbar />}
 
             {/* Add left margin to account for fixed navbar width on desktop */}
             <div className={`transition-all duration-300 ${!isMobile
-                    ? 'ml-[15rem] py-6 px-4'
+                    ? 'ml-[15rem] py-6 px-6'
                     : selectedChat
                         ? 'p-0'
-                        : 'py-6 px-4'
+                        : 'py-6 px-6'
                 }`}>
                 <div className={`rounded-lg overflow-hidden ${isMobile && selectedChat ? 'rounded-none' : ''
                     }`} style={{
@@ -163,7 +163,7 @@ const ChatPage = () => {
                         {/* Chat List Sidebar */}
                         <div className={`${isMobile
                                 ? (selectedChat ? 'hidden' : 'w-full')
-                                : 'w-1/3 border-r'
+                                : 'w-1/3 border-r border-neutral-200 dark:border-neutral-700'
                             }`}>
                             <ChatList
                                 onSelectChat={handleSelectChat}
@@ -181,10 +181,10 @@ const ChatPage = () => {
                                 : 'flex-1'
                             }`}>
                             {isInitializing ? (
-                                <div className="flex items-center justify-center h-full bg-gray-50">
+                                <div className="flex items-center justify-center h-full bg-white dark:bg-neutral-900">
                                     <div className="text-center">
                                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                                        <p className="text-gray-500">Opening chat...</p>
+                                        <p className="text-neutral-500 dark:text-neutral-400">Opening chat...</p>
                                     </div>
                                 </div>
                             ) : selectedChat ? (
@@ -194,9 +194,9 @@ const ChatPage = () => {
                                     onUpdateChatList={updateChatbotLastMessage}
                                 />) : (
                                 !isInitializing && (
-                                    <div className="flex items-center justify-center h-full bg-gray-50">
+                                    <div className="flex items-center justify-center h-full bg-white dark:bg-neutral-900">
                                         <div className="text-center">
-                                            <div className="text-gray-400 mb-4">
+                                            <div className="text-neutral-400 dark:text-neutral-500 mb-4">
                                                 <svg
                                                     className="w-24 h-24 mx-auto"
                                                     fill="none"
@@ -211,10 +211,10 @@ const ChatPage = () => {
                                                     />
                                                 </svg>
                                             </div>
-                                            <h3 className="text-xl font-medium text-gray-600 mb-2">
+                                            <h3 className="text-xl font-medium text-neutral-600 dark:text-neutral-400 mb-2">
                                                 Select a conversation
                                             </h3>
-                                            <p className="text-gray-500">
+                                            <p className="text-neutral-500 dark:text-neutral-400">
                                                 Choose from your existing conversations or start a new one
                                             </p>
                                         </div>

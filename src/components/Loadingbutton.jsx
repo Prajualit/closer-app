@@ -8,14 +8,14 @@ export default function LoadingButton({
     return (
         <Button
             onClick={onClick}
-            className={`${className} w-full border rounded-[7px] hover:bg-white  hover:text-black bg-black text-white duration-300`}
+            className={`${className} w-full border rounded-[7px] hover:bg-white dark:hover:bg-neutral-200 hover:text-black bg-black dark:bg-neutral-700 text-white dark:text-neutral-100 dark:hover:text-black duration-300`}
             type="submit"
             disabled={pending}
         >
             {pending ? (
                 <div className="flex items-center justify-center">
                     <svg
-                        className="animate-spin h-5 w-5 text-white mr-2"
+                        className="animate-spin h-5 w-5 text-white dark:text-neutral-200 mr-2"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"

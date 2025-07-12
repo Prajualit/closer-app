@@ -290,41 +290,41 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-full">
-                <div className="text-gray-500">Loading chats...</div>
+            <div className="flex items-center justify-center h-full bg-white dark:bg-neutral-900">
+                <div className="text-neutral-500 dark:text-neutral-400">Loading chats...</div>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-white dark:bg-neutral-900">
             {/* Header */}
-            <div className="p-4 border-b ">
-                <h2 className="text-xl font-semibold mb-4">Messages</h2>
+            <div className="p-4 border-b border-neutral-200 dark:border-neutral-700">
+                <h2 className="text-xl font-semibold mb-4 text-neutral-900 dark:text-white">Messages</h2>
 
                 {/* Search */}
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-4 h-4" />
                     <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search for users..."
-                        className="pl-10 outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white"
+                        className="pl-10 outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white"
                     />
                 </div>
             </div>
 
             {/* Search Results */}
             {searchQuery && (
-                <div className="border-b bg-gray-50">
+                <div className="border-b bg-neutral-50 dark:bg-neutral-800">
                     <div className="p-2">
-                        <div className="text-sm font-medium text-gray-600 mb-2">
+                        <div className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">
                             {searchLoading ? 'Searching...' : 'Start new conversation'}
                         </div>
                         <div className='flex flex-col space-y-2'>
                             {searchUsers.length > 0 ? (
                                 searchUsers.map((user) => (
-                                    <div key={user._id} className="w-full bg-white flex items-center space-x-3 p-3 hover:shadow-lg shadow-md rounded-[10px] transition-all duration-300">
+                                    <div key={user._id} className="w-full bg-white dark:bg-neutral-700 flex items-center space-x-3 p-3 hover:shadow-lg shadow-md rounded-[10px] transition-all duration-300">
                                         <div className="w-10 h-10 rounded-full overflow-hidden">
                                             <Image
                                                 src={user.avatarUrl}
@@ -335,8 +335,8 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                             />
                                         </div>
                                         <div className="flex-1 text-left">
-                                            <p className="font-medium">{user.name}</p>
-                                            <p className="text-sm text-gray-500">@{user.username}</p>
+                                            <p className="font-medium text-neutral-900 dark:text-white">{user.name}</p>
+                                            <p className="text-sm text-neutral-500 dark:text-neutral-400">@{user.username}</p>
                                         </div>
                                         <div className="flex space-x-2">
                                             <Button
@@ -357,7 +357,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                     </div>
                                 ))
                             ) : !searchLoading && (
-                                <div className="text-sm text-gray-500 p-2">
+                                <div className="text-sm text-neutral-500 dark:text-neutral-400 p-2">
                                     No users found
                                 </div>
                             )}
@@ -379,7 +379,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                 return (
                                     <div
                                         key={chatRoom._id}
-                                        className={`group w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-[#ededed] border-r-2' : 'hover:bg-[#f3f3f3] transition-colors duration-300'}`}
+                                        className={`group w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-neutral-200 dark:bg-neutral-700 border-r-2' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300'}`}
                                     >
                                         <button
                                             onClick={() => {
@@ -412,16 +412,16 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                             <div className="flex-1 text-left">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center space-x-2">
-                                                        <p className="font-medium text-gray-700">
+                                                        <p className="font-medium text-neutral-700 dark:text-neutral-200">
                                                             Your AI Friend
                                                         </p>
-                                                        <Bot className="w-4 h-4 text-black" />
+                                                        <Bot className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                                                     </div>
-                                                    <p className="text-xs text-gray-500">
+                                                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
                                                         {formatLastActivity(chatRoom.lastActivity)}
                                                     </p>
                                                 </div>
-                                                <p className="text-sm truncate text-gray-500">
+                                                <p className="text-sm truncate text-neutral-500 dark:text-neutral-400">
                                                     {chatRoom.lastMessage?.content || 'Start a conversation...'}
                                                 </p>
                                             </div>
@@ -438,7 +438,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                             return (
                                 <div
                                     key={chatRoom._id}
-                                    className={`group w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-[#ededed] border-r-2' : 'hover:bg-[#f3f3f3] transition-colors duration-300'}`}
+                                    className={`group w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-neutral-200 dark:bg-neutral-700 border-r-2' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300'}`}
                                 >
                                     <button
                                         onClick={() => {
@@ -468,7 +468,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                         <div className="flex-1 text-left">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-2">
-                                                    <p className={`font-medium ${unreadCount > 0 ? 'text-black' : 'text-gray-700'}`}>
+                                                    <p className={`font-medium ${unreadCount > 0 ? 'text-neutral-900 dark:text-white' : 'text-neutral-700 dark:text-neutral-300'}`}>
                                                         {otherParticipant?.name}
                                                     </p>
                                                     {unreadCount > 0 && (
@@ -477,11 +477,11 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                                         </div>
                                                     )}
                                                 </div>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-xs text-neutral-500 dark:text-neutral-400">
                                                     {formatLastActivity(chatRoom.lastActivity)}
                                                 </p>
                                             </div>
-                                            <p className={`text-sm truncate ${unreadCount > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+                                            <p className={`text-sm truncate ${unreadCount > 0 ? 'text-neutral-900 font-medium' : 'text-neutral-500 dark:text-neutral-400'}`}>
                                                 {chatRoom.lastMessage?.content || 'Start a conversation...'}
                                             </p>
                                         </div>
@@ -500,8 +500,8 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
 
                         {/* AI Chatbot Call-to-Action Card - Show at bottom when chatbot is NOT already in the chat list */}
                         {!searchQuery && !actualChatRooms.some(room => room.isChatbot) && (
-                            <div className="p-4 border-t border-gray-100">
-                                <div className="bg-white rounded-[15px] shadow-md p-4">
+                            <div className="p-4 border-t border-neutral-100 dark:border-neutral-700">
+                                <div className="bg-white dark:bg-neutral-800 rounded-[15px] shadow-md p-4">
                                     <div className="flex items-center mb-3">
                                         <div className="w-12 h-12 rounded-full overflow-hidden">
                                             <Image
@@ -514,14 +514,14 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                         </div>
                                         <div className="ml-3 flex-1">
                                             <div className="flex items-center space-x-2">
-                                                <h4 className="font-semibold text-gray-800">Your AI Friend</h4>
+                                                <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">Your AI Friend</h4>
                                                 <div className="bg-blue-500 text-white text-xs rounded-full px-2 py-1">
                                                     AI
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <p className="text-sm text-gray-600 mb-3">
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
                                         I'm here to be your friend! Let's talk about anything - your day, your dreams, your thoughts, or just have a deep conversation like close friends do!
                                     </p>
                                     <LoadingButton
@@ -538,13 +538,13 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                 ) : (
                     !searchQuery && (
                         <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-                            <MessageCircle className="w-16 h-16 text-gray-300 mb-4" />
-                            <h3 className="text-lg font-medium text-gray-600 mb-2">No conversations yet</h3>
-                            <p className="text-gray-500 mb-6">Search for users above to start a new conversation</p>
+                            <MessageCircle className="w-16 h-16 text-neutral-300 mb-4" />
+                            <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2">No conversations yet</h3>
+                            <p className="text-neutral-500 dark:text-neutral-400 mb-6">Search for users above to start a new conversation</p>
 
                             {/* AI Chatbot Call-to-Action for empty state */}
                             <div className="w-full max-w-sm  ">
-                                <div className="bg-white rounded-[15px] shadow-md p-6">
+                                <div className="bg-white dark:bg-neutral-800 rounded-[15px] shadow-md p-6">
                                     <div className="flex items-center justify-center mb-4">
                                         <div className="w-12 h-12 rounded-full overflow-hidden">
                                             <Image
@@ -556,10 +556,10 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                             />
                                         </div>
                                     </div>
-                                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                    <h4 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-2">
                                         Have no one to chat with?
                                     </h4>
-                                    <p className="text-sm text-gray-600 mb-4">
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
                                         I'm here to be your friend! Let's talk about anything - your day, your dreams, your thoughts, or just have a deep conversation like close friends do!
                                     </p>
                                     <LoadingButton

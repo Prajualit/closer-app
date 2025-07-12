@@ -386,28 +386,28 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-full">
-                <div className="text-gray-500">Loading messages...</div>
+            <div className="flex items-center justify-center h-full bg-white dark:bg-neutral-900">
+                <div className="text-neutral-500 dark:text-neutral-400">Loading messages...</div>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-white dark:bg-neutral-900">
             {/* Chat Header */}
-            <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
                 <div className="flex items-center space-x-3">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={onBack}
-                        className="md:hidden"
+                        className="md:hidden text-neutral-600 dark:text-neutral-300"
                     >
                         ←
                     </Button>
                     {otherParticipant && (
                         <div
-                            className={`flex items-center space-x-3 ${!isChatbot ? 'cursor-pointer hover:bg-gray-50' : ''} rounded-lg p-2 transition-colors duration-200`}
+                            className={`flex items-center space-x-3 ${!isChatbot ? 'cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-700' : ''} rounded-lg p-2 transition-colors duration-200`}
                             onClick={() => !isChatbot && router.push(`/profile/${otherParticipant._id}`)}
                         >
                             <div className="w-10 h-10 rounded-full overflow-hidden">
@@ -420,21 +420,21 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                                 />
                             </div>
                             <div>
-                                <h3 className="font-semibold">{otherParticipant.name}</h3>
-                                <p className="text-sm text-gray-500">
+                                <h3 className="font-semibold text-neutral-900 dark:text-white">{otherParticipant.name}</h3>
+                                <p className="text-sm text-neutral-500 dark:text-neutral-400">
                                     {isChatbot ? 'Your caring companion' : `@${otherParticipant.username}`}
                                 </p>
                             </div>
                         </div>
                     )}
                 </div>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700">
                     <MoreVertical className="w-4 h-4" />
                 </Button>
             </div>
 
             {/* Messages Area */}
-            <ScrollArea className="flex-1 p-4 bg-[#eeeeee] !scrollbar-hide ">
+            <ScrollArea className="flex-1 p-4 bg-neutral-100 dark:bg-neutral-800 !scrollbar-hide ">
                 <div className="space-y-4">
                     {messages.map((message, index) => {
                         const isOwnMessage = message.sender._id === userDetails?._id;
@@ -447,7 +447,7 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                                 {/* Date Separator */}
                                 {showDateSeparator && (
                                     <div className="flex justify-center my-6">
-                                        <div className="bg-gray-300 text-gray-600 text-xs px-3 py-1 rounded-full">
+                                        <div className="bg-neutral-300 dark:bg-neutral-600 text-neutral-600 dark:text-neutral-300 text-xs px-3 py-1 rounded-full">
                                             {formatDate(message.timestamp)}
                                         </div>
                                     </div>
@@ -472,12 +472,12 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                                         )}
                                         <div
                                             className={`px-4 py-2 flex flex-col items-start space-y-1 shadow-lg rounded-[10px] ${isOwnMessage
-                                                ? 'bg-white text-black'
+                                                ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white'
                                                 : 'bg-black text-white'
                                                 }`}
                                         >
                                             <p className="text-sm">{message.content || message.message}</p>
-                                            <p className={`text-xs mt-1 ${isOwnMessage ? 'text-gray-500' : 'text-gray-500'}`}>
+                                            <p className={`text-xs mt-1 ${isOwnMessage ? 'text-neutral-500 dark:text-neutral-400' : 'text-neutral-500 dark:text-neutral-400'}`}>
                                                 {formatTime(message.timestamp)}
                                             </p>
                                         </div>
@@ -499,11 +499,11 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                                     className="object-cover"
                                 />
                             </div>
-                            <div className="bg-gray-100 px-4 py-2 rounded-lg">
+                            <div className="bg-neutral-100 dark:bg-neutral-700 px-4 py-2 rounded-lg">
                                 <div className="flex space-x-1">
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                    <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce"></div>
+                                    <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                    <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                                 </div>
                             </div>
                         </div>
@@ -514,14 +514,14 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="p-4 border-t">
+            <div className="p-4 border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
                 <div className="flex items-center space-x-2">
                     <Input
                         value={newMessage}
                         onChange={handleInputChange}
                         onKeyPress={handleKeyPress}
                         placeholder={isChatbot ? "Ask me anything..." : `Message ${otherParticipant?.name}...`}
-                        className="py-2 outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white"
+                        className="py-2 outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white"
                     />
                     <Button
                         onClick={handleSendMessage}

@@ -14,7 +14,6 @@ import { useDispatch } from "react-redux";
 import { updateUser } from "@/redux/slice/userSlice.js";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import addImage from "@/assets/addImage.png";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 
@@ -217,25 +216,25 @@ const EditModal = ({ nav, activeNav }) => {
     return (
         <Dialog open={isOpen} onOpenChange={handleModalOpenChange}>
             <DialogTrigger asChild>
-                <button className="flex items-center group justify-center border rounded-[5px] px-5 py-2 !w-fit hover:bg-neutral-100 transition-all duration-300">Edit Profile</button>
+                <button className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-5 py-2 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white">Edit Profile</button>
             </DialogTrigger>
 
-            <DialogContent className="bg-white  w-[40%] ">
+            <DialogContent className="bg-white dark:bg-neutral-900 w-[40%] border-neutral-200 dark:border-neutral-700">
                 <VisuallyHidden>
                     <DialogHeader>
-                        <DialogTitle className="text-lg font-semibold">Edit Profile</DialogTitle>
+                        <DialogTitle className="text-lg font-semibold text-neutral-900 dark:text-white">Edit Profile</DialogTitle>
                     </DialogHeader>
                 </VisuallyHidden>
                 <div className="text-sm h-full">
-                    <Card className="w-full h-full border-none shadow-none">
+                    <Card className="w-full h-full border-none shadow-none bg-white dark:bg-neutral-900">
                         <CardHeader>
-                            <CardTitle>
+                            <CardTitle className="text-neutral-900 dark:text-white">
                                 {changePassword
                                     ? (passwordStep === 1 ? "Verify Current Password" : "Set New Password")
                                     : "Edit Profile"
                                 }
                             </CardTitle>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
                                 {changePassword
                                     ? (passwordStep === 1
                                         ? "Please enter your current password to continue."
@@ -252,7 +251,7 @@ const EditModal = ({ nav, activeNav }) => {
                                         <div className="w-full flex flex-col h-full">
                                             {["username", "name", "bio"].map((field) => (
                                                 <div key={field} className="mb-4 flex flex-col">
-                                                    <label htmlFor={field} className="block text-sm font-medium text-gray-700">
+                                                    <label htmlFor={field} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                                                         {field.charAt(0).toUpperCase() + field.slice(1)}
                                                     </label>
                                                     <Input
@@ -270,7 +269,7 @@ const EditModal = ({ nav, activeNav }) => {
                                                             }
                                                         })}
                                                         autoComplete="off"
-                                                        className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
+                                                        className={`mt-1 block w-full bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 ${errors[field] ? "border-red-500 dark:border-red-500" : ""
                                                             }`}
                                                     />
                                                     {errors[field] && (
@@ -281,13 +280,13 @@ const EditModal = ({ nav, activeNav }) => {
                                         </div>
 
                                         <div className="space-y-1 w-full flex flex-col h-full">
-                                            <label htmlFor={"avatar"} className="block text-sm font-medium text-gray-700">
-                                                Profile Photo <span className="text-gray-500 text-xs">(Optional)</span>
+                                            <label htmlFor={"avatar"} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                                                Profile Photo <span className="text-neutral-500 dark:text-neutral-400 text-xs">(Optional)</span>
                                             </label>
                                             <div
                                                 onClick={handleImageClick}
-                                                className={`${!image ? "border-[1px]" : "border-none"
-                                                    } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer p-4 `}
+                                                className={`${!image ? "border-[1px] border-dashed border-neutral-300 dark:border-neutral-600" : "border-none"
+                                                    } rounded-xl flex items-center justify-center cursor-pointer p-4 bg-white dark:bg-neutral-800`}
                                             >
                                                 <div className='w-[166px] h-[166px] rounded-full overflow-hidden relative'>
                                                     {image ? (
@@ -297,7 +296,15 @@ const EditModal = ({ nav, activeNav }) => {
                                                             className="w-[166px] h-[166px] object-cover rounded-full"
                                                         />
                                                     ) : (
-                                                        <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[166px] h-[166px]" />
+                                                        <div className="w-[166px] h-[166px] flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                                                            <svg
+                                                                className="w-16 h-16 text-neutral-400 dark:text-neutral-500"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                                            </svg>
+                                                        </div>
                                                     )}
                                                 </div>
                                                 <input
@@ -328,7 +335,7 @@ const EditModal = ({ nav, activeNav }) => {
                                                     type="password"
                                                     placeholder="Current Password"
                                                     {...register("currentPassword", { required: "Current password is required" })}
-                                                    className={`mt-1 block w-full ${errors.currentPassword ? "border-red-500" : "border-gray-300"}`}
+                                                    className={`mt-1 block w-full bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 ${errors.currentPassword ? "border-red-500 dark:border-red-500" : ""}`}
                                                 />
                                                 {errors.currentPassword && (
                                                     <p className="text-red-500 text-sm mt-1">{errors.currentPassword.message}</p>
@@ -341,7 +348,7 @@ const EditModal = ({ nav, activeNav }) => {
                                                     type="password"
                                                     placeholder="New Password"
                                                     {...register("newPassword", { required: "New password is required" })}
-                                                    className={`mt-1 block w-full ${errors.newPassword ? "border-red-500" : "border-gray-300"}`}
+                                                    className={`mt-1 block w-full bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 ${errors.newPassword ? "border-red-500 dark:border-red-500" : ""}`}
                                                 />
                                                 {errors.newPassword && (
                                                     <p className="text-red-500 text-sm mt-1">{errors.newPassword.message}</p>
@@ -354,7 +361,7 @@ const EditModal = ({ nav, activeNav }) => {
                                                         validate: (value) => value === watch("newPassword") || "Passwords do not match",
                                                         required: "Please confirm your new password"
                                                     })}
-                                                    className={`mt-1 block w-full ${errors.confirmNewPassword ? "border-red-500" : "border-gray-300"}`}
+                                                    className={`mt-1 block w-full bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 ${errors.confirmNewPassword ? "border-red-500 dark:border-red-500" : ""}`}
                                                 />
                                                 {errors.confirmNewPassword && (
                                                     <p className="text-red-500 text-sm mt-1">{errors.confirmNewPassword.message}</p>
@@ -378,7 +385,7 @@ const EditModal = ({ nav, activeNav }) => {
                                         reset();
                                         clearErrors();
                                     }}
-                                    className="mt-3 w-full bg-gray-200 text-black rounded-[8px] hover:bg-gray-300"
+                                    className="mt-3 w-full bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white rounded-[8px] hover:bg-neutral-300 dark:hover:bg-neutral-600"
                                 >
                                     Back to Current Password
                                 </Button>
@@ -392,7 +399,7 @@ const EditModal = ({ nav, activeNav }) => {
                                         setChangePassword(true);
                                     }
                                 }}
-                                className="mt-3 w-full bg-[#f7f7f7] shadow-md text-black rounded-[8px] transition-colors duration-300 hover:text-white hover:bg-[#cb3a3a]"
+                                className="mt-3 w-full bg-neutral-100 dark:bg-neutral-800 shadow-md text-neutral-900 dark:text-white rounded-[8px] transition-colors duration-300 hover:text-white hover:bg-red-500 dark:hover:bg-red-500"
                             >
                                 {changePassword ? "Cancel" : "Change Password"}
                             </Button>

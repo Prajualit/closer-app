@@ -20,14 +20,14 @@ const Userdata = () => {
     useEffect(() => {
         const fetchUserStats = async () => {
             if (!userDetails?._id) return;
-            
+
             // Only fetch if we don't have the counts
             if (userDetails.followersCount === undefined || userDetails.followingCount === undefined) {
                 try {
                     const response = await fetch(`http://localhost:5000/api/v1/users/profile/${userDetails._id}`, {
                         credentials: 'include',
                     });
-                    
+
                     if (response.ok) {
                         const data = await response.json();
                         if (data.success) {
@@ -35,9 +35,9 @@ const Userdata = () => {
                                 followersCount: data.data.user.followersCount || 0,
                                 followingCount: data.data.user.followingCount || 0
                             };
-                            
+
                             setStats(newStats);
-                            
+
                             // Update Redux with the fetched counts
                             dispatch(updateUser(newStats));
                         }
@@ -65,29 +65,29 @@ const Userdata = () => {
                 </div>
                 <div className="flex flex-col space-y-3 items-start ">
                     <div className="flex flex-col items-start justify-center">
-                        <h1 className=" text-neutral-500">@{userDetails.username}</h1>
-                        <h1 className="text-[32px] ">{userDetails.name}</h1>
-                        <p className="italic text-neutral-500 ">{userDetails.bio}</p>
+                        <h1 className="text-neutral-500 dark:text-neutral-400">@{userDetails.username}</h1>
+                        <h1 className="text-[32px] text-neutral-900 dark:text-white">{userDetails.name}</h1>
+                        <p className="italic text-neutral-500 dark:text-neutral-400">{userDetails.bio}</p>
                     </div>
                     <EditProfile />
-                    
+
                     {/* Stats */}
                     <div className="flex space-x-8 mt-4">
                         <div className="text-center">
-                            <div className="text-2xl font-bold">{photosCount}</div>
-                            <div className="text-gray-500">Photos</div>
+                            <div className="text-2xl font-bold text-neutral-900 dark:text-white">{photosCount}</div>
+                            <div className="text-neutral-500 dark:text-neutral-400">Photos</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold">{filmsCount}</div>
-                            <div className="text-gray-500">Films</div>
+                            <div className="text-2xl font-bold text-neutral-900 dark:text-white">{filmsCount}</div>
+                            <div className="text-neutral-500 dark:text-neutral-400">Films</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold">{stats.followersCount}</div>
-                            <div className="text-gray-500">Followers</div>
+                            <div className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.followersCount}</div>
+                            <div className="text-neutral-500 dark:text-neutral-400">Followers</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold">{stats.followingCount}</div>
-                            <div className="text-gray-500">Following</div>
+                            <div className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.followingCount}</div>
+                            <div className="text-neutral-500 dark:text-neutral-400">Following</div>
                         </div>
                     </div>
                 </div>

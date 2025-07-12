@@ -211,7 +211,7 @@ const Post = ({ post, onLike, onComment }) => {
     }
 
     return (
-        <div className='w-full max-w-[470px] bg-white rounded-lg shadow-sm border border-gray-100'>
+        <div className='w-full max-w-[470px] bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700'>
             {/* Post Header */}
             <div className='p-4 flex items-center justify-start space-x-3'>
                 <div className="relative w-10 h-10">
@@ -226,10 +226,10 @@ const Post = ({ post, onLike, onComment }) => {
                     />
                 </div>
                 <div className='flex-1'>
-                    <h2 className='font-semibold text-sm text-gray-900'>{post.username}</h2>
-                    <p className='text-xs text-gray-500'>{formatUploadDate(post.media.uploadedAt)}</p>
+                    <h2 className='font-semibold text-sm text-neutral-900 dark:text-white'>{post.username}</h2>
+                    <p className='text-xs text-neutral-500 dark:text-neutral-400'>{formatUploadDate(post.media.uploadedAt)}</p>
                 </div>
-                <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                <button className="text-neutral-400 hover:text-neutral-600 transition-colors">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                     </svg>
@@ -237,7 +237,7 @@ const Post = ({ post, onLike, onComment }) => {
             </div>
 
             {/* Post Media */}
-            <div className='relative w-full aspect-square bg-gray-100'>
+            <div className='relative w-full aspect-square bg-neutral-100'>
                 {isVideo(post.media.url) ? (
                     <video
                         className='w-full h-full object-contain'
@@ -264,12 +264,12 @@ const Post = ({ post, onLike, onComment }) => {
                     />
                 )}
                 {/* Video error fallback */}
-                <div className="hidden w-full h-full items-center justify-center bg-gray-200">
-                    <div className="text-center text-gray-500">
+                <div className="hidden w-full h-full items-center justify-center bg-neutral-200">
+                    <div className="text-center text-neutral-500 dark:text-neutral-400">
                         <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                         </svg>
-                        <p className="text-sm">Media unavailable</p>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Media unavailable</p>
                     </div>
                 </div>
             </div>
@@ -296,29 +296,29 @@ const Post = ({ post, onLike, onComment }) => {
 
                 {/* Likes Count */}
                 <div className='mb-2 flex space-x-2'>
-                    <span className='font-semibold text-sm'>{likesCount.toLocaleString()} like{likesCount === 1 ? "" : "s"}</span>
-                    <span className='font-semibold text-sm'>{commentsCount.toLocaleString()} comment{commentsCount === 1 ? "" : "s"}</span>
+                    <span className='font-semibold text-sm text-neutral-900 dark:text-white'>{likesCount.toLocaleString()} like{likesCount === 1 ? "" : "s"}</span>
+                    <span className='font-semibold text-sm text-neutral-900 dark:text-white'>{commentsCount.toLocaleString()} comment{commentsCount === 1 ? "" : "s"}</span>
                 </div>
 
                 {/* Caption */}
                 {post.media.caption && (
                     <div className='mb-2'>
-                        <span className='font-semibold text-sm mr-2'>{post.username}</span>
-                        <span className='text-sm text-gray-800'>{post.media.caption}</span>
+                        <span className='font-semibold text-sm mr-2 text-neutral-900 dark:text-white'>{post.username}</span>
+                        <span className='text-sm text-neutral-800 dark:text-neutral-200'>{post.media.caption}</span>
                     </div>
                 )}
 
                 {/* View Comments */}
                 <button
                     onClick={() => setShowComments(!showComments)}
-                    className="text-sm text-gray-500 hover:text-gray-700 transition-colors mb-2"
+                    className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors mb-2"
                 >
                     View all comments
                 </button>
 
                 {/* Comments Section */}
                 {showComments && (
-                    <div className='mt-3 pt-3 border-t border-gray-100 slide-up'>
+                    <div className='mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-700 slide-up'>
                         <div className='space-y-2 mb-3 max-h-32 overflow-y-auto scrollbar-hide'>
                             {comments.length > 0 ? (
                                 comments.map((comment, index) => (
@@ -326,11 +326,11 @@ const Post = ({ post, onLike, onComment }) => {
                                         <span className="font-semibold mr-2">
                                             {comment.userId?.username || comment.user?.username}
                                         </span>
-                                        <span className="text-gray-800">{comment.text}</span>
+                                        <span className="text-neutral-800">{comment.text}</span>
                                     </div>
                                 ))
                             ) : (
-                                <div className="text-sm text-gray-500">No comments yet</div>
+                                <div className="text-sm text-neutral-500 dark:text-neutral-400">No comments yet</div>
                             )}
                         </div>
                         <div className='flex items-center space-x-2'>
@@ -339,7 +339,7 @@ const Post = ({ post, onLike, onComment }) => {
                                 placeholder="Add a comment..."
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
-                                className='flex-1 text-sm border-none outline-none bg-transparent placeholder-gray-400'
+                                className='flex-1 text-sm border-none outline-none bg-transparent placeholder-neutral-400'
                                 onKeyPress={(e) => {
                                     if (e.key === 'Enter') {
                                         handleAddComment()

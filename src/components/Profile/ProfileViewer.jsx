@@ -367,7 +367,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
         }, [src]);
 
         return (
-            <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] flex items-center justify-center overflow-hidden ${containerClass}`}>
+            <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] dark:bg-black flex items-center justify-center overflow-hidden ${containerClass}`}>
                 <Image
                     src={src}
                     alt={alt}
@@ -388,7 +388,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
                 <div className="flex">
                     {loading ? (
                         <div className="flex items-center justify-center w-full h-96">
-                            <p className="text-gray-500">Loading user info...</p>
+                            <p className="text-neutral-500 dark:text-neutral-400">Loading user info...</p>
                         </div>
                     ) : profile ? (
                         <div className="flex flex-col items-center justify-center w-full h-full p-20">
@@ -417,7 +417,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
                                 <div className="flex flex-col space-y-3 items-start">
                                     <div className="flex flex-col items-start justify-center">
                                         <h1 className="text-neutral-500">@{profile.username}</h1>
-                                        <h1 className="text-[32px]">{profile.name}</h1>
+                                        <h1 className="text-[32px] text-neutral-900 dark:text-white">{profile.name}</h1>
                                         <p className="italic text-neutral-500">{profile.bio}</p>
                                     </div>
                                     {/* Action Buttons for other users */}
@@ -476,7 +476,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
                                                     className='group relative h-[12.5rem] w-[12.5rem]'
                                                 >
                                                     <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
-                                                    <div className='bg-[#181818] h-full flex items-center justify-center transition-transform duration-200'>
+                                                    <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
                                                         <SmartImage src={photo.url || photo} alt={`image-${i}`} />
                                                     </div>
                                                 </div>
@@ -525,7 +525,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
                                                         onMouseLeave={handleMouseLeave}
                                                     >
                                                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
-                                                        <div className="bg-[#181818] h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
+                                                        <div className="bg-[#181818] dark:bg-black h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
                                                             <video
                                                                 ref={videoRef}
                                                                 className={`w-full h-full ${videoClass}`}
@@ -552,7 +552,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
                     ) : (
                         <div className="flex items-center justify-center w-full h-96">
                             <div className="text-center">
-                                <div className="text-gray-500 mb-4">Profile not found</div>
+                                <div className="text-neutral-500 dark:text-neutral-400 mb-4">Profile not found</div>
                                 <Button onClick={onClose} variant="outline">
                                     Close
                                 </Button>

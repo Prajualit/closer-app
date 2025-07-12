@@ -203,9 +203,9 @@ const Navbar = () => {
     ];
 
     return (
-        <div className='h-screen fixed bg-neutral-50 border-r flex flex-col justify-center items-start px-5 py-10 w-[15rem] space-y-14 z-50 '>
+        <div className='h-screen fixed bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-700 flex flex-col justify-center items-start px-5 py-10 w-[15rem] space-y-14 z-50 '>
             <Link href='/'>
-                <Image className='w-[100px] ml-[16.67%] ' src={logo} alt="" />
+                <Image className='w-[100px] ml-[16.67%] dark:invert dark:brightness-0 dark:saturate-0 ' src={logo} alt="" />
             </Link>
             <div className='flex flex-col items-start justify-start h-full space-y-5 w-full '>
                 {navComp.map((nav) => {
@@ -223,8 +223,8 @@ const Navbar = () => {
                                 >
                                     <button 
                                         onClick={() => navigateTo(navKey)} 
-                                        className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-[#efefef] focus:bg-neutral-100 focus:text-black w-full ${
-                                            navIsActive ? "text-black bg-neutral-100" : "text-neutral-500"
+                                        className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:bg-neutral-100 dark:focus:bg-neutral-800 focus:text-black dark:focus:text-white w-full ${
+                                            navIsActive ? "text-black dark:text-white bg-neutral-100 dark:bg-neutral-800" : "text-neutral-500 dark:text-neutral-400"
                                         }`}
                                         aria-current={navIsActive ? "page" : undefined}
                                     >

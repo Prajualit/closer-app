@@ -14,14 +14,20 @@ const nextConfig = {
             tls: false,
             dns: false,
             fs: false,
+            ws: false,
         };
 
         // Ignore specific modules that cause issues
         config.plugins.push(
             new webpack.IgnorePlugin({
-                resourceRegExp: /^(bufferutil|utf-8-validate)$/,
+                resourceRegExp: /^(bufferutil|utf-8-validate|ws)$/,
             })
         );
+
+        // Externalize ws for server-side
+        if (isServer) {
+            config.externals.push('ws');
+        }
 
         return config;
     },

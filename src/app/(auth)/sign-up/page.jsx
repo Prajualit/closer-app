@@ -12,8 +12,6 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import addImage from "@/assets/addImage.png";
-import Image from "next/image";
 
 const Page = () => {
   const router = useRouter();
@@ -94,11 +92,11 @@ const Page = () => {
   };
 
   return (
-    <div className="h-screen flex justify-center items-center">
-      <Card className="w-full max-w-[60%] rounded-xl shadow-md">
+    <div className="h-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-900">
+      <Card className="w-full max-w-[60%] rounded-xl shadow-md bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
         <CardHeader>
-          <CardTitle>Sign Up</CardTitle>
-          <CardDescription>Create Your Account</CardDescription>
+          <CardTitle className="text-neutral-900 dark:text-white">Sign Up</CardTitle>
+          <CardDescription className="text-neutral-600 dark:text-neutral-400">Create Your Account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -107,7 +105,7 @@ const Page = () => {
               <div className="w-full">
                 {["username", "name", "bio", "password", "confirmPassword"].map((field) => (
                   <div key={field} className="mb-4 flex flex-col">
-                    <label htmlFor={field} className="block text-sm font-medium text-gray-700">
+                    <label htmlFor={field} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                       {field === "confirmPassword"
                         ? "Confirm Password"
                         : field.charAt(0).toUpperCase() + field.slice(1)}
@@ -126,7 +124,7 @@ const Page = () => {
                             : undefined,
                       })}
                       autoComplete="off"
-                      className={`mt-1 block w-full ${errors[field] ? "border-red-500" : "border-gray-300"
+                      className={`mt-1 block w-full bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 ${errors[field] ? "border-red-500 dark:border-red-500" : ""
                         }`}
                     />
                     {errors[field] && (
@@ -138,13 +136,13 @@ const Page = () => {
 
               {/* Right side image upload */}
               <div className="space-y-1 w-full flex flex-col h-full">
-                <label htmlFor={"avatar"} className="block text-sm font-medium text-gray-700">
+                <label htmlFor={"avatar"} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   Profile Photo
                 </label>
                 <div
                   onClick={handleImageClick}
-                  className={`${!image ? "border-[1px]" : "border-none"
-                    } border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer p-4`}
+                  className={`${!image ? "border-[1px] border-dashed border-neutral-300 dark:border-neutral-600" : "border-none"
+                    } rounded-xl flex items-center justify-center cursor-pointer p-4 bg-white dark:bg-neutral-800`}
                 >
                   <div className='w-[100px] h-[100px] rounded-full overflow-hidden relative'>
                     {image ? (
@@ -154,7 +152,15 @@ const Page = () => {
                         className="w-[100px] h-[100px] object-cover rounded-full"
                       />
                     ) : (
-                      <Image src={addImage} width={100} height={100} alt="Add Image" className="w-[100px] h-[100px]" />
+                      <div className="w-[100px] h-[100px] flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                        <svg
+                          className="w-8 h-8 text-neutral-400 dark:text-neutral-500"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                      </div>
                     )}
                   </div>
                   <input
@@ -181,7 +187,7 @@ const Page = () => {
 
             {/* Link to sign in */}
             <div className="mt-2 text-center text-sm">
-              <Link href="/sign-in" className="text-primary hover:underline">
+              <Link href="/sign-in" className="text-blue-600 dark:text-blue-400 hover:underline">
                 Already have an account? Sign in
               </Link>
             </div>

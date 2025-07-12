@@ -20,15 +20,15 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md max-h-[80vh] bg-white overflow-hidden flex flex-col">
+            <DialogContent className="max-w-md max-h-[80vh] bg-white dark:bg-neutral-800 overflow-hidden flex flex-col">
                 <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold">Suggested for you</DialogTitle>
+                    <DialogTitle className="text-lg font-semibold dark:text-white">Suggested for you</DialogTitle>
                 </DialogHeader>
                 
-                <div className="flex-1 overflow-y-auto bg-white">
+                <div className="flex-1 overflow-y-auto bg-white dark:bg-neutral-800">
                     <div className="space-y-1">
                         {suggestedUsers.map((user) => (
-                            <div key={user._id} className="flex items-center justify-between hover:bg-gray-50 py-3 px-2 rounded-lg transition-all duration-200">
+                            <div key={user._id} className="flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-700 py-3 px-2 rounded-lg transition-all duration-200">
                                 <div
                                     className="flex items-center space-x-3 flex-1 cursor-pointer"
                                     onClick={() => handleProfileClick(user._id)}
@@ -42,10 +42,10 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-medium text-gray-900 truncate">
+                                        <h4 className="text-sm font-medium text-neutral-900 dark:text-white truncate">
                                             {user.username}
                                         </h4>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-xs text-neutral-500 dark:text-neutral-400">
                                             {user.followersCount || 0} followers
                                         </p>
                                     </div>

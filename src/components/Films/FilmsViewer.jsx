@@ -274,12 +274,12 @@ const FilmsViewer = ({ initialFilms = [], username }) => {
       <div className="h-screen bg-black flex flex-col items-center justify-center text-white">
         <Camera className="w-20 h-20 mb-4 opacity-50" />
         <h2 className="text-2xl font-bold mb-2">No Films Yet</h2>
-        <p className="text-gray-400 mb-8 text-center">
+        <p className="text-neutral-400 mb-8 text-center">
           Be the first to share a film!
         </p>
         <button
           onClick={goToCreateFilm}
-          className="flex items-center space-x-2 bg-white text-black px-6 py-3 rounded-full font-semibold hover:bg-gray-200 transition-colors"
+          className="flex items-center space-x-2 bg-white text-black px-6 py-3 rounded-full font-semibold hover:bg-neutral-200 transition-colors"
         >
           <Plus className="w-5 h-5" />
           <span>Create Film</span>

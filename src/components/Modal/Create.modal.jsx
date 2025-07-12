@@ -83,7 +83,7 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
                 setCaption(""); // Reset caption
 
                 dispatch(updateUser({ media: data.data.media }));
-                
+
                 // Close modal if onOpenChange is provided
                 if (onOpenChange) {
                     onOpenChange(false);
@@ -101,9 +101,9 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
             {nav && (
                 <DialogTrigger asChild>
                     <button
-                        className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-[#efefef] focus:bg-neutral-100 focus:text-black w-full ${activeNav === nav.name.toLowerCase()
-                            ? "text-black"
-                            : "text-neutral-500"
+                        className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:bg-neutral-100 dark:focus:bg-neutral-800 focus:text-black dark:focus:text-white w-full ${activeNav === nav.name.toLowerCase()
+                            ? "text-black dark:text-white"
+                            : "text-neutral-500 dark:text-neutral-400"
                             }`}
                     >
                         {nav.icon}
@@ -112,12 +112,12 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
                 </DialogTrigger>
             )}
 
-            <DialogContent className="bg-white h-[80%] w-[40%]">
+            <DialogContent className="bg-white dark:bg-neutral-900 h-[80%] w-[40%] border-neutral-200 dark:border-neutral-700">
                 <DialogHeader>
-                    <DialogTitle>Create New Post</DialogTitle>
+                    <DialogTitle className="text-neutral-900 dark:text-white">Create New Post</DialogTitle>
                 </DialogHeader>
                 {!file && (
-                    <DialogDescription className="flex flex-col space-y-5 justify-center items-center text-lg text-black">
+                    <DialogDescription className="flex flex-col space-y-5 justify-center items-center text-lg text-neutral-900 dark:text-white">
                         <MediaIcon />
                         Upload a photo or video
                     </DialogDescription>
@@ -146,7 +146,8 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
                                             type="text"
                                             placeholder="Add a caption"
                                             value={caption}
-                                            className="w-full rounded border p-2 text-sm outline-neutral-400 "
+                                            className="w-full rounded border p-2 text-sm outline-neutral-400 
+                                            dark:bg-neutral-800 dark:text-white dark:border-neutral-700"
                                             onChange={(e) => setCaption(e.target.value)}
                                         />
                                     </div>
@@ -156,7 +157,7 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
                         )}
                         <div className="flex items-center justify-center space-x-4">
                             <Button
-                                className={`bg-black text-white rounded-[8px] hover:bg-neutral-800 ${!file && "hidden"} `}
+                                className={`bg-black text-white rounded-[8px] hover:bg-neutral-800 ${!file && "hidden"} dark:hover:bg-neutral-200 dark:hover:text-black dark:text-neutral-100`}
                                 onClick={handleSubmitFile}
                                 disabled={!file}
                             >
@@ -172,7 +173,7 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
                             <Button
                                 variant="outline"
                                 onClick={() => inputRef.current?.click()}
-                                className="rounded-[8px] hover:bg-black hover:text-white text-black duration-300"
+                                className="rounded-[8px] hover:bg-black hover:text-white text-black duration-300 dark:hover:bg-neutral-200 dark:hover:text-black dark:text-neutral-100"
                             >
                                 {file ? "Change File" : "Select from Computer"}
                             </Button>

@@ -49,12 +49,12 @@ const FilmsPage = () => {
 
     if (error) {
         return (
-            <div className="h-screen bg-black flex items-center justify-center text-white">
+            <div className="h-screen bg-neutral-900 dark:bg-black flex items-center justify-center text-neutral-100 dark:text-white">
                 <div className="text-center">
                     <p className="text-lg mb-4">{error}</p>
                     <button 
                         onClick={loadInitialFilms}
-                        className="px-6 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-colors"
+                        className="px-6 py-2 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                     >
                         Retry
                     </button>

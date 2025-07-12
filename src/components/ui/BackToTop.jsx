@@ -32,7 +32,7 @@ const BackToTop = () => {
     return (
         <button
             onClick={scrollToTop}
-            className="fixed bottom-24 right-6 w-12 h-12 bg-white text-gray-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 z-40 flex items-center justify-center border border-gray-200"
+            className="fixed bottom-24 right-6 w-12 h-12 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-full shadow-lg hover:shadow-xl dark:shadow-neutral-900/50 transition-all duration-300 transform hover:scale-110 z-40 flex items-center justify-center border border-neutral-200 dark:border-neutral-700"
             aria-label="Back to top"
         >
             <svg

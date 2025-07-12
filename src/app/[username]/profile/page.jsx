@@ -104,20 +104,20 @@ const Page = ({ params }) => {
     ];
 
     return (
-        <div className="flex ">
+        <div className="flex bg-white dark:bg-neutral-900 min-h-screen">
             <Navbar />
             {userDetails ? (
                 <div className="flex flex-col items-center justify-center w-full h-full p-20 ml-[15rem] ">
                     <Userdata />
-                    <div className="w-[75%] border mt-20 "></div>
+                    <div className="w-[75%] border border-neutral-200 dark:border-neutral-700 mt-20 "></div>
                     <div className="flex justify-center items-center space-x-32 relative w-full mb-20 ">
                         {navComp.map((nav) => (
-                            <div key={nav.name} className="flex flex-col text-neutral-500 items-center space-y-5 ">
+                            <div key={nav.name} className="flex flex-col text-neutral-500 dark:text-neutral-400 items-center space-y-5 ">
                                 <div
-                                    className={` h-[1px] w-[120%] bg-neutral-500 transition-all duration-300 ${activeNav === nav.name ? "block" : "hidden"}`}
+                                    className={` h-[1px] w-[120%] bg-neutral-500 dark:bg-neutral-400 transition-all duration-300 ${activeNav === nav.name ? "block" : "hidden"}`}
                                 ></div>
                                 <button
-                                    className={`transition-all duration-300 text-[14px] flex items-center space-x-2 ${activeNav === nav.name ? "text-black" : "text-neutral-500"} `}
+                                    className={`transition-all duration-300 text-[14px] flex items-center space-x-2 ${activeNav === nav.name ? "text-black dark:text-white" : "text-neutral-500 dark:text-neutral-400"} `}
                                     onClick={() => setActiveNav(nav.name)}
                                 >
                                     {nav.icon}
@@ -133,7 +133,9 @@ const Page = ({ params }) => {
                     {activeNav === "FILMS" && <Films />}
                 </div>
             ) : (
-                <p>Loading user info...</p>
+                <div className="flex items-center justify-center w-full h-screen ml-[15rem]">
+                    <p className="text-neutral-500 dark:text-neutral-400">Loading user info...</p>
+                </div>
             )}
         </div>
     );

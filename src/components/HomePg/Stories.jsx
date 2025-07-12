@@ -48,13 +48,13 @@ const Stories = () => {
     )
 
     return (
-        <div className="w-full bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Stories</h3>
+        <div className="w-full bg-white dark:bg-neutral-800 rounded-xl p-4 shadow-sm border border-neutral-100 dark:border-neutral-700 mb-6">
+            <h3 className="text-sm font-semibold text-neutral-900 dark:text-white mb-4">Stories</h3>
             <div className="flex space-x-3 overflow-x-auto scrollbar-hide">
                 {stories.map((story) => (
                     <div key={story.id} className="flex flex-col items-center space-y-1 min-w-[60px]">
                         <div className={`relative ${story.hasStory && !story.isOwnStory ? 'p-0.5 bg-gradient-to-tr from-yellow-400 to-fuchsia-600 rounded-full' : ''}`}>
-                            <div className="relative w-12 h-12 bg-white rounded-full p-0.5">
+                            <div className="relative w-12 h-12 bg-white dark:bg-neutral-700 rounded-full p-0.5">
                                 <Image
                                     src={story.avatar}
                                     alt={story.username}
@@ -62,13 +62,13 @@ const Stories = () => {
                                     className="rounded-full object-cover"
                                 />
                                 {story.isOwnStory && !story.hasStory && (
-                                    <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white">
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white dark:border-neutral-700">
                                         <AddIcon />
                                     </div>
                                 )}
                             </div>
                         </div>
-                        <span className="text-xs text-gray-600 text-center max-w-[60px] truncate">
+                        <span className="text-xs text-neutral-600 dark:text-neutral-400 text-center max-w-[60px] truncate">
                             {story.isOwnStory ? 'Your story' : story.username}
                         </span>
                     </div>
