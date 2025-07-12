@@ -78,19 +78,25 @@ const page = () => {
                   placeholder={`Enter your ${field}`}
                   error={errors[field]}
                   disabled={pending}
+                  className={`bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 ${errors[field] ? "border-red-500 dark:border-red-500" : ""}`}
                 />
                 {errors[field] && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors[field].message}
                   </p>
                 )}
-                {error && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {error}
-                  </p>
-                )}
               </div>
             ))}
+            
+            {/* General error message */}
+            {error && (
+              <div className="mb-4">
+                <p className="text-red-500 text-sm">
+                  {error}
+                </p>
+              </div>
+            )}
+            
             <LoadingButton
               type="submit"
               pending={pending}

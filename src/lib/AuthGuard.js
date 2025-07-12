@@ -51,12 +51,15 @@ export default function AuthGuard({ children }) {
 
   if (loading) {
     return (
-      <div className="h-screen w-screen flex flex-col items-center justify-center">
-        <Image src={logo} alt="logo" width={300} height={300} priority />
-        <div className="mt-4 text-sm text-gray-600">Debug: {debugInfo}</div>
-        <div className="mt-2 text-xs text-gray-400">
-          Check console for detailed logs
-        </div>
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-white dark:bg-neutral-900">
+        <Image
+          src={logo}
+          alt="logo"
+          width={300}
+          height={300}
+          priority
+          className="drop-shadow-lg dark:brightness-0 dark:contrast-0 dark:invert"
+        />
       </div>
     );
   }

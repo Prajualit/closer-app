@@ -141,20 +141,20 @@ const Page = () => {
                 </label>
                 <div
                   onClick={handleImageClick}
-                  className={`${!image ? "border-[1px] border-dashed border-neutral-300 dark:border-neutral-600" : "border-none"
+                  className={`${!image ? "border-[1px] border-dashed h-full border-neutral-300 dark:border-neutral-600" : "border-none"
                     } rounded-xl flex items-center justify-center cursor-pointer p-4 bg-white dark:bg-neutral-800`}
                 >
-                  <div className='w-[100px] h-[100px] rounded-full overflow-hidden relative'>
+                  <div className='w-[326px] h-[326px] rounded-full overflow-hidden relative'>
                     {image ? (
                       <img
                         src={URL.createObjectURL(image)}
                         alt="Profile Preview"
-                        className="w-[100px] h-[100px] object-cover rounded-full"
+                        className="w-[326px] h-[326px] object-cover bg-center rounded-full"
                       />
                     ) : (
-                      <div className="w-[100px] h-[100px] flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                      <div className="w-[326px] h-[326px] flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
                         <svg
-                          className="w-8 h-8 text-neutral-400 dark:text-neutral-500"
+                          className="w-[100px] h-[100px] text-neutral-400 dark:text-neutral-500"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
