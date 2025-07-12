@@ -8,15 +8,29 @@ import { notifyLike, notifyComment } from "./notification.controller.js";
 
 // Get all posts from all users with pagination
 const getAllPosts = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, type } = req.query;
   const skip = (page - 1) * limit;
   const currentUserId = req.user._id;
+
+  console.log('getAllPosts called with:', { page, limit, type, currentUserId });
+
+  // Build match criteria for media type filtering
+  const matchCriteria = {};
+  if (type === 'video') {
+    matchCriteria['media.resource_type'] = 'video';
+  } else if (type === 'image') {
+    matchCriteria['media.resource_type'] = 'image';
+  }
+
+  console.log('Match criteria:', matchCriteria);
 
   // Get all users with their media, sorted by upload date
   const posts = await User.aggregate([
     {
       $unwind: "$media",
     },
+    // Add type filtering if specified
+    ...(Object.keys(matchCriteria).length > 0 ? [{ $match: matchCriteria }] : []),
     {
       $lookup: {
         from: "users",
@@ -136,6 +150,14 @@ const getAllPosts = asyncHandler(async (req, res) => {
       $limit: parseInt(limit),
     },
   ]);
+
+  console.log('Posts found:', posts.length);
+  console.log('First post sample:', posts[0] ? {
+    id: posts[0]._id,
+    username: posts[0].username,
+    mediaType: posts[0].media?.resource_type,
+    mediaUrl: posts[0].media?.url
+  } : 'No posts');
 
   return res.status(200).json(
     new ApiResponse(
