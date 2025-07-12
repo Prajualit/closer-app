@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateUser } from '@/redux/slice/userSlice';
 import Navbar from '@/components/HomePg/Navbar';
 import LoadingButton from '@/components/LoadingButton';
+import ImageModal from '@/components/Modal/viewMedia.modal';
 
 const ProfilePage = () => {
     const params = useParams();
@@ -23,6 +24,8 @@ const ProfilePage = () => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [activeNav, setActiveNav] = useState("PHOTOS");
     const [videoOrientations, setVideoOrientations] = useState({});
+    const [selectedMedia, setSelectedMedia] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
     const { toast } = useToast();
     const currentUser = useSelector((state) => state.user.user);
     const dispatch = useDispatch();
@@ -207,6 +210,16 @@ const ProfilePage = () => {
 
     const handleBack = () => {
         router.back();
+    };
+
+    const handleImageClick = (media, isVideo = false) => {
+        setSelectedMedia(isVideo ? { videoUrl: media } : { imageUrl: media });
+        setSelectedUser(profile);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedMedia(null);
+        setSelectedUser(null);
     };
 
     // Icon components from original profile page
@@ -564,7 +577,8 @@ const ProfilePage = () => {
                                 {photos.map((photo, i) => (
                                     <div
                                         key={i}
-                                        className='group relative h-[12.5rem] w-[12.5rem]'
+                                        className='group relative h-[12.5rem] w-[12.5rem] cursor-pointer'
+                                        onClick={() => handleImageClick({ url: photo.url || photo, caption: photo.caption, uploadedAt: photo.uploadedAt })}
                                     >
                                         <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
                                         <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
@@ -614,6 +628,7 @@ const ProfilePage = () => {
                                             className="h-[20rem] w-[12.5rem] group relative cursor-pointer"
                                             onMouseEnter={handleMouseEnter}
                                             onMouseLeave={handleMouseLeave}
+                                            onClick={() => handleImageClick({ url: film.url || film, caption: film.caption, uploadedAt: film.uploadedAt }, true)}
                                         >
                                             <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
                                             <div className="bg-[#181818] h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
@@ -640,6 +655,16 @@ const ProfilePage = () => {
                     </>
                 )}
             </div>
+            
+            {/* Image/Video Modal */}
+            {selectedMedia && (
+                <ImageModal
+                    imageUrl={selectedMedia.imageUrl}
+                    videoUrl={selectedMedia.videoUrl}
+                    onClose={handleCloseModal}
+                    user={selectedUser}
+                />
+            )}
         </div>
     );
 };
