@@ -14,7 +14,7 @@ import { updateUser } from "@/redux/slice/userSlice.js";
 import { Input } from "@/components/ui/input";
 
 
-const CreateModal = ({ nav, activeNav }) => {
+const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
     const [file, setFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [caption, setCaption] = useState(""); // Added caption state
@@ -83,6 +83,11 @@ const CreateModal = ({ nav, activeNav }) => {
                 setCaption(""); // Reset caption
 
                 dispatch(updateUser({ media: data.data.media }));
+                
+                // Close modal if onOpenChange is provided
+                if (onOpenChange) {
+                    onOpenChange(false);
+                }
             } else {
                 console.error("Failed to upload file");
             }
@@ -92,18 +97,20 @@ const CreateModal = ({ nav, activeNav }) => {
     };
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <button
-                    className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-[#efefef] focus:bg-neutral-100 focus:text-black w-full ${activeNav === nav.name.toLowerCase()
-                        ? "text-black"
-                        : "text-neutral-500"
-                        }`}
-                >
-                    {nav.icon}
-                    <span>{nav.name}</span>
-                </button>
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            {nav && (
+                <DialogTrigger asChild>
+                    <button
+                        className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-[#efefef] focus:bg-neutral-100 focus:text-black w-full ${activeNav === nav.name.toLowerCase()
+                            ? "text-black"
+                            : "text-neutral-500"
+                            }`}
+                    >
+                        {nav.icon}
+                        <span>{nav.name}</span>
+                    </button>
+                </DialogTrigger>
+            )}
 
             <DialogContent className="bg-white h-[80%] w-[40%]">
                 <DialogHeader>

@@ -1,25 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateUser } from '@/redux/slice/userSlice';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { useSelector } from 'react-redux';
 import ImageModal from '@/components/Modal/viewMedia.modal.jsx';
+import CreateModal from '@/components/Modal/create.modal';
+import LoadingButton from '../Loadingbutton';
 
 const Films = () => {
   const user = useSelector((state) => state.user.user);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeVideoUrl, setActiveVideoUrl] = useState(null);
-
-  const inputRef = React.useRef(null);
-  const dispatch = useDispatch();
 
   const hasFilms =
     Array.isArray(user?.media) &&
@@ -44,42 +32,6 @@ const Films = () => {
         };
       });
   }, [user?.media]);
-
-  const handleFileUpload = async () => {
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const response = await fetch('http://localhost:5000/api/v1/create', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(updateUser({ media: data.data.media }));
-        setIsModalOpen(false);
-        setFile(null);
-        setPreviewUrl(null);
-      } else {
-        console.error('Upload failed');
-      }
-    } catch (err) {
-      console.error('Upload error:', err);
-    }
-  };
-
-  useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
 
   const FilmIcon = ({ size = 24, color = "#000000" }) => {
     return (
@@ -192,56 +144,19 @@ const Films = () => {
           <FilmIcon size={100} color="black" />
           <h1 className="text-2xl font-semibold">No Films Yet</h1>
           <p className="text-neutral-500">When you share films, they will appear on your profile.</p>
-          <Button onClick={() => setIsModalOpen(true)} className="rounded-[8px] hover:text-[#474747] transition-all focus:bg-transparent focus:text-black duration-300">Share your first film</Button>
+          <LoadingButton 
+            onClick={() => setIsCreateModalOpen(true)} 
+            className="!w-fit"
+          >
+            Share your first film
+          </LoadingButton>
         </div>
       )}
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-white h-[80%] w-[40%]">
-          <DialogHeader>
-            <DialogTitle>Create New Post</DialogTitle>
-          </DialogHeader>
-
-          <DialogDescription className="flex flex-col items-center space-y-5 text-lg text-black">
-            <span>Upload a photo or video</span>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="video/*"
-              className="hidden"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-            />
-            <Button
-              variant="outline"
-              onClick={() => inputRef.current?.click()}
-              className="rounded-[8px] text-black"
-            >
-              {file ? 'Change File' : 'Select from Computer'}
-            </Button>
-            {file && (
-              <>
-                <span className="text-sm text-neutral-500">Selected: {file.name}</span>
-                {previewUrl && file.type.startsWith('video/') && (
-                  <video
-                    height={200}
-                    width={200}
-                    src={previewUrl}
-                    className="max-w-xs max-h-48 rounded-md mt-2 object-contain"
-                    controls
-                  />
-                )}
-              </>
-            )}
-            <Button
-              className="mt-2 bg-black text-white rounded-[8px] hover:bg-neutral-800"
-              onClick={handleFileUpload}
-              disabled={!file}
-            >
-              Upload
-            </Button>
-          </DialogDescription>
-        </DialogContent>
-      </Dialog>
+      <CreateModal 
+        open={isCreateModalOpen} 
+        onOpenChange={setIsCreateModalOpen}
+      />
     </>
   );
 };

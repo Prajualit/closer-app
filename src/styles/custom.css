@@ -152,3 +152,114 @@
     background-position: 200% 0;
   }
 }
+
+/* Films viewer specific animations */
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Films video overlay animations */
+.film-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0) 20%,
+    rgba(0, 0, 0, 0) 80%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+}
+
+/* Action button hover effects */
+.action-button {
+  @apply transition-all duration-200 ease-in-out;
+  backdrop-filter: blur(10px);
+}
+
+.action-button:hover {
+  @apply scale-110;
+  backdrop-filter: blur(15px);
+}
+
+.action-button:active {
+  @apply scale-95;
+}
+
+/* Video progress bar */
+.video-progress {
+  background: linear-gradient(90deg, #ffffff 0%, #ffffff 50%, rgba(255, 255, 255, 0.3) 50%);
+  background-size: 200% 100%;
+  transition: background-position 0.1s ease;
+}
+
+/* Comment modal animations */
+.comment-bubble {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+.comment-bubble:hover {
+  @apply bg-gray-200;
+}
+
+/* Films grid hover effects */
+.film-grid-item {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.film-grid-item:hover {
+  @apply scale-105 shadow-lg;
+}
+
+/* Loading spinner for films */
+.films-loading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Line clamp utilities for text truncation */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
