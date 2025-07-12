@@ -6,6 +6,7 @@ import ReduxProvider from "@/redux/reduxProvider";
 import AuthWrapper from "@/lib/AuthWrapper"; // client wrapper
 import { SocketProvider } from "@/lib/SocketContext";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 dotenv.config();
 
@@ -28,16 +29,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white transition-colors duration-300`}
       >
-        <GoogleOAuthProvider clientId={`${process.env.GOOGLE_CLIENT_ID}`}>
-          <ReduxProvider>
-            <SocketProvider>
-              <AuthWrapper>{children}</AuthWrapper>
-              <Toaster />
-            </SocketProvider>
-          </ReduxProvider>
-        </GoogleOAuthProvider>
+        <ThemeProvider>
+          <GoogleOAuthProvider clientId={`${process.env.GOOGLE_CLIENT_ID}`}>
+            <ReduxProvider>
+              <SocketProvider>
+                <AuthWrapper>{children}</AuthWrapper>
+                <Toaster />
+              </SocketProvider>
+            </ReduxProvider>
+          </GoogleOAuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
