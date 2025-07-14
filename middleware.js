@@ -33,9 +33,14 @@ export async function middleware(request) {
   }
 
   if (!refreshToken) {
-    // No refresh token, redirect to sign-in
-    url.pathname = "/sign-in";
-    return NextResponse.redirect(url);
+    // No refresh token in cookies, but we can't check localStorage in middleware
+    // Let the client-side AuthGuard handle localStorage tokens
+    // Only redirect if we're not already on an auth page
+    if (url.pathname !== "/sign-in" && url.pathname !== "/sign-up") {
+      url.pathname = "/sign-in";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
   }
 
   // Try refreshing access token

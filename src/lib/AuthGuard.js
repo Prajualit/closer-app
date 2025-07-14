@@ -20,23 +20,37 @@ export default function AuthGuard({ children }) {
         cookie.trim().startsWith('refreshToken=')
       );
       
+      // EMERGENCY FIX: Also check localStorage
+      const refreshTokenLS = localStorage.getItem('refreshToken');
+      
       console.log("🍪 All cookies:", document.cookie);
       console.log("🔍 Refresh token cookie found:", !!refreshTokenCookie);
+      console.log("💾 Refresh token in localStorage:", !!refreshTokenLS);
       
-      if (!refreshTokenCookie) {
-        console.log("No refresh token found, redirecting to sign-in");
-        setDebugInfo("No refresh token found in cookies");
+      if (!refreshTokenCookie && !refreshTokenLS) {
+        console.log("No refresh token found anywhere, redirecting to sign-in");
+        setDebugInfo("No refresh token found in cookies or localStorage");
         router.push("/sign-in");
         return;
       }
 
       try {
         console.log("📡 Making refresh token request...");
+        
+        // Try to get refresh token from cookies first, fallback to localStorage
+        const refreshToken = refreshTokenCookie ? 
+          refreshTokenCookie.split('=')[1] : 
+          localStorage.getItem('refreshToken');
+        
         const res = await fetch(
           API_ENDPOINTS.REFRESH_TOKEN,
           {
             method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
             credentials: "include",
+            body: JSON.stringify({ refreshToken })
           }
         );
 
@@ -44,6 +58,15 @@ export default function AuthGuard({ children }) {
 
         if (res.ok) {
           const data = await res.json();
+          
+          // Store new tokens in localStorage as backup
+          if (data.data.accessToken) {
+            localStorage.setItem('accessToken', data.data.accessToken);
+          }
+          if (data.data.refreshToken) {
+            localStorage.setItem('refreshToken', data.data.refreshToken);
+          }
+          
           setDebugInfo("Auth successful!");
           setLoading(false);
         } else {
@@ -60,6 +83,10 @@ export default function AuthGuard({ children }) {
           } catch (logoutError) {
             console.log("Logout failed, but continuing to redirect");
           }
+          
+          // Clear localStorage tokens
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
           
           router.push("/sign-in");
         }

@@ -53,8 +53,17 @@ const page = () => {
         console.log("✅ Login successful, dispatching user data");
         dispatch(setUser(responseData.data.user));
         
+        // EMERGENCY FIX: Store tokens in localStorage as backup
+        if (responseData.data.accessToken) {
+          localStorage.setItem('accessToken', responseData.data.accessToken);
+        }
+        if (responseData.data.refreshToken) {
+          localStorage.setItem('refreshToken', responseData.data.refreshToken);
+        }
+        
         // Check if cookies were actually set
         console.log("🍪 Cookies after login:", document.cookie);
+        console.log("💾 Stored tokens in localStorage as backup");
         
         router.push(`/${responseData.data.user.username}/home`);
       }
