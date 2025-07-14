@@ -8,6 +8,7 @@ import LoadingButton from '@/components/LoadingButton';
 import { Button } from '../ui/button';
 import { useToast } from "@/hooks/use-toast";
 import ThemeDropdown from '../ui/ThemeDropdown';
+import { API_ENDPOINTS } from "@/lib/api";
 
 const UserButton = () => {
     const [isOpen, setIsOpen] = useState(false)
@@ -34,7 +35,7 @@ const UserButton = () => {
     const router = useRouter();
     const handleLogout = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/v1/users/logout`, {
+            const response = await fetch(API_ENDPOINTS.LOGOUT, {
                 method: "POST",
                 credentials: "include",
             });
@@ -63,7 +64,7 @@ const UserButton = () => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:5000/api/v1/users/delete-account`, {
+            const response = await fetch(API_ENDPOINTS.DELETE_ACCOUNT, {
                 method: "DELETE",
                 credentials: "include",
             });

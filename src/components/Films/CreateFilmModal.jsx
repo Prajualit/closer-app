@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { X, Upload, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { updateUser } from '@/redux/slice/userSlice';
 import { useToast } from '@/hooks/use-toast';
+import { API_ENDPOINTS } from '@/lib/api';
 
 const CreateFilmModal = ({ isOpen, onClose }) => {
   const [file, setFile] = useState(null);
@@ -147,7 +148,7 @@ const CreateFilmModal = ({ isOpen, onClose }) => {
         formData.append('hashtags', JSON.stringify(extractedHashtags));
       }
 
-      const response = await fetch('http://localhost:5000/api/v1/create', {
+      const response = await fetch(API_ENDPOINTS.CREATE_MEDIA, {
         method: 'POST',
         body: formData,
         credentials: 'include',

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { API_ENDPOINTS } from "@/lib/api";
 
 const Page = () => {
   const router = useRouter();
@@ -72,7 +73,7 @@ const Page = () => {
       formData.append("bio", data.bio);
       formData.append("avatarUrl", image);
 
-      const response = await fetch("http://localhost:5000/api/v1/users/register", {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: "POST",
         body: formData,
       });

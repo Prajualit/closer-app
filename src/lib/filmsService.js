@@ -193,7 +193,7 @@ export const filmsService = {
         formData.append('hashtags', JSON.stringify(hashtags));
       }
 
-      const response = await fetch('http://localhost:5000/api/v1/create', {
+      const response = await fetch(API_ENDPOINTS.CREATE_MEDIA, {
         method: 'POST',
         body: formData,
         credentials: 'include',

@@ -4,9 +4,12 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://local
 // API endpoints
 export const API_ENDPOINTS = {
   // Auth endpoints
+  LOGIN: `${API_BASE_URL}/api/v1/users/login`,
+  REGISTER: `${API_BASE_URL}/api/v1/users/register`,
   REFRESH_TOKEN: `${API_BASE_URL}/api/v1/users/refresh-token`,
   LOGOUT: `${API_BASE_URL}/api/v1/users/logout`,
   DELETE_ACCOUNT: `${API_BASE_URL}/api/v1/users/delete-account`,
+  GOOGLE_AUTH: `${API_BASE_URL}/auth/google`,
   
   // User endpoints
   USER_PROFILE: (userId) => `${API_BASE_URL}/api/v1/users/profile/${userId}`,
@@ -15,6 +18,9 @@ export const API_ENDPOINTS = {
   FOLLOW_STATUS: (userId) => `${API_BASE_URL}/api/v1/users/follow-status/${userId}`,
   FOLLOW: `${API_BASE_URL}/api/v1/users/follow`,
   UNFOLLOW: `${API_BASE_URL}/api/v1/users/unfollow`,
+  UPDATE_PROFILE: `${API_BASE_URL}/api/v1/users/update-profile`,
+  VERIFY_PASSWORD: `${API_BASE_URL}/api/v1/users/verify-password`,
+  CHANGE_PASSWORD: `${API_BASE_URL}/api/v1/users/change-password`,
   
   // Posts endpoints
   POSTS: `${API_BASE_URL}/api/v1/posts`,

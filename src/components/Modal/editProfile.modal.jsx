@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
+import { API_ENDPOINTS } from "@/lib/api";
 
 const EditModal = ({ nav, activeNav }) => {
     const [pending, setPending] = useState(false);
@@ -111,7 +112,7 @@ const EditModal = ({ nav, activeNav }) => {
                 return;
             }
 
-            const response = await fetch("http://localhost:5000/api/v1/users/update-profile", {
+            const response = await fetch(API_ENDPOINTS.UPDATE_PROFILE, {
                 method: "POST",
                 body: formData,
                 credentials: "include",
@@ -158,7 +159,7 @@ const EditModal = ({ nav, activeNav }) => {
         try {
             if (passwordStep === 1) {
                 // Verify current password
-                const response = await fetch("http://localhost:5000/api/v1/users/verify-password", {
+                const response = await fetch(API_ENDPOINTS.VERIFY_PASSWORD, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -180,7 +181,7 @@ const EditModal = ({ nav, activeNav }) => {
                 }
             } else {
                 // Change password (step 2)
-                const response = await fetch("http://localhost:5000/api/v1/users/change-password", {
+                const response = await fetch(API_ENDPOINTS.CHANGE_PASSWORD, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

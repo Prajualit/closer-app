@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import search from "@/assets/search.png";
 import { useToast } from '@/hooks/use-toast';
+import { API_ENDPOINTS } from '@/lib/api';
 
 const Navsearch = () => {
     const [query, setQuery] = useState('');
@@ -38,7 +39,7 @@ const Navsearch = () => {
 
             setIsSearching(true);
             try {
-                const response = await fetch(`http://localhost:5000/api/v1/users/search?query=${encodeURIComponent(query)}`, {
+                const response = await fetch(API_ENDPOINTS.USER_SEARCH(encodeURIComponent(query)), {
                     credentials: 'include',
                 });
                 const data = await response.json();

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+// Use environment variable for API base URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
 export async function middleware(request) {
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
@@ -37,7 +40,7 @@ export async function middleware(request) {
 
   // Try refreshing access token
   const refreshRes = await fetch(
-    `$http://localhost:5000/api/v1/users/refresh-token`,
+    `${API_BASE_URL}/api/v1/users/refresh-token`,
     {
       method: "POST",
       headers: {
@@ -61,7 +64,7 @@ export async function middleware(request) {
   }
 
   // Refresh token invalid or expired → call logout endpoint
-  await fetch(`http://localhost:5000/api/v1/users/logout`, {
+  await fetch(`${API_BASE_URL}/api/v1/users/logout`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${refreshToken}`,

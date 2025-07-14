@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/slice/userSlice.js";
+import { API_ENDPOINTS } from "@/lib/api";
 
 const page = () => {
 
@@ -25,7 +26,7 @@ const page = () => {
   const onSubmit = async (data) => {
     setPending(true);
     try {
-      const response = await fetch("http://localhost:5000/api/v1/users/login", {
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -113,7 +114,7 @@ const page = () => {
             <LoadingButton
                 type="submit"
                 pending={pending}
-                href="http://localhost:5000/auth/google">
+                href={API_ENDPOINTS.GOOGLE_AUTH}>
                 Sign In with Google
               </LoadingButton>
             <GoogleLogin

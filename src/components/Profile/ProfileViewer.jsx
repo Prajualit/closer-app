@@ -7,6 +7,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X, MessageCircle, UserPlus, UserMinus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSelector } from 'react-redux';
+import { API_ENDPOINTS } from '@/lib/api';
 
 const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
     const [profile, setProfile] = useState(userProfile || null);
@@ -55,7 +56,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
     const fetchProfile = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5000/api/v1/users/profile/${userId}`, {
+            const response = await fetch(API_ENDPOINTS.USER_PROFILE(userId), {
                 credentials: 'include',
             });
             const data = await response.json();
@@ -83,10 +84,10 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
 
     const fetchUserMedia = async () => {
         try {
-            const photosResponse = await fetch(`http://localhost:5000/api/v1/users/photos/${profile._id}`, {
+            const photosResponse = await fetch(API_ENDPOINTS.USER_PHOTOS(profile._id), {
                 credentials: 'include',
             });
-            const filmsResponse = await fetch(`http://localhost:5000/api/v1/users/films/${profile._id}`, {
+            const filmsResponse = await fetch(API_ENDPOINTS.USER_FILMS(profile._id), {
                 credentials: 'include',
             });
 
@@ -106,7 +107,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
 
     const checkFollowStatus = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/v1/users/follow-status/${profile._id}`, {
+            const response = await fetch(API_ENDPOINTS.FOLLOW_STATUS(profile._id), {
                 credentials: 'include',
             });
             const data = await response.json();
@@ -121,7 +122,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
 
     const handleFollow = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/v1/users/${isFollowing ? 'unfollow' : 'follow'}`, {
+            const response = await fetch(isFollowing ? API_ENDPOINTS.UNFOLLOW : API_ENDPOINTS.FOLLOW, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

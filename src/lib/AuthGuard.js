@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
+import { API_ENDPOINTS } from "./api";
 
 export default function AuthGuard({ children }) {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function AuthGuard({ children }) {
       try {
         console.log("📡 Making refresh token request...");
         const res = await fetch(
-          "http://localhost:5000/api/v1/users/refresh-token",
+          API_ENDPOINTS.REFRESH_TOKEN,
           {
             method: "POST",
             credentials: "include",
@@ -33,7 +34,7 @@ export default function AuthGuard({ children }) {
           const errorText = await res.text();
           setDebugInfo(`Auth failed: ${errorText}`);
 
-          await fetch("http://localhost:5000/api/v1/users/logout", {
+          await fetch(API_ENDPOINTS.LOGOUT, {
             method: "POST",
             credentials: "include",
           });

@@ -11,6 +11,7 @@ import { updateUser } from '@/redux/slice/userSlice';
 import Navbar from '@/components/HomePg/Navbar';
 import LoadingButton from '@/components/LoadingButton';
 import ImageModal from '@/components/Modal/viewMedia.modal';
+import { API_ENDPOINTS } from '@/lib/api';
 
 const ProfilePage = () => {
     const params = useParams();
@@ -63,7 +64,7 @@ const ProfilePage = () => {
     const fetchProfile = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5000/api/v1/users/profile/${userId}`, {
+            const response = await fetch(API_ENDPOINTS.USER_PROFILE(userId), {
                 credentials: 'include',
             });
             
@@ -113,10 +114,10 @@ const ProfilePage = () => {
     const fetchUserMedia = async () => {
         try {
             const [photosResponse, filmsResponse] = await Promise.all([
-                fetch(`http://localhost:5000/api/v1/users/photos/${profile._id}`, {
+                fetch(API_ENDPOINTS.USER_PHOTOS(profile._id), {
                     credentials: 'include',
                 }),
-                fetch(`http://localhost:5000/api/v1/users/films/${profile._id}`, {
+                fetch(API_ENDPOINTS.USER_FILMS(profile._id), {
                     credentials: 'include',
                 })
             ]);
@@ -137,7 +138,7 @@ const ProfilePage = () => {
 
     const checkFollowStatus = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/v1/users/follow-status/${profile._id}`, {
+            const response = await fetch(API_ENDPOINTS.FOLLOW_STATUS(profile._id), {
                 credentials: 'include',
             });
             const data = await response.json();
@@ -152,7 +153,7 @@ const ProfilePage = () => {
 
     const handleFollow = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/v1/users/${isFollowing ? 'unfollow' : 'follow'}`, {
+            const response = await fetch(isFollowing ? API_ENDPOINTS.UNFOLLOW : API_ENDPOINTS.FOLLOW, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

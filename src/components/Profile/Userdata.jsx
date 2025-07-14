@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import Image from "next/image";
 import EditProfile from "@/components/Modal/editProfile.modal";
 import { updateUser } from '@/redux/slice/userSlice';
+import { API_ENDPOINTS } from "@/lib/api";
 
 const Userdata = () => {
     const userDetails = useSelector((state) => state.user.user);
@@ -24,7 +25,7 @@ const Userdata = () => {
             // Only fetch if we don't have the counts
             if (userDetails.followersCount === undefined || userDetails.followingCount === undefined) {
                 try {
-                    const response = await fetch(`http://localhost:5000/api/v1/users/profile/${userDetails._id}`, {
+                    const response = await fetch(API_ENDPOINTS.USER_PROFILE(userDetails._id), {
                         credentials: 'include',
                     });
 

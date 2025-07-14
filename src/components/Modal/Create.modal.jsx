@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useDispatch } from "react-redux";
 import { updateUser } from "@/redux/slice/userSlice.js";
 import { Input } from "@/components/ui/input";
+import { API_ENDPOINTS } from "@/lib/api";
 
 
 const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
@@ -69,7 +70,7 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange }) => {
         formData.append("caption", caption); // Add caption to form data
 
         try {
-            const response = await fetch("http://localhost:5000/api/v1/create", {
+            const response = await fetch(API_ENDPOINTS.CREATE_MEDIA, {
                 method: "POST",
                 body: formData,
                 credentials: "include",
