@@ -8,7 +8,7 @@ import UserButton from '@/components/HomePg/UserButton'
 import NotificationBadge from '@/components/Notifications/NotificationBadge'
 import { useSelector } from "react-redux";
 import { useNavigation } from '@/hooks/useNavigation'
-import CreateModal from '@/components/Modal/create.modal.jsx'
+import CreateModal from '@/components/Modal/create.modal'
 
 const Navbar = () => {
     const userDetails = useSelector((state) => state.user.user);

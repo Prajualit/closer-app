@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import NextImage from 'next/image';
-import ImageModal from '@/components/Modal/viewMedia.modal.jsx';
-import CreateModal from '@/components/Modal/create.modal.jsx';
+import ImageModal from '@/components/Modal/viewMedia.modal';
+import CreateModal from '@/components/Modal/create.modal';
 import LoadingButton from '@/components/LoadingButton';
 
 const Photos = () => {

@@ -6,7 +6,7 @@ import FilmItem from './FilmItem';
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import CreateModal from '@/components/Modal/create.modal.jsx';
+import CreateModal from '@/components/Modal/create.modal';
 
 const FilmsViewer = ({ initialFilms = [], username }) => {
   const [films, setFilms] = useState(initialFilms);
