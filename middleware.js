@@ -44,8 +44,11 @@ export async function middleware(request) {
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${refreshToken}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        refreshToken: refreshToken
+      }),
     }
   );
 
@@ -67,7 +70,7 @@ export async function middleware(request) {
   await fetch(`${API_BASE_URL}/api/v1/users/logout`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${refreshToken}`,
+      'Content-Type': 'application/json',
     },
   });
 
@@ -77,5 +80,15 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/((?!sign-in|sign-up|public).*)"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - sign-in and sign-up pages
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|sign-in|sign-up).*)',
+  ],
 };

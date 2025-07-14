@@ -32,12 +32,19 @@ export default function AuthGuard({ children }) {
           setLoading(false);
         } else {
           const errorText = await res.text();
+          console.log("Auth failed, redirecting to sign-in");
           setDebugInfo(`Auth failed: ${errorText}`);
 
-          await fetch(API_ENDPOINTS.LOGOUT, {
-            method: "POST",
-            credentials: "include",
-          });
+          // Clear any existing cookies by calling logout
+          try {
+            await fetch(API_ENDPOINTS.LOGOUT, {
+              method: "POST",
+              credentials: "include",
+            });
+          } catch (logoutError) {
+            console.log("Logout failed, but continuing to redirect");
+          }
+          
           router.push("/sign-in");
         }
       } catch (error) {
