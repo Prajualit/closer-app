@@ -223,8 +223,11 @@ const editUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/",
+    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
   };
 
   return res
@@ -365,8 +368,11 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/",
+    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
   };
 
   res
