@@ -11,7 +11,7 @@ import { Search, MessageCircle, Plus, Info, Bot } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
 import { useSocket } from '@/lib/SocketContext';
-import LoadingButton from '@/components/LoadingButton.jsx';
+import LoadingButton from '@/components/LoadingButton';
 
 const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChatId, chatRooms, setChatRooms }) => {
     const [searchUsers, setSearchUsers] = useState([]);

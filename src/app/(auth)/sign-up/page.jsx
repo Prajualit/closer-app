@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import LoadingButton from "@/components/LoadingButton";
+import LoadingButton from "@/components/LoadingButton.jsx";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
