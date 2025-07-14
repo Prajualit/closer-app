@@ -121,8 +121,11 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/",
+    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
   };
 
   // send response
@@ -146,7 +149,13 @@ const logoutUser = asyncHandler(async (req, res) => {
     { new: true }
   );
 
-  const options = { httpOnly: true, secure: false };
+  const options = { 
+    httpOnly: true, 
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
+    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
+  };
 
   res
     .status(200)
@@ -257,8 +266,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+      ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
     };
 
     const { accessToken, refreshToken: newRefreshToken } =

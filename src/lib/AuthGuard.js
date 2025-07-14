@@ -15,13 +15,17 @@ export default function AuthGuard({ children }) {
       setDebugInfo("Starting auth check...");
 
       // Check if we have any refresh token in cookies first
-      const hasRefreshToken = document.cookie.split(';').some(cookie => 
+      const cookies = document.cookie.split(';');
+      const refreshTokenCookie = cookies.find(cookie => 
         cookie.trim().startsWith('refreshToken=')
       );
-
-      if (!hasRefreshToken) {
+      
+      console.log("🍪 All cookies:", document.cookie);
+      console.log("🔍 Refresh token cookie found:", !!refreshTokenCookie);
+      
+      if (!refreshTokenCookie) {
         console.log("No refresh token found, redirecting to sign-in");
-        setDebugInfo("No refresh token found");
+        setDebugInfo("No refresh token found in cookies");
         router.push("/sign-in");
         return;
       }

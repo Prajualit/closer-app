@@ -45,10 +45,9 @@ export async function middleware(request) {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
+        'Cookie': `refreshToken=${refreshToken}`
       },
-      body: JSON.stringify({
-        refreshToken: refreshToken
-      }),
+      credentials: 'include'
     }
   );
 
@@ -61,6 +60,7 @@ export async function middleware(request) {
       path: "/",
       maxAge: 15 * 60, // 15 mins
       secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     });
 
     return response;
