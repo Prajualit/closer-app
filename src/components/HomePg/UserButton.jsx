@@ -4,7 +4,7 @@ import { ApiError } from '../../../backend/utils/apiError'
 import { useRouter } from "next/navigation";
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
-import LoadingButton from '../Loadingbutton';
+import LoadingButton from '../LoadingButton';
 import { Button } from '../ui/button';
 import { useToast } from "@/hooks/use-toast";
 import ThemeDropdown from '../ui/ThemeDropdown';

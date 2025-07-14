@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import NextImage from 'next/image';
 import ImageModal from '@/components/Modal/viewMedia.modal.jsx';
 import CreateModal from '@/components/Modal/create.modal';
-import LoadingButton from '../Loadingbutton';
+import LoadingButton from '../LoadingButton';
 
 const Photos = () => {
   const user = useSelector((state) => state.user.user);

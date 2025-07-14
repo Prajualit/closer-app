@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api'
 import { useSelector } from 'react-redux'
-import LoadingButton from '../Loadingbutton'
+import LoadingButton from '../LoadingButton'
 import SuggestedUsersModal from '../Modal/suggestedUsers.modal'
 
 const SuggestedUsers = () => {

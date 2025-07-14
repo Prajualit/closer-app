@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import LoadingButton from '../Loadingbutton'
+import LoadingButton from '../LoadingButton'
 
 const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
     const router = useRouter()

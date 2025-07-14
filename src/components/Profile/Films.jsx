@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ImageModal from '@/components/Modal/viewMedia.modal.jsx';
 import CreateModal from '@/components/Modal/create.modal';
-import LoadingButton from '../Loadingbutton';
+import LoadingButton from '../LoadingButton';
 
 const Films = () => {
   const user = useSelector((state) => state.user.user);

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import LoadingButton from "@/components/Loadingbutton";
+import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
 import { useDispatch } from "react-redux";
 import { updateUser } from "@/redux/slice/userSlice.js";
