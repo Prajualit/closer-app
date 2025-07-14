@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api'
 import Post from '@/components/ui/Post'
 import { Skeleton } from '@/components/ui/skeleton'
-import LoadingButton from '../LoadingButton'
+import LoadingButton from '@/components/LoadingButton'
 
 const PostsFeed = () => {
     const [posts, setPosts] = useState([])
