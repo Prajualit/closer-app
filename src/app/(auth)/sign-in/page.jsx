@@ -26,6 +26,8 @@ const page = () => {
   const onSubmit = async (data) => {
     setPending(true);
     try {
+      console.log("🚀 Making login request to:", API_ENDPOINTS.LOGIN);
+      
       const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: "POST",
         headers: {
@@ -38,11 +40,22 @@ const page = () => {
         }),
       });
 
+      console.log("📡 Login response status:", response.status);
+      console.log("🍪 Set-Cookie headers:", response.headers.get('set-cookie'));
+      console.log("🍪 All response headers:", [...response.headers.entries()]);
+
       const responseData = await response.json();
+      console.log("📦 Response data:", responseData);
+      
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
+        console.log("✅ Login successful, dispatching user data");
         dispatch(setUser(responseData.data.user));
+        
+        // Check if cookies were actually set
+        console.log("🍪 Cookies after login:", document.cookie);
+        
         router.push(`/${responseData.data.user.username}/home`);
       }
     }
