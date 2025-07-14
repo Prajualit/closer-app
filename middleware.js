@@ -40,7 +40,7 @@ export async function middleware(request) {
 
   // Try refreshing access token
   const refreshRes = await fetch(
-    `${API_BASE_URL}/api/v1/users/refresh-token`,
+    `$${API_BASE_URL}/api/v1/users/refresh-token`,
     {
       method: "POST",
       headers: {
