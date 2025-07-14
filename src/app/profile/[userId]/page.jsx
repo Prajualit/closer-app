@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUser } from '@/redux/slice/userSlice';
 import Navbar from '@/components/HomePg/Navbar';
-import LoadingButton from '@/components/LoadingButton.jsx';
+import LoadingButton from '@/components/LoadingButton';
 import ImageModal from '@/components/Modal/viewMedia.modal';
 import { API_ENDPOINTS } from '@/lib/api';
 
