@@ -17,7 +17,7 @@ const uploadMedia = asyncHandler(async (req, res) => {
   }
 
   const uploadedFile = await uploadOnCloudinary(fileLocalPath);
-  if (!uploadedFile || !uploadedFile.url) {
+  if (!uploadedFile || !uploadedFile.secure_url) {
     throw new ApiError(500, "File upload failed.");
   }
 
@@ -31,7 +31,7 @@ const uploadMedia = asyncHandler(async (req, res) => {
   }
 
   user.media.push({
-    url: uploadedFile.url,
+    url: uploadedFile.secure_url,
     caption: req.body.caption || "",
     public_id: uploadedFile.public_id,
     resource_type: uploadedFile.resource_type,

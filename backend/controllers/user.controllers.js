@@ -55,7 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
-  if (!avatarUpload || !avatarUpload.url) {
+  if (!avatarUpload || !avatarUpload.secure_url) {
     throw new ApiError(400, `Avatar upload failed ${avatarUpload}`);
   }
 
@@ -65,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     name,
     bio,
-    avatarUrl: !avatarUpload.url ? "" : avatarUpload.url,
+    avatarUrl: avatarUpload.secure_url || "",
   });
 
   //   remove password and refreshtoken from response
@@ -186,11 +186,11 @@ const editUser = asyncHandler(async (req, res) => {
     const avatarLocalPath = path.normalize(req.file.path);
 
     const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
-    if (!avatarUpload || !avatarUpload.url) {
+    if (!avatarUpload || !avatarUpload.secure_url) {
       throw new ApiError(400, "Avatar upload failed");
     }
 
-    updateFields.avatarUrl = avatarUpload.url;
+    updateFields.avatarUrl = avatarUpload.secure_url;
   }
 
   if (Object.keys(updateFields).length === 0) {

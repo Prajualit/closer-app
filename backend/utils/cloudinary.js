@@ -9,6 +9,7 @@ cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true, // Force HTTPS URLs
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
@@ -28,9 +29,10 @@ const uploadOnCloudinary = async (localFilePath) => {
     // Upload to Cloudinary
     const response = await cloudinary.uploader.upload(normalizedPath, {
       resource_type: "auto",
+      secure: true, // Ensure HTTPS URL in response
     });
 
-    console.log("Media uploaded to Cloudinary:", response.url);
+    console.log("Media uploaded to Cloudinary:", response.secure_url);
 
     // Delete local file after successful upload
     fs.unlinkSync(normalizedPath);
