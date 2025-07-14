@@ -1,10 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ['res.cloudinary.com'], // Allow images from Cloudinary
-    },
-    experimental: {
-        esmExternals: 'loose',
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+                port: '',
+                pathname: '/**',
+            },
+        ],
     },
     webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
         // Handle socket.io client side issues
