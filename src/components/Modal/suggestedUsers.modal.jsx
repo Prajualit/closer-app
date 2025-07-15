@@ -20,14 +20,17 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md max-h-[80vh] bg-white dark:bg-neutral-800 overflow-hidden flex flex-col">
+            <DialogContent className="max-w-md max-h-[90vh] bg-white dark:bg-neutral-800">
                 <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold dark:text-white">Suggested for you</DialogTitle>
+                    <DialogTitle className="text-lg font-semibold dark:text-white">
+                        Suggested for you ({suggestedUsers?.filter(user => !user.isFollowed).length || 0})
+                    </DialogTitle>
                 </DialogHeader>
                 
-                <div className="flex-1 overflow-y-auto bg-white dark:bg-neutral-800">
-                    <div className="space-y-1">
-                        {suggestedUsers.map((user) => (
+                <div className="max-h-[60vh] overflow-y-auto pr-2">
+                    <div className="space-y-3">
+                        {suggestedUsers && suggestedUsers.length > 0 ? (
+                            suggestedUsers.filter(user => !user.isFollowed).map((user) => (
                             <div key={user._id} className="flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-700 py-3 px-2 rounded-lg transition-all duration-200">
                                 <div
                                     className="flex items-center space-x-3 flex-1 cursor-pointer"
@@ -56,11 +59,17 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
                                         onFollow(user._id)
                                     }}
                                     className="px-4 py-1.5 text-xs font-medium !w-fit !h-fit transition-colors"
+                                    disabled={user.isFollowed}
                                 >
-                                    Follow
+                                    {user.isFollowed ? 'Followed' : 'Follow'}
                                 </LoadingButton>
                             </div>
-                        ))}
+                        ))
+                        ) : (
+                            <div className="text-center py-8">
+                                <p className="text-neutral-500 dark:text-neutral-400">No suggested users found</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </DialogContent>

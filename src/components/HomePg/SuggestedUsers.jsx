@@ -17,16 +17,23 @@ const SuggestedUsers = () => {
     useEffect(() => {
         const fetchSuggestedUsers = async () => {
             try {
+                // Fetch more users for the modal (increased limit)
                 const response = await makeAuthenticatedRequest(
-                    API_ENDPOINTS.SUGGESTED_USERS,
+                    `${API_ENDPOINTS.SUGGESTED_USERS}?limit=20`,
                     { method: 'GET' }
                 )
 
                 if (response.ok) {
                     const data = await response.json()
+                    console.log('Suggested users response:', data) // Debug log
                     if (data.success && data.data.users) {
+                        console.log('Setting suggested users:', data.data.users) // Debug log
                         setSuggestedUsers(data.data.users)
+                    } else {
+                        console.log('No users in response or unsuccessful:', data)
                     }
+                } else {
+                    console.error('API response not ok:', response.status, response.statusText)
                 }
             } catch (error) {
                 console.error('Error fetching suggested users:', error)
@@ -35,8 +42,12 @@ const SuggestedUsers = () => {
             }
         }
 
-        fetchSuggestedUsers()
-    }, [])
+        if (currentUser && currentUser !== "home") {
+            fetchSuggestedUsers()
+        } else {
+            setLoading(false)
+        }
+    }, [currentUser])
 
     const handleFollow = async (userId) => {
         try {
@@ -49,8 +60,15 @@ const SuggestedUsers = () => {
             )
 
             if (response.ok) {
-                // Remove the followed user from suggestions
-                setSuggestedUsers(prev => prev.filter(user => user._id !== userId))
+                console.log('Successfully followed user:', userId) // Debug log
+                // Update the user's following status instead of removing them
+                setSuggestedUsers(prev => prev.map(user => 
+                    user._id === userId 
+                        ? { ...user, isFollowed: true }
+                        : user
+                ))
+            } else {
+                console.error('Failed to follow user:', response.status)
             }
         } catch (error) {
             console.error('Error following user:', error)
@@ -68,12 +86,16 @@ const SuggestedUsers = () => {
             </div>
 
             <div className="">
-                {suggestedUsers.length === 0 ? (
+                {loading ? (
+                    <div className="text-center py-4">
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">Loading suggestions...</p>
+                    </div>
+                ) : suggestedUsers.length === 0 ? (
                     <div>
                         <p className="text-sm text-neutral-500 dark:text-neutral-400">No suggestions available.</p>
                     </div>
                 ) : (
-                    suggestedUsers.slice(0, 3).map((user) => (
+                    suggestedUsers.slice(0, 3).filter(user => !user.isFollowed).map((user) => (
                         <div key={user._id} className="flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-neutral-700 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer ">
                             <div
                                 className="flex items-center space-x-3 flex-1 cursor-pointer rounded-lg p-2 transition-colors"
@@ -96,18 +118,19 @@ const SuggestedUsers = () => {
                                     </p>
                                 </div>
                             </div>
-                            <LoadingButton
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleFollow(user._id)
-                                }}
-                                className="px-5 text-xs font-medium !w-fit !h-fit transition-colors"
-                            >
-                                Follow
-                            </LoadingButton>
+                                <LoadingButton
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleFollow(user._id)
+                                    }}
+                                    className="px-5 text-xs font-medium !w-fit !h-fit transition-colors"
+                                    disabled={user.isFollowed}
+                                >
+                                    {user.isFollowed ? 'Followed' : 'Follow'}
+                                </LoadingButton>
                         </div>
                     )))}
-                {suggestedUsers.length > 3 && (
+                {suggestedUsers.filter(user => !user.isFollowed).length > 3 && (
                     < div className="text-center mt-4">
                         <LoadingButton
                             onClick={() => setIsModalOpen(true)}
