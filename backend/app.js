@@ -1,12 +1,8 @@
 import express, { urlencoded } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { ensureTempDir } from "./utils/fileUtils.js";
 
 const app = express();
-
-// Ensure temp directory exists
-ensureTempDir();
 
 // CORS configuration to handle multiple origins
 const corsOrigins = process.env.CORS_ORIGIN 

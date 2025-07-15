@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
 // Ensure temp directory exists
 export const ensureTempDir = () => {
   const tempDir = process.env.NODE_ENV === "production" ? 
-    require('os').tmpdir() : 
+    os.tmpdir() : 
     path.join(process.cwd(), 'temp');
   
   if (!fs.existsSync(tempDir)) {
