@@ -82,6 +82,16 @@ const Page = () => {
         body: formData,
       });
 
+      console.log("📡 Response status:", response.status);
+      console.log("📦 Response headers:", [...response.headers.entries()]);
+
+      // Handle non-200 responses
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ Server error response:", errorText);
+        throw new Error(`Server error (${response.status}): ${errorText.substring(0, 100)}...`);
+      }
+
       const responseData = await response.json();
       if (!responseData.success) {
         throw new Error(responseData.message);
