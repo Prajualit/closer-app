@@ -1,11 +1,8 @@
-name: Deploy to Render
+name: Deploy to Render (API - Backup)
 
+# Disabled - use deploy-simple.yml instead  
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-    types: [ closed ]
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   deploy:
@@ -15,7 +12,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Deploy to Render
+    - name: Deploy to Render via API
       env:
         RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
@@ -23,20 +20,34 @@ jobs:
         echo "🚀 Triggering Render deployment for service ID: $RENDER_SERVICE_ID"
         echo "📡 Deploying service: closer-app"
         
-        # Trigger deployment using Render API with better error handling
+        # First, let's test if the service exists
+        echo "🔍 Checking service status..."
+        service_check=$(curl -s -w "\n%{http_code}" \
+          "https://api.render.com/v1/services/$RENDER_SERVICE_ID" \
+          -H "Authorization: Bearer $RENDER_API_KEY")
+        
+        service_code=$(echo "$service_check" | tail -n1)
+        if [ "$service_code" -ne 200 ]; then
+          echo "❌ Service not found or API key invalid"
+          echo "Service check response: $(echo "$service_check" | head -n -1)"
+          exit 1
+        fi
+        
+        echo "✅ Service found, triggering deployment..."
+        
+        # Trigger deployment using Render API with corrected format
         response=$(curl -s -w "\n%{http_code}" -X POST \
           "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
           -H "Authorization: Bearer $RENDER_API_KEY" \
           -H "Content-Type: application/json" \
-          -d '{
-            "clearCache": false
-          }')
+          -H "Accept: application/json" \
+          -d '{}')
         
         # Extract response body and status code
         http_code=$(echo "$response" | tail -n1)
         response_body=$(echo "$response" | head -n -1)
         
-        echo "� HTTP Status Code: $http_code"
+        echo "📊 HTTP Status Code: $http_code"
         echo "📦 Response: $response_body"
         
         # Check if deployment was successful
@@ -47,6 +58,10 @@ jobs:
           echo "Response: $response_body"
           exit 1
         fi
+        
+        echo "✅ Deployment triggered successfully!"
+        echo "📡 Check your Render dashboard for deployment status"
+        echo "🔗 Your service: https://dashboard.render.com/web/$RENDER_SERVICE_ID"
 
   notify:
     runs-on: ubuntu-latest
@@ -61,4 +76,5 @@ jobs:
           echo "Your app will be live in a few minutes at: https://closer-app.onrender.com"
         else
           echo "❌ Deployment failed. Check the logs above."
+          echo "💡 Try using the deploy hook method instead."
         fi
