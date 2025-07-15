@@ -28,6 +28,10 @@ const generateAccessAndRefreshTokens = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
+  console.log("🔥 Registration attempt started");
+  console.log("📦 Request body:", req.body);
+  console.log("📁 Request file:", req.file);
+  
   // Requesting User Data from frontend
   const { username, password, name, bio } = req.body;
 
@@ -49,9 +53,14 @@ const registerUser = asyncHandler(async (req, res) => {
   // }else if(!req.files?.avatarUrl[0]) {
   //   avatarLocalPath = path.normalize(req.files?.avatarUrl.path);
   // }
-  const avatarLocalPath = path.normalize(req.file?.path);
-  if (!avatarLocalPath) {
-    throw new ApiError(400, `Avatar is required ${avatarLocalPath}`);
+  const avatarLocalPath = req.file?.path ? path.normalize(req.file.path) : null;
+  if (!avatarLocalPath || !req.file) {
+    console.error("❌ Avatar upload failed:", {
+      file: req.file,
+      body: req.body,
+      files: req.files
+    });
+    throw new ApiError(400, "Avatar is required and upload failed");
   }
 
   const avatarUpload = await uploadOnCloudinary(avatarLocalPath);

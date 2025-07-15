@@ -4,6 +4,15 @@ import mongoDB from "./db/index.js";
 import { app } from "./app.js";
 import { createServer } from "http";
 import { initializeSocket } from "./utils/socket.js";
+import fs from "fs";
+import path from "path";
+
+// Ensure temp directory exists
+const tempDir = path.join(process.cwd(), 'temp');
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+  console.log('✅ Created temp directory:', tempDir);
+}
 
 const server = createServer(app);
 
