@@ -1,4 +1,4 @@
-name: Deploy to Render (Deploy Hook)
+name: Deploy to Render (Deploy          echo "📊 Deploy Hook - HTTP Status: $http_code"Hook)
 
 on:
   push:

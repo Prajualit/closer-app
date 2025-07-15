@@ -53,15 +53,13 @@ jobs:
         # Check if deployment was successful
         if [ "$http_code" -eq 201 ] || [ "$http_code" -eq 200 ]; then
           echo "✅ Deployment triggered successfully!"
+          echo "📡 Check your Render dashboard for deployment status"
+          echo "🔗 Your service: https://dashboard.render.com/web/$RENDER_SERVICE_ID"
         else
           echo "❌ Failed to trigger deployment"
           echo "Response: $response_body"
           exit 1
         fi
-        
-        echo "✅ Deployment triggered successfully!"
-        echo "📡 Check your Render dashboard for deployment status"
-        echo "🔗 Your service: https://dashboard.render.com/web/$RENDER_SERVICE_ID"
 
   notify:
     runs-on: ubuntu-latest
