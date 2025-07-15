@@ -12,9 +12,12 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/slice/userSlice.js";
 import { API_ENDPOINTS } from "@/lib/api";
 
 const Page = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [image, setImage] = useState(null);
@@ -75,6 +78,7 @@ const Page = () => {
 
       const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: "POST",
+        credentials: "include", // Important for cookies
         body: formData,
       });
 
@@ -82,7 +86,20 @@ const Page = () => {
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
-        router.push("/sign-in");
+        // Store tokens in localStorage as backup (same as login)
+        if (responseData.data.accessToken) {
+          localStorage.setItem('accessToken', responseData.data.accessToken);
+        }
+        if (responseData.data.refreshToken) {
+          localStorage.setItem('refreshToken', responseData.data.refreshToken);
+        }
+        
+        // Dispatch user data to Redux store
+        dispatch(setUser(responseData.data.user));
+        
+        console.log("✅ Registration successful, redirecting to home");
+        // Redirect to user's home page instead of sign-in
+        router.push(`/${responseData.data.user.username}/home`);
       }
     } catch (error) {
       console.log("Error during sign up:", error.message);

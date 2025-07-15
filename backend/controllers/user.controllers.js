@@ -76,10 +76,32 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
-  //   return a response
+  // Generate tokens to automatically log the user in
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    user._id
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/",
+    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
+  };
+
+  //   return a response with tokens (auto-login)
   return res
     .status(201)
-    .json(new ApiResponse(200, createdUser, "User Registered Successfully"));
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200, 
+        { user: createdUser, accessToken, refreshToken }, 
+        "User registered and logged in successfully"
+      )
+    );
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
