@@ -1,0 +1,78 @@
+name: Simple Render Deploy (WORKING VERSION)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to Render
+      env:
+        RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+      run: |
+        echo "🚀 Starting Render deployment..."
+        
+        # Method 1: Deploy Hook (RELIABLE)
+        if [ ! -z "$RENDER_DEPLOY_HOOK" ]; then
+          echo "📡 Using deploy hook (recommended method)..."
+          
+          response=$(curl -s -o response.txt -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK")
+          response_body=$(cat response.txt)
+          
+          echo "📊 Deploy Hook Response Code: $response"
+          echo "📦 Response Body: $response_body"
+          
+          if [ "$response" = "200" ] || [ "$response" = "201" ] || [ "$response" = "204" ]; then
+            echo "✅ SUCCESS! Deployment triggered via deploy hook!"
+            echo "🔗 Your app: https://closer-app.onrender.com"
+            echo "📱 Check deployment progress: https://dashboard.render.com"
+            exit 0
+          else
+            echo "⚠️ Deploy hook failed with code: $response"
+          fi
+        else
+          echo "⚠️ RENDER_DEPLOY_HOOK not set in GitHub secrets"
+        fi
+        
+        # Method 2: Manual instructions if hook fails
+        echo ""
+        echo "🔧 MANUAL DEPLOYMENT REQUIRED"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "👆 Go to: https://dashboard.render.com"
+        echo "🎯 Find your 'closer-app' service"  
+        echo "⚡ Click 'Manual Deploy' → 'Deploy latest commit'"
+        echo "⏰ Deployment takes ~2-3 minutes"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "💡 To fix auto-deploy, add RENDER_DEPLOY_HOOK to GitHub secrets:"
+        echo "   1. Go to Render service settings"
+        echo "   2. Copy the Deploy Hook URL"
+        echo "   3. Add it as RENDER_DEPLOY_HOOK secret in GitHub"
+        
+        # Don't fail the workflow - just notify
+        exit 0
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: always()
+    
+    steps:
+    - name: Deployment Status
+      run: |
+        echo "🎉 Code pushed successfully!"
+        echo "📦 Latest changes are ready for deployment"
+        echo "🔗 App URL: https://closer-app.onrender.com"
+        echo ""
+        if [ "${{ needs.deploy.result }}" = "success" ]; then
+          echo "✅ Auto-deployment completed or manual steps provided"
+        else
+          echo "⚠️ Please check deployment logs above"
+        fi
