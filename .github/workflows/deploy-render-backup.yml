@@ -35,20 +35,50 @@ jobs:
         
         echo "✅ Service found, triggering deployment..."
         
-        # Trigger deployment using Render API with corrected format
+        # Try multiple API approaches
+        echo "🔄 Attempting deployment with empty body..."
         response=$(curl -s -w "\n%{http_code}" -X POST \
           "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
           -H "Authorization: Bearer $RENDER_API_KEY" \
           -H "Content-Type: application/json" \
-          -H "Accept: application/json" \
-          -d '{}')
+          -H "Accept: application/json")
         
-        # Extract response body and status code
         http_code=$(echo "$response" | tail -n1)
         response_body=$(echo "$response" | head -n -1)
         
-        echo "📊 HTTP Status Code: $http_code"
+        echo "📊 Attempt 1 - HTTP Status: $http_code"
         echo "📦 Response: $response_body"
+        
+        # If first attempt fails, try with minimal JSON body
+        if [ "$http_code" -ne 201 ] && [ "$http_code" -ne 200 ]; then
+          echo "🔄 Attempting deployment with minimal JSON body..."
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d '{"clearCache": false}')
+          
+          http_code=$(echo "$response" | tail -n1)
+          response_body=$(echo "$response" | head -n -1)
+          
+          echo "📊 Attempt 2 - HTTP Status: $http_code"
+          echo "📦 Response: $response_body"
+        fi
+        
+        # If still fails, try without JSON content-type
+        if [ "$http_code" -ne 201 ] && [ "$http_code" -ne 200 ]; then
+          echo "🔄 Attempting deployment without JSON content-type..."
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
+            -H "Authorization: Bearer $RENDER_API_KEY")
+          
+          http_code=$(echo "$response" | tail -n1)
+          response_body=$(echo "$response" | head -n -1)
+          
+          echo "📊 Attempt 3 - HTTP Status: $http_code"
+          echo "📦 Response: $response_body"
+        fi
         
         # Check if deployment was successful
         if [ "$http_code" -eq 201 ] || [ "$http_code" -eq 200 ]; then
