@@ -217,10 +217,13 @@ const EditModal = ({ nav, activeNav }) => {
     return (
         <Dialog open={isOpen} onOpenChange={handleModalOpenChange}>
             <DialogTrigger asChild>
-                <button className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-5 py-2 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white">Edit Profile</button>
+                <button className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-3 sm:px-5 py-2 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm sm:text-base">
+                    <span className="hidden sm:inline">Edit Profile</span>
+                    <span className="sm:hidden">Edit</span>
+                </button>
             </DialogTrigger>
 
-            <DialogContent className="bg-white dark:bg-neutral-900 w-[40%] border-neutral-200 dark:border-neutral-700">
+            <DialogContent className="bg-white dark:bg-neutral-900 w-[95vw] sm:w-[85vw] md:w-[70vw] lg:w-[50vw] xl:w-[40vw] max-w-2xl border-neutral-200 dark:border-neutral-700 max-h-[90vh] overflow-y-auto">
                 <VisuallyHidden>
                     <DialogHeader>
                         <DialogTitle className="text-lg font-semibold text-neutral-900 dark:text-white">Edit Profile</DialogTitle>

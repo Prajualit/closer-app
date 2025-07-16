@@ -20,23 +20,23 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md max-h-[90vh] bg-white dark:bg-neutral-800">
+            <DialogContent className="max-w-[95vw] sm:max-w-sm md:max-w-md max-h-[90vh] bg-white dark:bg-neutral-800 mx-4">
                 <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold dark:text-white">
+                    <DialogTitle className="text-base sm:text-lg font-semibold dark:text-white px-2">
                         Suggested for you ({suggestedUsers?.filter(user => !user.isFollowed).length || 0})
                     </DialogTitle>
                 </DialogHeader>
                 
                 <div className="max-h-[60vh] overflow-y-auto pr-2">
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                         {suggestedUsers && suggestedUsers.length > 0 ? (
                             suggestedUsers.filter(user => !user.isFollowed).map((user) => (
-                            <div key={user._id} className="flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-700 py-3 px-2 rounded-lg transition-all duration-200">
+                            <div key={user._id} className="flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-700 py-2 sm:py-3 px-2 rounded-lg transition-all duration-200">
                                 <div
-                                    className="flex items-center space-x-3 flex-1 cursor-pointer"
+                                    className="flex items-center space-x-2 sm:space-x-3 flex-1 cursor-pointer"
                                     onClick={() => handleProfileClick(user._id)}
                                 >
-                                    <div className="relative w-12 h-12">
+                                    <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                                         <Image
                                             src={user.avatarUrl || '/default-avatar.svg'}
                                             alt={user.name}
@@ -45,10 +45,10 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-medium text-neutral-900 dark:text-white truncate">
+                                        <h4 className="text-xs sm:text-sm font-medium text-neutral-900 dark:text-white truncate">
                                             {user.username}
                                         </h4>
-                                        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                        <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400">
                                             {user.followersCount || 0} followers
                                         </p>
                                     </div>
@@ -58,7 +58,8 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
                                         e.stopPropagation()
                                         onFollow(user._id)
                                     }}
-                                    className="px-4 py-1.5 text-xs font-medium !w-fit !h-fit transition-colors"
+                                    size="sm"
+                                    className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:h-8 bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0 !w-fit !h-fit transition-colors"
                                     disabled={user.isFollowed}
                                 >
                                     {user.isFollowed ? 'Followed' : 'Follow'}

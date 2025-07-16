@@ -90,41 +90,41 @@ const UserButton = () => {
     const userDetails = useSelector((state) => state.user.user);
     return (
         <div className="relative" ref={dropdownRef}>
-            <div className={`absolute bottom-full left-0 mb-2 z-50 rounded-lg transition-all duration-300 ease-in-out transform ${isOpen
+            <div className={`absolute lg:bottom-full lg:left-0 lg:mb-2 top-full right-0 mt-2 lg:mt-0 lg:top-auto lg:right-auto z-50 rounded-lg transition-all duration-300 ease-in-out transform ${isOpen
                 ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
                 : 'opacity-0 scale-95 translate-y-2 pointer-events-none'
                 }`}>
-                <div className="bg-white dark:bg-neutral-900 shadow-lg shadow-neutral-300 dark:shadow-neutral-900 rounded-xl w-80 p-5 flex flex-col justify-between min-h-[350px] border border-neutral-200 dark:border-neutral-700">
+                <div className="bg-white dark:bg-neutral-900 shadow-lg shadow-neutral-300 dark:shadow-neutral-900 rounded-xl w-72 sm:w-80 p-4 sm:p-5 flex flex-col justify-between min-h-[320px] sm:min-h-[350px] border border-neutral-200 dark:border-neutral-700">
                     <div>
-                        <div className='flex items-center space-x-3 mt-4'>
-                            <div className='flex items-center justify-center rounded-full w-[64px] h-[64px] overflow-hidden relative'>
+                        <div className='flex items-center space-x-2 sm:space-x-3 mt-3 sm:mt-4'>
+                            <div className='flex items-center justify-center rounded-full w-[56px] h-[56px] sm:w-[64px] sm:h-[64px] overflow-hidden relative flex-shrink-0'>
                                 {userDetails && <Image fill className='rounded-full object-cover' src={userDetails.avatarUrl} alt="" />}
                             </div>
-                            <div>
-                                <h3 className='text-lg font-semibold text-neutral-900 dark:text-white'>{userDetails.name}</h3>
-                                <p className='text-sm text-neutral-500 dark:text-neutral-400'>{userDetails.username}</p>
+                            <div className="min-w-0 flex-1">
+                                <h3 className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-white truncate'>{userDetails.name}</h3>
+                                <p className='text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 truncate'>@{userDetails.username}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                         <div>
-                            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                            <label className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1 sm:mb-2">
                                 Theme
                             </label>
                             <ThemeDropdown />
                         </div>
                     </div>
-                    <div className='flex flex-col space-y-3'>
+                    <div className='flex flex-col space-y-2 sm:space-y-3'>
                         <LoadingButton
                             onClick={handleLogout}
-                            className="bg-neutral-900 dark:bg-neutral-700 text-white hover:bg-neutral-800 dark:hover:bg-neutral-600"
+                            className="bg-neutral-900 dark:bg-neutral-700 text-white hover:bg-neutral-800 dark:hover:bg-neutral-600 text-sm sm:text-base py-2 sm:py-3"
                         >
                             Logout
                         </LoadingButton>
                         <Button
                             onClick={handleDeleteAccount}
-                            className='w-full py-3 shadow-lg shadow-red-300 dark:shadow-red-900 rounded-[5px] !bg-red-500 text-white hover:!bg-red-600 transition-colors duration-300'>
+                            className='w-full py-2 sm:py-3 shadow-lg shadow-red-300 dark:shadow-red-900 rounded-[5px] !bg-red-500 text-white hover:!bg-red-600 transition-colors duration-300 text-sm sm:text-base'>
                             Delete Account
                         </Button>
                     </div>
@@ -132,11 +132,11 @@ const UserButton = () => {
             </div>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className='hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300 rounded-[8px] flex space-x-2 w-full items-center px-4 py-2' >
-                <div className='flex items-center justify-center rounded-full w-[32px] h-[32px] overflow-hidden relative'>
+                className='hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300 rounded-[8px] flex space-x-2 w-full lg:w-full items-center px-2 sm:px-4 py-2' >
+                <div className='flex items-center justify-center rounded-full w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] overflow-hidden relative flex-shrink-0'>
                     {userDetails ? <Image fill className='rounded-full object-cover ' src={userDetails.avatarUrl} alt="" /> : <UserAvatar />}
                 </div>
-                <span className="text-neutral-900 dark:text-white">{userDetails.name.split(" ")[0]}</span>
+                <span className="text-neutral-900 dark:text-white text-sm sm:text-base hidden lg:inline">{userDetails.name.split(" ")[0]}</span>
             </button >
         </div>
     )

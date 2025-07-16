@@ -307,10 +307,10 @@ const FilmItem = ({
   return (
     <div ref={ref} className="relative w-full h-screen bg-black flex">
       {/* Left Side - User Info */}
-      <div className="flex-1 flex flex-col justify-end p-4 text-white z-10 min-w-0">
+      <div className="flex-1 flex flex-col justify-end p-3 sm:p-4 text-white z-10 min-w-0">
         {/* User Info */}
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="relative w-12 h-12 flex-shrink-0">
+        <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex-shrink-0">
             <Image
               fill
               className="rounded-full object-cover border-2 border-white"
@@ -322,21 +322,21 @@ const FilmItem = ({
             />
           </div>
           <div className="min-w-0">
-            <h3 className="font-semibold text-sm truncate">{film.username}</h3>
+            <h3 className="font-semibold text-xs sm:text-sm truncate">{film.username}</h3>
             <p className="text-xs opacity-75 truncate">{formatTimeAgo(film.media?.uploadedAt || film.uploadedAt)}</p>
           </div>
         </div>
 
         {/* Caption */}
         {(film.media?.caption || film.caption) && (
-          <p className="text-sm mb-4 leading-relaxed max-w-xs line-clamp-3">
+          <p className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed max-w-[250px] sm:max-w-xs line-clamp-3">
             {film.media?.caption || film.caption}
           </p>
         )}
 
         {/* Hashtags */}
         {film.hashtags && film.hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1 sm:gap-2">
             {film.hashtags.slice(0, 3).map((tag, index) => (
               <span key={index} className="text-xs text-blue-300">#{tag}</span>
             ))}
@@ -348,7 +348,7 @@ const FilmItem = ({
       </div>
 
       {/* Center - Video Container */}
-      <div className="relative flex-shrink-0 w-72 sm:w-80 md:w-96 h-full flex items-center justify-center">
+      <div className="relative flex-shrink-0 w-48 sm:w-64 md:w-80 lg:w-96 h-full flex items-center justify-center">
         {/* Video */}
         <video
           ref={videoRef}
@@ -378,42 +378,42 @@ const FilmItem = ({
             className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer rounded-lg"
             onClick={handlePlayPause}
           >
-            <div className="w-20 h-20 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center">
-              <Play className="w-10 h-10 text-white opacity-90" fill="white" />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center">
+              <Play className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white opacity-90" fill="white" />
             </div>
           </div>
         )}
       </div>
 
       {/* Right Side - Action Controls */}
-      <div className="flex-1 flex flex-col justify-center items-end p-4 z-10">
+      <div className="flex-1 flex flex-col justify-center items-end p-2 sm:p-3 lg:p-4 z-10">
         {/* Volume Control */}
         <button
           onClick={onMuteToggle}
-          className="w-12 h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-opacity-30 mb-6"
+          className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-opacity-30 mb-4 sm:mb-6"
         >
           {muted ? (
-            <VolumeX className="w-5 h-5 text-white" />
+            <VolumeX className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-white" />
           ) : (
-            <Volume2 className="w-5 h-5 text-white" />
+            <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-white" />
           )}
         </button>
 
         {/* Action Buttons */}
-        <div className="flex flex-col items-center space-y-6">
+        <div className="flex flex-col items-center space-y-3 sm:space-y-4 lg:space-y-6">
           {/* Like */}
           <div className="flex flex-col items-center">
             <button
               onClick={handleLike}
               disabled={loading}
-              className={`w-12 h-12 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110 ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110 ${
                 isLiked 
                   ? 'bg-red-500 bg-opacity-80' 
                   : 'bg-white bg-opacity-20 hover:bg-opacity-30'
               }`}
             >
               <Heart 
-                className={`w-6 h-6 ${isLiked ? 'text-white fill-white' : 'text-white'}`}
+                className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${isLiked ? 'text-white fill-white' : 'text-white'}`}
               />
             </button>
             <span className="text-white text-xs mt-1 font-medium">{likesCount}</span>
@@ -423,9 +423,9 @@ const FilmItem = ({
           <div className="flex flex-col items-center">
             <button
               onClick={handleComment}
-              className="w-12 h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-opacity-30 hover:scale-110"
+              className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-opacity-30 hover:scale-110"
             >
-              <MessageCircle className="w-6 h-6 text-white" />
+              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
             </button>
             <span className="text-white text-xs mt-1 font-medium">{commentsCount}</span>
           </div>
@@ -433,14 +433,14 @@ const FilmItem = ({
           {/* Share */}
           <button
             onClick={handleShare}
-            className="w-12 h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-opacity-30 hover:scale-110"
+            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-opacity-30 hover:scale-110"
           >
-            <Share className="w-6 h-6 text-white" />
+            <Share className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
           </button>
 
           {/* More Options */}
-          <button className="w-12 h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-opacity-30 hover:scale-110">
-            <MoreHorizontal className="w-6 h-6 text-white" />
+          <button className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-opacity-30 hover:scale-110">
+            <MoreHorizontal className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
           </button>
         </div>
       </div>

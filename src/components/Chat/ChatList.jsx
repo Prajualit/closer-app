@@ -299,8 +299,8 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
     return (
         <div className="flex flex-col h-full bg-white dark:bg-neutral-900">
             {/* Header */}
-            <div className="p-4 border-b border-neutral-200 dark:border-neutral-700">
-                <h2 className="text-xl font-semibold mb-4 text-neutral-900 dark:text-white">Messages</h2>
+            <div className="p-3 sm:p-4 border-b border-neutral-200 dark:border-neutral-700">
+                <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Messages</h2>
 
                 {/* Search */}
                 <div className="relative">
@@ -309,7 +309,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search for users..."
-                        className="pl-10 outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white"
+                        className="pl-10 text-sm sm:text-base outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white"
                     />
                 </div>
             </div>
@@ -317,47 +317,47 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
             {/* Search Results */}
             {searchQuery && (
                 <div className="border-b bg-neutral-50 dark:bg-neutral-800">
-                    <div className="p-2">
-                        <div className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+                    <div className="p-2 sm:p-3">
+                        <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-2">
                             {searchLoading ? 'Searching...' : 'Start new conversation'}
                         </div>
                         <div className='flex flex-col space-y-2'>
                             {searchUsers.length > 0 ? (
                                 searchUsers.map((user) => (
-                                    <div key={user._id} className="w-full bg-white dark:bg-neutral-700 flex items-center space-x-3 p-3 hover:shadow-lg shadow-md rounded-[10px] transition-all duration-300">
-                                        <div className="w-10 h-10 rounded-full overflow-hidden">
+                                    <div key={user._id} className="w-full bg-white dark:bg-neutral-700 flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 hover:shadow-lg shadow-md rounded-[10px] transition-all duration-300">
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex-shrink-0">
                                             <Image
                                                 src={user.avatarUrl}
                                                 alt={user.name}
                                                 width={40}
                                                 height={40}
-                                                className="object-cover bg-center rounded-full"
+                                                className="object-cover bg-center rounded-full w-full h-full"
                                             />
                                         </div>
-                                        <div className="flex-1 text-left">
-                                            <p className="font-medium text-neutral-900 dark:text-white">{user.name}</p>
-                                            <p className="text-sm text-neutral-500 dark:text-neutral-400">@{user.username}</p>
+                                        <div className="flex-1 text-left min-w-0">
+                                            <p className="font-medium text-sm sm:text-base text-neutral-900 dark:text-white truncate">{user.name}</p>
+                                            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 truncate">@{user.username}</p>
                                         </div>
-                                        <div className="flex space-x-2">
+                                        <div className="flex space-x-1 sm:space-x-2 flex-shrink-0">
                                             <Button
                                                 size="sm"
                                                 onClick={(e) => handleViewProfile(e, user._id)}
-                                                className="p-2"
+                                                className="p-1.5 sm:p-2 h-8 w-8 sm:h-9 sm:w-9"
                                             >
-                                                <Info className="w-4 h-4" />
+                                                <Info className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
                                             <Button
                                                 size="sm"
                                                 onClick={() => startNewChat(user._id)}
-                                                className="p-2"
+                                                className="p-1.5 sm:p-2 h-8 w-8 sm:h-9 sm:w-9"
                                             >
-                                                <Plus className="w-4 h-4" />
+                                                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
                                         </div>
                                     </div>
                                 ))
                             ) : !searchLoading && (
-                                <div className="text-sm text-neutral-500 dark:text-neutral-400 p-2">
+                                <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 p-2">
                                     No users found
                                 </div>
                             )}
@@ -379,7 +379,7 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                 return (
                                     <div
                                         key={chatRoom._id}
-                                        className={`group w-full rounded-l-xl flex items-center space-x-3 p-4 transition-colors ${isSelected ? 'bg-neutral-200 dark:bg-neutral-700 border-r-2' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300'}`}
+                                        className={`group w-full rounded-l-xl flex items-center space-x-2 sm:space-x-3 p-2 sm:p-4 transition-colors ${isSelected ? 'bg-neutral-200 dark:bg-neutral-700 border-r-2' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-300'}`}
                                     >
                                         <button
                                             onClick={() => {
@@ -398,30 +398,30 @@ const ChatList = ({ onSelectChat, selectedChatId, refreshTrigger, autoSelectChat
                                                 };
                                                 onSelectChat(chatbotRoomWithCorrectStructure);
                                             }}
-                                            className="flex items-center space-x-3 flex-1"
+                                            className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0"
                                         >
-                                            <div className="relative w-12 h-12 rounded-full overflow-hidden">
+                                            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden flex-shrink-0">
                                                 <Image
                                                     src="/chatbot.png"
                                                     alt="Your AI Friend"
                                                     width={48}
                                                     height={48}
-                                                    className="object-cover bg-center rounded-full"
+                                                    className="object-cover bg-center rounded-full w-full h-full"
                                                 />
                                             </div>
-                                            <div className="flex-1 text-left">
+                                            <div className="flex-1 text-left min-w-0">
                                                 <div className="flex items-center justify-between">
-                                                    <div className="flex items-center space-x-2">
-                                                        <p className="font-medium text-neutral-700 dark:text-neutral-200">
+                                                    <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
+                                                        <p className="font-medium text-sm sm:text-base text-neutral-700 dark:text-neutral-200 truncate">
                                                             Your AI Friend
                                                         </p>
-                                                        <Bot className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+                                                        <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-neutral-500 dark:text-neutral-400 flex-shrink-0" />
                                                     </div>
-                                                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                                    <p className="text-xs text-neutral-500 dark:text-neutral-400 flex-shrink-0 ml-2">
                                                         {formatLastActivity(chatRoom.lastActivity)}
                                                     </p>
                                                 </div>
-                                                <p className="text-sm truncate text-neutral-500 dark:text-neutral-400">
+                                                <p className="text-xs sm:text-sm truncate text-neutral-500 dark:text-neutral-400">
                                                     {chatRoom.lastMessage?.content || 'Start a conversation...'}
                                                 </p>
                                             </div>

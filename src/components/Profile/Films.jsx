@@ -88,7 +88,7 @@ const Films = () => {
   return (
     <>
       {hasFilms ? (
-        <div className="grid grid-cols-3 items-center justify-center gap-2  ">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 items-center justify-center gap-1 sm:gap-2">
           {user?.media
             ?.filter((m) => m.resource_type === "video")
             .map((m, i) => {
@@ -113,13 +113,13 @@ const Films = () => {
               return (
                 <div
                   key={i}
-                  className="h-[20rem] w-[12.5rem] group relative cursor-pointer "
+                  className="aspect-[3/4] sm:aspect-square group relative cursor-pointer"
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                   onClick={() => setActiveVideoUrl(m.url)}
                 >
                   <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
-                  <div className="bg-[#181818] dark:bg-black h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
+                  <div className="bg-[#181818] dark:bg-black h-full w-full flex items-center justify-center transition-transform duration-200">
                     <video
                       ref={videoRef}
                       className={`w-full h-full ${videoClass}`}

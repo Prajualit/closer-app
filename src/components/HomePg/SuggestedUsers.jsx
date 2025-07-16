@@ -95,43 +95,89 @@ const SuggestedUsers = () => {
                         <p className="text-sm text-neutral-500 dark:text-neutral-400">No suggestions available.</p>
                     </div>
                 ) : (
-                    suggestedUsers.slice(0, 3).filter(user => !user.isFollowed).map((user) => (
-                        <div key={user._id} className="flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-neutral-700 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer ">
-                            <div
-                                className="flex items-center space-x-3 flex-1 cursor-pointer rounded-lg p-2 transition-colors"
-                                onClick={() => handleProfileClick(user._id)}
-                            >
-                                <div className="relative w-10 h-10">
-                                    <Image
-                                        src={user.avatarUrl || '/default-avatar.svg'}
-                                        alt={user.name}
-                                        fill
-                                        className="rounded-full object-cover"
-                                    />
+                    <>
+                        {/* Desktop View - Vertical List */}
+                        <div className="hidden lg:block space-y-2">
+                            {suggestedUsers.slice(0, 3).filter(user => !user.isFollowed).map((user) => (
+                                <div key={user._id} className="flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-neutral-700 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer">
+                                    <div
+                                        className="flex items-center space-x-3 flex-1 cursor-pointer rounded-lg p-2 transition-colors"
+                                        onClick={() => handleProfileClick(user._id)}
+                                    >
+                                        <div className="relative w-10 h-10">
+                                            <Image
+                                                src={user.avatarUrl || '/default-avatar.svg'}
+                                                alt={user.name}
+                                                fill
+                                                className="rounded-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-sm font-medium text-neutral-900 dark:text-white truncate">
+                                                {user.username}
+                                            </h4>
+                                            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                                {user.followersCount || 0} followers
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <LoadingButton
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleFollow(user._id)
+                                        }}
+                                        className="px-3 py-1 text-xs font-medium !w-fit !h-fit transition-colors"
+                                        disabled={user.isFollowed}
+                                    >
+                                        {user.isFollowed ? 'Followed' : 'Follow'}
+                                    </LoadingButton>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="text-sm font-medium text-neutral-900 dark:text-white truncate">
-                                        {user.username}
-                                    </h4>
-                                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                        {user.followersCount || 0} followers
-                                    </p>
-                                </div>
-                            </div>
-                                <LoadingButton
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleFollow(user._id)
-                                    }}
-                                    className="px-5 text-xs font-medium !w-fit !h-fit transition-colors"
-                                    disabled={user.isFollowed}
-                                >
-                                    {user.isFollowed ? 'Followed' : 'Follow'}
-                                </LoadingButton>
+                            ))}
                         </div>
-                    )))}
+
+                        {/* Mobile View - Horizontal Scroll */}
+                        <div className="lg:hidden">
+                            <div className="flex space-x-4 overflow-x-auto scrollbar-hide pb-2">
+                                {suggestedUsers.filter(user => !user.isFollowed).map((user) => (
+                                    <div key={user._id} className="flex-shrink-0 w-20 sm:w-24">
+                                        <div className="flex flex-col items-center space-y-2">
+                                            <div
+                                                className="relative w-16 h-16 sm:w-20 sm:h-20 cursor-pointer"
+                                                onClick={() => handleProfileClick(user._id)}
+                                            >
+                                                <Image
+                                                    src={user.avatarUrl || '/default-avatar.svg'}
+                                                    alt={user.name}
+                                                    fill
+                                                    className="rounded-full object-cover border-2 border-neutral-200 dark:border-neutral-600"
+                                                />
+                                            </div>
+                                            <div className="text-center">
+                                                <h4 className="text-xs font-medium text-neutral-900 dark:text-white truncate w-full">
+                                                    {user.username}
+                                                </h4>
+                                                <LoadingButton
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleFollow(user._id)
+                                                    }}
+                                                    className="mt-1 px-2 py-1 text-xs font-medium !w-full !h-fit transition-colors"
+                                                    disabled={user.isFollowed}
+                                                >
+                                                    {user.isFollowed ? 'Followed' : 'Follow'}
+                                                </LoadingButton>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
+                
+                {/* Show More Button - Only on Desktop */}
                 {suggestedUsers.filter(user => !user.isFollowed).length > 3 && (
-                    < div className="text-center mt-4">
+                    <div className="hidden lg:block text-center mt-4">
                         <LoadingButton
                             onClick={() => setIsModalOpen(true)}
                             className="!bg-white dark:!bg-neutral-700 hover:!bg-neutral-50 dark:hover:!bg-neutral-600 !text-black dark:!text-white"
@@ -148,8 +194,6 @@ const SuggestedUsers = () => {
                 suggestedUsers={suggestedUsers}
                 onFollow={handleFollow}
             />
-
-
         </div>
     )
 }

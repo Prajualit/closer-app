@@ -31,6 +31,10 @@ const ProfilePage = () => {
     const currentUser = useSelector((state) => state.user.user);
     const dispatch = useDispatch();
 
+    const handleBack = () => {
+        router.back();
+    };
+
     useEffect(() => {
         if (userId) {
             fetchProfile();
@@ -207,10 +211,6 @@ const ProfilePage = () => {
     const handleMessage = () => {
         // Navigate to chat with this user using query parameters
         router.push(`/${currentUser.username}/chat?userId=${profile._id}&username=${profile.username}`);
-    };
-
-    const handleBack = () => {
-        router.back();
     };
 
     const handleImageClick = (media, isVideo = false) => {
@@ -467,18 +467,18 @@ const ProfilePage = () => {
         <div className="flex bg-neutral-100 dark:bg-neutral-900 min-h-screen">
             <Navbar />
             {/* Header with back button */}
-            <div className="fixed top-0 left-0 right-0 ml-[15rem] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 z-10">
+            <div className="fixed top-0 left-0 right-0 lg:ml-[15rem] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 z-10">
                 <div className="p-4">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-20">
+                        <div className="flex items-center space-x-4 lg:space-x-20">
                             <Button
                                 onClick={handleBack}
-                                className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-5 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
+                                className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-3 lg:px-5 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                             >
-                                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-all duration-300 " />
-                                <span>Back</span>
+                                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-all duration-300" />
+                                <span className="hidden sm:inline">Back</span>
                             </Button>
-                            <h1 className="text-xl font-semibold text-neutral-900 dark:text-white">{profile.name}</h1>
+                            <h1 className="text-lg lg:text-xl font-semibold text-neutral-900 dark:text-white">{profile.name}</h1>
                         </div>
                         <Button variant="ghost" size="sm" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800">
                             <MoreVertical className="w-4 h-4" />
@@ -487,8 +487,8 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            {/* Main content - exact copy from original profile page */}
-            <div className="flex flex-col items-center justify-center w-full h-full p-20 pt-32 ml-[15rem] ">
+            {/* Main content */}
+            <div className="hidden lg:flex lg:ml-[15rem] flex-col items-center justify-center w-full h-full p-20 pt-32">
                 {/* Profile section - Userdata component style */}
                 <div className="flex items-center justify-center w-full space-x-32">
                     <div className='w-[250px] h-[250px] rounded-full overflow-hidden relative'>
@@ -655,6 +655,185 @@ const ProfilePage = () => {
                         )}
                     </>
                 )}
+            </div>
+
+            {/* Mobile Layout */}
+            <div className="lg:hidden w-full pt-16 pb-20">
+                <div className="px-4 py-6">
+                    {/* Mobile Profile Header */}
+                    <div className="flex flex-col items-center space-y-6 mb-8">
+                        {/* Avatar */}
+                        <div className="relative w-24 h-24 sm:w-32 sm:h-32">
+                            <Image
+                                src={profile.avatarUrl || '/default-avatar.svg'}
+                                alt={profile.name}
+                                fill
+                                className="rounded-full object-cover"
+                            />
+                        </div>
+
+                        {/* User Info */}
+                        <div className="text-center">
+                            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">{profile.name}</h1>
+                            <p className="text-sm sm:text-base text-neutral-500 dark:text-neutral-400">@{profile.username}</p>
+                            {profile.bio && (
+                                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 max-w-xs mx-auto">{profile.bio}</p>
+                            )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        {profile._id !== currentUser._id && (
+                            <div className="flex space-x-3">
+                                <LoadingButton
+                                    onClick={handleFollow}
+                                    variant={isFollowing ? "outline" : "default"}
+                                    className="flex items-center space-x-2 dark:!bg-neutral-800 dark:!text-white dark:hover:!bg-neutral-700 transition-all text-sm px-4 py-2"
+                                >
+                                    {isFollowing ? <UserMinus className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                                    <span>{isFollowing ? 'Unfollow' : 'Follow'}</span>
+                                </LoadingButton>
+                                <Button
+                                    onClick={handleMessage}
+                                    className="flex items-center space-x-2 text-sm px-4 py-2 border border-neutral-200 dark:border-neutral-700 rounded-[5px] hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
+                                >
+                                    <MessageCircle className="w-4 h-4" />
+                                    <span>Message</span>
+                                </Button>
+                            </div>
+                        )}
+                        
+                        {/* Stats */}
+                        <div className="flex space-x-6 sm:space-x-8">
+                            <div className="text-center">
+                                <div className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{photos.length}</div>
+                                <div className="text-xs sm:text-sm text-neutral-500">Photos</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{films.length}</div>
+                                <div className="text-xs sm:text-sm text-neutral-500">Films</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{profile.followersCount || 0}</div>
+                                <div className="text-xs sm:text-sm text-neutral-500">Followers</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{profile.followingCount || 0}</div>
+                                <div className="text-xs sm:text-sm text-neutral-500">Following</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Navigation Tabs */}
+                    <div className="sticky top-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 mb-6 pb-3 z-30">
+                        <div className="flex justify-center space-x-8">
+                            {navComp.map((nav) => (
+                                <button
+                                    key={nav.name}
+                                    className={`flex flex-col items-center space-y-2 py-2 px-4 transition-all duration-300 ${
+                                        activeNav === nav.name 
+                                            ? "text-neutral-900 dark:text-white border-b-2 border-neutral-900 dark:border-white" 
+                                            : "text-neutral-500 dark:text-neutral-400"
+                                    }`}
+                                    onClick={() => setActiveNav(nav.name)}
+                                >
+                                    {nav.icon}
+                                    <span className="text-sm font-medium">{nav.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Mobile Content Grid */}
+                    <div className="min-h-[60vh]">
+                        {activeNav === "PHOTOS" && (
+                            <>
+                                {hasPhotos ? (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2">
+                                        {photos.map((photo, i) => (
+                                            <div
+                                                key={i}
+                                                className='group relative aspect-square'
+                                                onClick={() => handleImageClick(photo, false)}
+                                            >
+                                                <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
+                                                <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
+                                                    <Image
+                                                        src={photo.url || photo}
+                                                        alt="User photo"
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center space-y-5 py-20">
+                                        <GridIcon size={80} color="currentColor" />
+                                        <h1 className="text-xl font-semibold text-neutral-900 dark:text-white">No Photos Yet</h1>
+                                        <p className="text-neutral-500 dark:text-neutral-400 text-center">When {profile.name} shares photos, they will appear here.</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {activeNav === "FILMS" && (
+                            <>
+                                {hasFilms ? (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2">
+                                        {films.map((film, i) => {
+                                            const isPortrait = videoOrientations[film.url || film];
+                                            const videoClass = isPortrait !== undefined
+                                                ? isPortrait
+                                                    ? "object-cover"
+                                                    : "object-contain"
+                                                : "object-contain";
+
+                                            const videoRef = React.createRef();
+
+                                            const handleMouseEnter = () => {
+                                                videoRef.current?.play();
+                                            };
+
+                                            const handleMouseLeave = () => {
+                                                videoRef.current?.pause();
+                                                videoRef.current.currentTime = 0;
+                                            };
+
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    className="aspect-[3/4] group relative cursor-pointer"
+                                                    onMouseEnter={handleMouseEnter}
+                                                    onMouseLeave={handleMouseLeave}
+                                                    onClick={() => handleImageClick({ url: film.url || film, caption: film.caption, uploadedAt: film.uploadedAt }, true)}
+                                                >
+                                                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
+                                                    <div className="bg-[#181818] h-full w-full flex items-center justify-center transition-transform duration-200">
+                                                        <video
+                                                            ref={videoRef}
+                                                            className={`w-full h-full ${videoClass}`}
+                                                            src={film.url || film}
+                                                            muted
+                                                            loop
+                                                            playsInline
+                                                        />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center space-y-5 py-20">
+                                        <FilmIcon size={80} color="currentColor" />
+                                        <h1 className="text-xl font-semibold text-neutral-900 dark:text-white">No Films Yet</h1>
+                                        <p className="text-neutral-500 dark:text-neutral-400 text-center">When {profile.name} shares films, they will appear here.</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </div>
             </div>
             
             {/* Image/Video Modal */}

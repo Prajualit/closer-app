@@ -395,47 +395,47 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
     return (
         <div className="flex flex-col h-full bg-white dark:bg-neutral-900">
             {/* Chat Header */}
-            <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
-                <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
+                <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={onBack}
-                        className="md:hidden text-neutral-600 dark:text-neutral-300"
+                        className="md:hidden text-neutral-600 dark:text-neutral-300 p-1 sm:p-2 h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0"
                     >
                         ←
                     </Button>
                     {otherParticipant && (
                         <div
-                            className={`flex items-center space-x-3 ${!isChatbot ? 'cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-700' : ''} rounded-lg p-2 transition-colors duration-200`}
+                            className={`flex items-center space-x-2 sm:space-x-3 ${!isChatbot ? 'cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-700' : ''} rounded-lg p-1 sm:p-2 transition-colors duration-200 min-w-0 flex-1`}
                             onClick={() => !isChatbot && router.push(`/profile/${otherParticipant._id}`)}
                         >
-                            <div className="w-10 h-10 rounded-full overflow-hidden">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex-shrink-0">
                                 <Image
                                     src={otherParticipant.avatarUrl}
                                     alt={otherParticipant.name}
                                     width={40}
                                     height={40}
-                                    className="object-cover bg-center rounded-full"
+                                    className="object-cover bg-center rounded-full w-full h-full"
                                 />
                             </div>
-                            <div>
-                                <h3 className="font-semibold text-neutral-900 dark:text-white">{otherParticipant.name}</h3>
-                                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                            <div className="min-w-0">
+                                <h3 className="font-semibold text-sm sm:text-base text-neutral-900 dark:text-white truncate">{otherParticipant.name}</h3>
+                                <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 truncate">
                                     {isChatbot ? 'Your caring companion' : `@${otherParticipant.username}`}
                                 </p>
                             </div>
                         </div>
                     )}
                 </div>
-                <Button variant="ghost" size="sm" className="text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700">
-                    <MoreVertical className="w-4 h-4" />
+                <Button variant="ghost" size="sm" className="text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 p-1 sm:p-2 h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0">
+                    <MoreVertical className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
             </div>
 
             {/* Messages Area */}
-            <ScrollArea className="flex-1 p-4 bg-neutral-100 dark:bg-neutral-800 !scrollbar-hide ">
-                <div className="space-y-4">
+            <ScrollArea className="flex-1 p-2 sm:p-4 bg-neutral-100 dark:bg-neutral-800 !scrollbar-hide ">
+                <div className="space-y-3 sm:space-y-4">
                     {messages.map((message, index) => {
                         const isOwnMessage = message.sender._id === userDetails?._id;
                         const showAvatar = index === 0 ||
@@ -446,8 +446,8 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                             <div key={message._id || index}>
                                 {/* Date Separator */}
                                 {showDateSeparator && (
-                                    <div className="flex justify-center my-6">
-                                        <div className="bg-neutral-300 dark:bg-neutral-600 text-neutral-600 dark:text-neutral-300 text-xs px-3 py-1 rounded-full">
+                                    <div className="flex justify-center my-4 sm:my-6">
+                                        <div className="bg-neutral-300 dark:bg-neutral-600 text-neutral-600 dark:text-neutral-300 text-xs px-2 sm:px-3 py-1 rounded-full">
                                             {formatDate(message.timestamp)}
                                         </div>
                                     </div>
@@ -455,9 +455,9 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
 
                                 {/* Message */}
                                 <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                                    <div className={`flex items-end space-x-1 sm:space-x-2 max-w-[280px] sm:max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                                         {!isOwnMessage && showAvatar && (
-                                            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden flex-shrink-0">
                                                 <Image
                                                     src={message.sender.avatarUrl}
                                                     alt={message.sender.name}
@@ -468,15 +468,15 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                                             </div>
                                         )}
                                         {!isOwnMessage && !showAvatar && (
-                                            <div className="w-8 h-8 flex-shrink-0" />
+                                            <div className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0" />
                                         )}
                                         <div
-                                            className={`px-4 py-2 flex flex-col items-start space-y-1 shadow-lg rounded-[10px] ${isOwnMessage
+                                            className={`px-3 sm:px-4 py-2 flex flex-col items-start space-y-1 shadow-lg rounded-[10px] ${isOwnMessage
                                                 ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white'
                                                 : 'bg-black text-white'
                                                 }`}
                                         >
-                                            <p className="text-sm">{message.content || message.message}</p>
+                                            <p className="text-xs sm:text-sm break-words">{message.content || message.message}</p>
                                             <p className={`text-xs mt-1 ${isOwnMessage ? 'text-neutral-500 dark:text-neutral-400' : 'text-neutral-500 dark:text-neutral-400'}`}>
                                                 {formatTime(message.timestamp)}
                                             </p>
@@ -489,21 +489,21 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
 
                     {/* Typing Indicator */}
                     {(typingUsers.length > 0 || aiTyping) && (
-                        <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 rounded-full overflow-hidden">
+                        <div className="flex items-center space-x-1 sm:space-x-2">
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden">
                                 <Image
                                     src={aiTyping ? '/chatbot.png' : otherParticipant?.avatarUrl}
                                     alt={aiTyping ? 'Your AI Friend' : otherParticipant?.name}
                                     width={32}
                                     height={32}
-                                    className="object-cover"
+                                    className="object-cover w-full h-full"
                                 />
                             </div>
-                            <div className="bg-neutral-100 dark:bg-neutral-700 px-4 py-2 rounded-lg">
+                            <div className="bg-neutral-100 dark:bg-neutral-700 px-3 sm:px-4 py-2 rounded-lg">
                                 <div className="flex space-x-1">
-                                    <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce"></div>
-                                    <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                    <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce"></div>
+                                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-neutral-400 dark:bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                                 </div>
                             </div>
                         </div>
@@ -514,21 +514,22 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="p-4 border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
+            <div className="p-3 sm:p-4 border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
                 <div className="flex items-center space-x-2">
                     <Input
                         value={newMessage}
                         onChange={handleInputChange}
                         onKeyPress={handleKeyPress}
                         placeholder={isChatbot ? "Ask me anything..." : `Message ${otherParticipant?.name}...`}
-                        className="py-2 outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white"
+                        className="py-2 text-sm sm:text-base outline-none border-none shadow-md hover:shadow-lg transition-shadow duration-300 focus:!shadow-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white"
                     />
                     <Button
                         onClick={handleSendMessage}
                         disabled={!newMessage.trim()}
                         size="sm"
+                        className="h-9 w-9 sm:h-10 sm:w-10 p-2"
                     >
-                        <Send className="w-4 h-4" />
+                        <Send className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
                 </div>
             </div>

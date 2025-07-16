@@ -203,12 +203,12 @@ const CommentModal = ({ isOpen, onClose, film, onCommentUpdate }) => {
         >
             <div
                 ref={modalRef}
-                className="w-full max-w-lg bg-white dark:bg-neutral-900 rounded-t-3xl max-h-[80vh] flex flex-col animate-slide-up"
+                className="w-full max-w-[95vw] sm:max-w-lg bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-3xl max-h-[85vh] sm:max-h-[80vh] flex flex-col animate-slide-up mx-auto"
                 onClick={handleModalClick}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
-                    <h3 className="font-semibold text-lg text-neutral-900 dark:text-white">Comments</h3>
+                <div className="flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 dark:border-neutral-700">
+                    <h3 className="font-semibold text-base sm:text-lg text-neutral-900 dark:text-white">Comments</h3>
                     <button
                         onClick={onClose}
                         className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"

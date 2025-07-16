@@ -470,11 +470,11 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
                             {activeNav === "PHOTOS" && (
                                 <>
                                     {hasPhotos ? (
-                                        <div className="grid grid-cols-3 items-center justify-center gap-2">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 items-center justify-center gap-1 sm:gap-2">
                                             {photos.map((photo, i) => (
                                                 <div
                                                     key={i}
-                                                    className='group relative h-[12.5rem] w-[12.5rem]'
+                                                    className='group relative aspect-square'
                                                 >
                                                     <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
                                                     <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
@@ -498,7 +498,7 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
                             {activeNav === "FILMS" && (
                                 <>
                                     {hasFilms ? (
-                                        <div className="grid grid-cols-3 items-center justify-center gap-2">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 items-center justify-center gap-1 sm:gap-2">
                                             {films.map((film, i) => {
                                                 const isPortrait = videoOrientations[film.url || film];
                                                 const videoClass = isPortrait !== undefined
@@ -521,12 +521,12 @@ const ProfileViewer = ({ isOpen, onClose, userId, userProfile }) => {
                                                 return (
                                                     <div
                                                         key={i}
-                                                        className="h-[20rem] w-[12.5rem] group relative cursor-pointer"
+                                                        className="aspect-[3/4] sm:aspect-square group relative cursor-pointer"
                                                         onMouseEnter={handleMouseEnter}
                                                         onMouseLeave={handleMouseLeave}
                                                     >
                                                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
-                                                        <div className="bg-[#181818] dark:bg-black h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
+                                                        <div className="bg-[#181818] dark:bg-black h-full w-full flex items-center justify-center transition-transform duration-200">
                                                             <video
                                                                 ref={videoRef}
                                                                 className={`w-full h-full ${videoClass}`}

@@ -149,19 +149,26 @@ const ChatPage = () => {
             {(!isMobile || !selectedChat) && <Navbar />}
 
             {/* Add left margin to account for fixed navbar width on desktop */}
-            <div className={`transition-all duration-300 ${!isMobile
-                    ? 'ml-[15rem] py-6 px-6'
+            <div className={`transition-all duration-300 ${
+                !isMobile
+                    ? 'lg:ml-[15rem] py-6 px-6'
                     : selectedChat
                         ? 'p-0'
-                        : 'py-6 px-6'
+                        : 'py-6 px-6 pt-20 pb-24'
                 }`}>
-                <div className={`rounded-lg overflow-hidden ${isMobile && selectedChat ? 'rounded-none' : ''
+                <div className={`rounded-lg overflow-hidden ${
+                    isMobile && selectedChat ? 'rounded-none' : ''
                     }`} style={{
-                        height: isMobile && selectedChat ? '100vh' : 'calc(100vh - 48px)'
+                        height: isMobile && selectedChat 
+                            ? '100vh' 
+                            : isMobile 
+                                ? 'calc(100vh - 112px)' 
+                                : 'calc(100vh - 48px)'
                     }}>
                     <div className="flex h-full">
                         {/* Chat List Sidebar */}
-                        <div className={`${isMobile
+                        <div className={`${
+                            isMobile
                                 ? (selectedChat ? 'hidden' : 'w-full')
                                 : 'w-1/3 border-r border-neutral-200 dark:border-neutral-700'
                             }`}>
@@ -176,7 +183,8 @@ const ChatPage = () => {
                         </div>
 
                         {/* Chat Interface */}
-                        <div className={`${isMobile
+                        <div className={`${
+                            isMobile
                                 ? (selectedChat ? 'w-full' : 'hidden')
                                 : 'flex-1'
                             }`}>

@@ -79,17 +79,17 @@ const page = () => {
 
   return (
 
-    <div className="h-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-900">
-      <Card className="w-full max-w-md rounded-xl shadow-md bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
-        <CardHeader>
-          <CardTitle className="text-neutral-900 dark:text-white">Sign In</CardTitle>
-          <CardDescription className="text-neutral-600 dark:text-neutral-400">Log Into Your Account</CardDescription>
+    <div className="min-h-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-900 px-4 py-6 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-sm sm:max-w-md rounded-xl shadow-md bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
+        <CardHeader className="px-4 sm:px-6 pt-6 pb-4">
+          <CardTitle className="text-lg sm:text-xl text-neutral-900 dark:text-white text-center">Sign In</CardTitle>
+          <CardDescription className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 text-center">Log Into Your Account</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6 pb-6">
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             {["username", "password"].map((field) => (
               <div key={field} className="mb-4">
-                <label htmlFor={field} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <label htmlFor={field} className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                   {field.charAt(0).toUpperCase() + field.slice(1)}
                 </label>
                 <Input
@@ -101,10 +101,10 @@ const page = () => {
                   placeholder={`Enter your ${field}`}
                   error={errors[field]}
                   disabled={pending}
-                  className={`bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 ${errors[field] ? "border-red-500 dark:border-red-500" : ""}`}
+                  className={`bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 text-sm sm:text-base h-10 sm:h-11 ${errors[field] ? "border-red-500 dark:border-red-500" : ""}`}
                 />
                 {errors[field] && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="text-red-500 text-xs sm:text-sm mt-1">
                     {errors[field].message}
                   </p>
                 )}
@@ -114,7 +114,7 @@ const page = () => {
             {/* General error message */}
             {error && (
               <div className="mb-4">
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-xs sm:text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
                   {error}
                 </p>
               </div>
@@ -123,6 +123,7 @@ const page = () => {
             <LoadingButton
               type="submit"
               pending={pending}
+              className="h-10 sm:h-12 text-sm sm:text-base"
             >
               Sign In
             </LoadingButton>
@@ -145,8 +146,8 @@ const page = () => {
               onError={() => "Login Failed"}
             /> */}
           </form>
-          <div className="mt-4 text-center text-sm">
-            <Link href="/sign-up" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <div className="mt-4 text-center">
+            <Link href="/sign-up" className="text-blue-600 dark:text-blue-400 hover:underline text-xs sm:text-sm">
               Don't have an account? Sign up
             </Link>
           </div>

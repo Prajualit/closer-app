@@ -60,11 +60,12 @@ const Userdata = () => {
 
     return (
         <div>
-            <div className="flex items-center justify-center w-full space-x-32 ">
+            {/* Desktop Layout */}
+            <div className="hidden lg:flex items-center justify-center w-full space-x-32">
                 <div className='w-[250px] h-[250px] rounded-full overflow-hidden relative'>
-                    <Image height={250} width={250} className="rounded-full object-cover w-full h-full bg-center " src={userDetails.avatarUrl} alt="" />
+                    <Image height={250} width={250} className="rounded-full object-cover w-full h-full bg-center" src={userDetails.avatarUrl} alt="" />
                 </div>
-                <div className="flex flex-col space-y-3 items-start ">
+                <div className="flex flex-col space-y-3 items-start">
                     <div className="flex flex-col items-start justify-center">
                         <h1 className="text-neutral-500 dark:text-neutral-400">@{userDetails.username}</h1>
                         <h1 className="text-[32px] text-neutral-900 dark:text-white">{userDetails.name}</h1>
@@ -72,7 +73,7 @@ const Userdata = () => {
                     </div>
                     <EditProfile />
 
-                    {/* Stats */}
+                    {/* Desktop Stats */}
                     <div className="flex space-x-8 mt-4">
                         <div className="text-center">
                             <div className="text-2xl font-bold text-neutral-900 dark:text-white">{photosCount}</div>
@@ -90,6 +91,51 @@ const Userdata = () => {
                             <div className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.followingCount}</div>
                             <div className="text-neutral-500 dark:text-neutral-400">Following</div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Mobile Layout */}
+            <div className="lg:hidden flex flex-col items-center space-y-6">
+                {/* Mobile Avatar */}
+                <div className='w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden relative'>
+                    <Image 
+                        fill
+                        className="rounded-full object-cover" 
+                        src={userDetails.avatarUrl} 
+                        alt="" 
+                    />
+                </div>
+                
+                {/* Mobile User Info */}
+                <div className="flex flex-col items-center text-center space-y-2">
+                    <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">{userDetails.name}</h1>
+                    <h2 className="text-sm sm:text-base text-neutral-500 dark:text-neutral-400">@{userDetails.username}</h2>
+                    {userDetails.bio && (
+                        <p className="text-sm text-neutral-600 dark:text-neutral-300 max-w-xs">{userDetails.bio}</p>
+                    )}
+                </div>
+
+                {/* Mobile Edit Profile */}
+                <EditProfile />
+
+                {/* Mobile Stats */}
+                <div className="flex justify-center space-x-6 sm:space-x-8 w-full max-w-sm">
+                    <div className="text-center">
+                        <div className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{photosCount}</div>
+                        <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">Photos</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{filmsCount}</div>
+                        <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">Films</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{stats.followersCount}</div>
+                        <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">Followers</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{stats.followingCount}</div>
+                        <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">Following</div>
                     </div>
                 </div>
             </div>

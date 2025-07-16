@@ -211,10 +211,10 @@ const Post = ({ post, onLike, onComment }) => {
     }
 
     return (
-        <div className='w-full max-w-[470px] bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700'>
+        <div className='w-full max-w-[470px] sm:max-w-[500px] bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700'>
             {/* Post Header */}
-            <div className='p-4 flex items-center justify-start space-x-3'>
-                <div className="relative w-10 h-10">
+            <div className='p-3 sm:p-4 flex items-center justify-start space-x-2 sm:space-x-3'>
+                <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                     <Image
                         fill
                         className='rounded-full object-cover'
@@ -225,12 +225,12 @@ const Post = ({ post, onLike, onComment }) => {
                         }}
                     />
                 </div>
-                <div className='flex-1'>
-                    <h2 className='font-semibold text-sm text-neutral-900 dark:text-white'>{post.username}</h2>
+                <div className='flex-1 min-w-0'>
+                    <h2 className='font-semibold text-xs sm:text-sm text-neutral-900 dark:text-white truncate'>{post.username}</h2>
                     <p className='text-xs text-neutral-500 dark:text-neutral-400'>{formatUploadDate(post.media.uploadedAt)}</p>
                 </div>
-                <button className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <button className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors p-1 flex-shrink-0">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                     </svg>
                 </button>
@@ -275,43 +275,43 @@ const Post = ({ post, onLike, onComment }) => {
             </div>
 
             {/* Post Actions */}
-            <div className='p-4'>
-                <div className='flex items-center justify-between mb-3'>
-                    <div className='flex items-center space-x-4'>
-                        <button onClick={handleLike} className='scale-animation'>
+            <div className='p-3 sm:p-4'>
+                <div className='flex items-center justify-between mb-2 sm:mb-3'>
+                    <div className='flex items-center space-x-3 sm:space-x-4'>
+                        <button onClick={handleLike} className='scale-animation p-1'>
                             <FavouriteIcon
-                                size={24}
+                                size={20}
                                 color={isLiked ? "#ef4444" : "currentColor"}
                                 filled={isLiked}
                             />
                         </button>
-                        <button onClick={() => setShowComments(!showComments)} className='scale-animation'>
+                        <button onClick={() => setShowComments(!showComments)} className='scale-animation p-1'>
                             <CommentIcon />
                         </button>
-                        <button onClick={handleShare} className='scale-animation'>
+                        <button onClick={handleShare} className='scale-animation p-1'>
                             <ShareIcon />
                         </button>
                     </div>
                 </div>
 
                 {/* Likes Count */}
-                <div className='mb-2 flex space-x-2'>
-                    <span className='font-semibold text-sm text-neutral-900 dark:text-white'>{likesCount.toLocaleString()} like{likesCount === 1 ? "" : "s"}</span>
-                    <span className='font-semibold text-sm text-neutral-900 dark:text-white'>{commentsCount.toLocaleString()} comment{commentsCount === 1 ? "" : "s"}</span>
+                <div className='mb-2 flex flex-col sm:flex-row sm:space-x-2 space-y-1 sm:space-y-0'>
+                    <span className='font-semibold text-xs sm:text-sm text-neutral-900 dark:text-white'>{likesCount.toLocaleString()} like{likesCount === 1 ? "" : "s"}</span>
+                    <span className='font-semibold text-xs sm:text-sm text-neutral-900 dark:text-white'>{commentsCount.toLocaleString()} comment{commentsCount === 1 ? "" : "s"}</span>
                 </div>
 
                 {/* Caption */}
                 {post.media.caption && (
                     <div className='mb-2'>
-                        <span className='font-semibold text-sm mr-2 text-neutral-900 dark:text-white'>{post.username}</span>
-                        <span className='text-sm text-neutral-800 dark:text-neutral-200'>{post.media.caption}</span>
+                        <span className='font-semibold text-xs sm:text-sm mr-2 text-neutral-900 dark:text-white'>{post.username}</span>
+                        <span className='text-xs sm:text-sm text-neutral-800 dark:text-neutral-200 break-words'>{post.media.caption}</span>
                     </div>
                 )}
 
                 {/* View Comments */}
                 <button
                     onClick={() => setShowComments(!showComments)}
-                    className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors mb-2"
+                    className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors mb-2"
                 >
                     View all comments
                 </button>
@@ -319,18 +319,18 @@ const Post = ({ post, onLike, onComment }) => {
                 {/* Comments Section */}
                 {showComments && (
                     <div className='mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-700 slide-up'>
-                        <div className='space-y-2 mb-3 max-h-32 overflow-y-auto scrollbar-hide'>
+                        <div className='space-y-2 mb-3 max-h-24 sm:max-h-32 overflow-y-auto scrollbar-hide'>
                             {comments.length > 0 ? (
                                 comments.map((comment, index) => (
-                                    <div key={comment._id || index} className="text-sm">
+                                    <div key={comment._id || index} className="text-xs sm:text-sm">
                                         <span className="font-semibold mr-2 text-neutral-900 dark:text-white">
                                             {comment.userId?.username || comment.user?.username}
                                         </span>
-                                        <span className="text-neutral-800 dark:text-neutral-200">{comment.text}</span>
+                                        <span className="text-neutral-800 dark:text-neutral-200 break-words">{comment.text}</span>
                                     </div>
                                 ))
                             ) : (
-                                <div className="text-sm text-neutral-500 dark:text-neutral-400">No comments yet</div>
+                                <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">No comments yet</div>
                             )}
                         </div>
                         <div className='flex items-center space-x-2'>
@@ -339,7 +339,7 @@ const Post = ({ post, onLike, onComment }) => {
                                 placeholder="Add a comment..."
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
-                                className='flex-1 text-sm border-none outline-none bg-transparent placeholder-neutral-400 dark:placeholder-neutral-500 text-neutral-900 dark:text-white'
+                                className='flex-1 text-xs sm:text-sm border-none outline-none bg-transparent placeholder-neutral-400 dark:placeholder-neutral-500 text-neutral-900 dark:text-white'
                                 onKeyPress={(e) => {
                                     if (e.key === 'Enter') {
                                         handleAddComment()
@@ -350,7 +350,7 @@ const Post = ({ post, onLike, onComment }) => {
                             <button
                                 onClick={handleAddComment}
                                 disabled={!newComment.trim() || loading}
-                                className='text-blue-500 dark:text-blue-400 text-sm font-semibold hover:text-blue-600 dark:hover:text-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                                className='text-blue-500 dark:text-blue-400 text-xs sm:text-sm font-semibold hover:text-blue-600 dark:hover:text-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed px-1'
                             >
                                 {loading ? 'Posting...' : 'Post'}
                             </button>

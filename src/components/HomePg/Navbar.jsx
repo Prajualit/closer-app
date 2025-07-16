@@ -203,49 +203,103 @@ const Navbar = () => {
     ];
 
     return (
-        <div className='h-screen fixed bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-700 flex flex-col justify-center items-start px-5 py-10 w-[15rem] space-y-14 z-50 '>
-            <Link href='/'>
-                <Image className='w-[100px] ml-[16.67%] dark:invert dark:brightness-0 dark:saturate-0 ' src={logo} alt="" />
-            </Link>
-            <div className='flex flex-col items-start justify-start h-full space-y-5 w-full '>
-                {navComp.map((nav) => {
-                    const navKey = nav.name.toLowerCase();
-                    const navIsActive = isActive(navKey);
-                    
-                    return (
-                        nav.name === "Create" ? 
-                            <CreateModal key={nav.name} nav={nav} activeNav={activeNav} /> : 
-                            (
-                                <Link 
-                                    className='w-full' 
-                                    key={nav.name} 
-                                    href={getNavUrl(navKey)}
-                                >
-                                    <button 
-                                        onClick={() => navigateTo(navKey)} 
-                                        className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:bg-neutral-100 dark:focus:bg-neutral-800 focus:text-black dark:focus:text-white w-full ${
-                                            navIsActive ? "text-black dark:text-white bg-neutral-100 dark:bg-neutral-800" : "text-neutral-500 dark:text-neutral-400"
-                                        }`}
-                                        aria-current={navIsActive ? "page" : undefined}
+        <>
+            {/* Desktop Sidebar Navigation */}
+            <div className='hidden lg:flex h-screen fixed bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-700 flex-col justify-center items-start px-5 py-10 w-[15rem] space-y-14 z-50'>
+                <Link href='/'>
+                    <Image className='w-[100px] ml-[16.67%] dark:invert dark:brightness-0 dark:saturate-0' src={logo} alt="" />
+                </Link>
+                <div className='flex flex-col items-start justify-start h-full space-y-5 w-full'>
+                    {navComp.map((nav) => {
+                        const navKey = nav.name.toLowerCase();
+                        const navIsActive = isActive(navKey);
+                        
+                        return (
+                            nav.name === "Create" ? 
+                                <CreateModal key={nav.name} nav={nav} activeNav={activeNav} /> : 
+                                (
+                                    <Link 
+                                        className='w-full' 
+                                        key={nav.name} 
+                                        href={getNavUrl(navKey)}
                                     >
+                                        <button 
+                                            onClick={() => navigateTo(navKey)} 
+                                            className={`transition-all duration-300 flex items-center space-x-2 rounded-[8px] px-5 py-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:bg-neutral-100 dark:focus:bg-neutral-800 focus:text-black dark:focus:text-white w-full ${
+                                                navIsActive ? "text-black dark:text-white bg-neutral-100 dark:bg-neutral-800" : "text-neutral-500 dark:text-neutral-400"
+                                            }`}
+                                            aria-current={navIsActive ? "page" : undefined}
+                                        >
+                                            {nav.name === "Notifications" ? (
+                                                <NotificationBadge>
+                                                    {nav.icon}
+                                                </NotificationBadge>
+                                            ) : (
+                                                nav.icon
+                                            )}
+                                            <span>{nav.name}</span>
+                                        </button>
+                                    </Link>
+                                )
+                        )
+                    })}
+                </div>
+                <div className='absolute bottom-10 w-[83.33%]'>
+                    <UserButton />
+                </div>
+            </div>
+
+            {/* Mobile Bottom Navigation */}
+            <div className='lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 z-50 px-2 py-2 safe-area-pb'>
+                <div className='flex items-center justify-around w-full max-w-md mx-auto'>
+                    {navComp.map((nav) => {
+                        const navKey = nav.name.toLowerCase();
+                        const navIsActive = isActive(navKey);
+                        
+                        return nav.name === "Create" ? (
+                            <div key={nav.name} className='flex-1 flex justify-center'>
+                                <CreateModal nav={nav} activeNav={activeNav} isMobile={true} />
+                            </div>
+                        ) : (
+                            <Link 
+                                key={nav.name} 
+                                href={getNavUrl(navKey)}
+                                className='flex-1'
+                            >
+                                <button 
+                                    onClick={() => navigateTo(navKey)} 
+                                    className={`w-full flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-300 ${
+                                        navIsActive ? "text-black dark:text-white" : "text-neutral-500 dark:text-neutral-400"
+                                    }`}
+                                    aria-current={navIsActive ? "page" : undefined}
+                                >
+                                    <div className="mb-1">
                                         {nav.name === "Notifications" ? (
                                             <NotificationBadge>
-                                                {nav.icon}
+                                                {React.cloneElement(nav.icon, { size: 20 })}
                                             </NotificationBadge>
                                         ) : (
-                                            nav.icon
+                                            React.cloneElement(nav.icon, { size: 20 })
                                         )}
-                                        <span>{nav.name}</span>
-                                    </button>
-                                </Link>
-                            )
-                    )
-                })}
+                                    </div>
+                                    <span className='text-xs font-medium'>{nav.name}</span>
+                                </button>
+                            </Link>
+                        )
+                    })}
+                </div>
             </div>
-            <div className='absolute bottom-10 w-[83.33%] '>
-                <UserButton />
+
+            {/* Mobile Top Bar */}
+            <div className='lg:hidden fixed top-0 left-0 right-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 z-40 px-4 py-3 safe-area-pt'>
+                <div className='flex items-center justify-between'>
+                    <Link href='/'>
+                        <Image className='h-8 w-auto dark:invert dark:brightness-0 dark:saturate-0' src={logo} alt="" />
+                    </Link>
+                    <UserButton />
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 

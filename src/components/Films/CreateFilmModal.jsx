@@ -227,11 +227,11 @@ const CreateFilmModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-white rounded-2xl w-[95vw] sm:w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col mx-4"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-neutral-200">
-          <h2 className="text-xl font-bold">Create Film</h2>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-neutral-200">
+          <h2 className="text-lg sm:text-xl font-bold">Create Film</h2>
           <button
             onClick={handleClose}
             disabled={uploading}

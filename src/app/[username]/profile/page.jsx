@@ -107,31 +107,67 @@ const Page = ({ params }) => {
         <div className="flex bg-white dark:bg-neutral-900 min-h-screen">
             <Navbar />
             {userDetails ? (
-                <div className="flex flex-col items-center justify-center w-full h-full p-20 ml-[15rem] ">
-                    <Userdata />
-                    <div className="w-[75%] border border-neutral-200 dark:border-neutral-700 mt-20 "></div>
-                    <div className="flex justify-center items-center space-x-32 relative w-full mb-20 ">
-                        {navComp.map((nav) => (
-                            <div key={nav.name} className="flex flex-col text-neutral-500 dark:text-neutral-400 items-center space-y-5 ">
-                                <div
-                                    className={` h-[1px] w-[120%] bg-neutral-500 dark:bg-neutral-400 transition-all duration-300 ${activeNav === nav.name ? "block" : "hidden"}`}
-                                ></div>
-                                <button
-                                    className={`transition-all duration-300 text-[14px] flex items-center space-x-2 ${activeNav === nav.name ? "text-black dark:text-white" : "text-neutral-500 dark:text-neutral-400"} `}
-                                    onClick={() => setActiveNav(nav.name)}
-                                >
-                                    {nav.icon}
-                                    <span>
-                                        {nav.name}
-                                    </span>
-                                </button>
-                            </div>
-                        )
-                        )}
+                <>
+                    {/* Desktop Layout */}
+                    <div className="hidden lg:flex lg:ml-[15rem] flex-col items-center justify-center w-full h-full p-6 lg:p-20">
+                        <Userdata />
+                        <div className="w-[75%] border border-neutral-200 dark:border-neutral-700 mt-20"></div>
+                        <div className="flex justify-center items-center space-x-32 relative w-full mb-20">
+                            {navComp.map((nav) => (
+                                <div key={nav.name} className="flex flex-col text-neutral-500 dark:text-neutral-400 items-center space-y-5">
+                                    <div
+                                        className={`h-[1px] w-[120%] bg-neutral-500 dark:bg-neutral-400 transition-all duration-300 ${activeNav === nav.name ? "block" : "hidden"}`}
+                                    ></div>
+                                    <button
+                                        className={`transition-all duration-300 text-[14px] flex items-center space-x-2 ${activeNav === nav.name ? "text-black dark:text-white" : "text-neutral-500 dark:text-neutral-400"}`}
+                                        onClick={() => setActiveNav(nav.name)}
+                                    >
+                                        {nav.icon}
+                                        <span>{nav.name}</span>
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        {activeNav === "PHOTOS" && <Posts />}
+                        {activeNav === "FILMS" && <Films />}
                     </div>
-                    {activeNav === "PHOTOS" && <Posts />}
-                    {activeNav === "FILMS" && <Films />}
-                </div>
+
+                    {/* Mobile Layout */}
+                    <div className="lg:hidden w-full pt-16 pb-20">
+                        <div className="px-4 py-6">
+                            {/* Mobile User Data */}
+                            <div className="mb-8">
+                                <Userdata />
+                            </div>
+                            
+                            {/* Mobile Navigation Tabs */}
+                            <div className="sticky top-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 mb-6 pb-3 z-30">
+                                <div className="flex justify-center space-x-8">
+                                    {navComp.map((nav) => (
+                                        <button
+                                            key={nav.name}
+                                            className={`flex flex-col items-center space-y-2 py-2 px-4 transition-all duration-300 ${
+                                                activeNav === nav.name 
+                                                    ? "text-black dark:text-white border-b-2 border-black dark:border-white" 
+                                                    : "text-neutral-500 dark:text-neutral-400"
+                                            }`}
+                                            onClick={() => setActiveNav(nav.name)}
+                                        >
+                                            {nav.icon}
+                                            <span className="text-sm font-medium">{nav.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Mobile Content */}
+                            <div className="min-h-[60vh]">
+                                {activeNav === "PHOTOS" && <Posts />}
+                                {activeNav === "FILMS" && <Films />}
+                            </div>
+                        </div>
+                    </div>
+                </>
             ) : (
                 <div className="flex items-center justify-center w-full h-screen ml-[15rem]">
                     <p className="text-neutral-500 dark:text-neutral-400">Loading user info...</p>

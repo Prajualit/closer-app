@@ -9,14 +9,14 @@ export default function LoadingButton({
     return (
         <Button
             onClick={onClick}
-            className={`${className} w-full border rounded-[7px] hover:bg-white dark:hover:bg-neutral-200 hover:text-black bg-black dark:bg-neutral-700 text-white dark:text-neutral-100 dark:hover:text-black duration-300`}
+            className={`${className} w-full border rounded-[7px] hover:bg-white dark:hover:bg-neutral-200 hover:text-black bg-black dark:bg-neutral-700 text-white dark:text-neutral-100 dark:hover:text-black duration-300 text-sm sm:text-base py-2 sm:py-3`}
             type="submit"
             disabled={pending}
         >
             {pending ? (
                 <div className="flex items-center justify-center">
                     <svg
-                        className="animate-spin h-5 w-5 text-white dark:text-neutral-200 mr-2"
+                        className="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white dark:text-neutral-200 mr-2"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -35,6 +35,7 @@ export default function LoadingButton({
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                     </svg>
+                    <span className="text-sm sm:text-base">Loading...</span>
                 </div>
             ) : (
                 children
