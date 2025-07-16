@@ -80,7 +80,7 @@ const SuggestedUsers = () => {
     }
 
     return (
-        <div className="w-full bg-white dark:bg-neutral-800 rounded-xl p-4 shadow-sm border border-neutral-100 dark:border-neutral-700">
+        <div className="w-full">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Suggested for you</h3>
             </div>
@@ -97,7 +97,7 @@ const SuggestedUsers = () => {
                 ) : (
                     <>
                         {/* Desktop View - Vertical List */}
-                        <div className="hidden lg:block space-y-2">
+                        <div className="hidden lg:block space-y-2 bg-white dark:bg-neutral-800 rounded-xl p-4 shadow-sm border border-neutral-100 dark:border-neutral-700">
                             {suggestedUsers.slice(0, 3).filter(user => !user.isFollowed).map((user) => (
                                 <div key={user._id} className="flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-neutral-700 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer">
                                     <div
@@ -133,58 +133,71 @@ const SuggestedUsers = () => {
                                     </LoadingButton>
                                 </div>
                             ))}
+                            
+                            {/* Show More Button - Only on Desktop */}
+                            {suggestedUsers.filter(user => !user.isFollowed).length > 3 && (
+                                <div className="text-center mt-4">
+                                    <LoadingButton
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="!bg-white dark:!bg-neutral-700 hover:!bg-neutral-50 dark:hover:!bg-neutral-600 !text-black dark:!text-white"
+                                    >
+                                        Show More
+                                    </LoadingButton>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Mobile View - Horizontal Scroll */}
+                        {/* Mobile View - Improved Grid Layout */}
                         <div className="lg:hidden">
-                            <div className="flex space-x-4 overflow-x-auto scrollbar-hide pb-2">
-                                {suggestedUsers.filter(user => !user.isFollowed).map((user) => (
-                                    <div key={user._id} className="flex-shrink-0 w-20 sm:w-24">
-                                        <div className="flex flex-col items-center space-y-2">
-                                            <div
-                                                className="relative w-16 h-16 sm:w-20 sm:h-20 cursor-pointer"
-                                                onClick={() => handleProfileClick(user._id)}
+                            <div className="grid grid-cols-2 gap-4">
+                                {suggestedUsers.filter(user => !user.isFollowed).slice(0, 2).map((user) => (
+                                    <div key={user._id} className="flex flex-col items-center space-y-3 p-3 bg-neutral-50 dark:bg-neutral-700 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors">
+                                        <div
+                                            className="relative w-16 h-16 sm:w-20 sm:h-20 cursor-pointer"
+                                            onClick={() => handleProfileClick(user._id)}
+                                        >
+                                            <Image
+                                                src={user.avatarUrl || '/default-avatar.svg'}
+                                                alt={user.name}
+                                                fill
+                                                className="rounded-full object-cover border-2 border-white dark:border-neutral-600 shadow-sm"
+                                            />
+                                        </div>
+                                        <div className="text-center w-full">
+                                            <h4 className="text-sm font-medium text-neutral-900 dark:text-white truncate mb-1">
+                                                {user.username}
+                                            </h4>
+                                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2">
+                                                {user.followersCount || 0} followers
+                                            </p>
+                                            <LoadingButton
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    handleFollow(user._id)
+                                                }}
+                                                className="w-full px-3 py-1.5 text-xs font-medium transition-colors"
+                                                disabled={user.isFollowed}
                                             >
-                                                <Image
-                                                    src={user.avatarUrl || '/default-avatar.svg'}
-                                                    alt={user.name}
-                                                    fill
-                                                    className="rounded-full object-cover border-2 border-neutral-200 dark:border-neutral-600"
-                                                />
-                                            </div>
-                                            <div className="text-center">
-                                                <h4 className="text-xs font-medium text-neutral-900 dark:text-white truncate w-full">
-                                                    {user.username}
-                                                </h4>
-                                                <LoadingButton
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        handleFollow(user._id)
-                                                    }}
-                                                    className="mt-1 px-2 py-1 text-xs font-medium !w-full !h-fit transition-colors"
-                                                    disabled={user.isFollowed}
-                                                >
-                                                    {user.isFollowed ? 'Followed' : 'Follow'}
-                                                </LoadingButton>
-                                            </div>
+                                                {user.isFollowed ? 'Followed' : 'Follow'}
+                                            </LoadingButton>
                                         </div>
                                     </div>
                                 ))}
                             </div>
+                            
+                            {/* Show More Button for Mobile */}
+                            {suggestedUsers.filter(user => !user.isFollowed).length > 2 && (
+                                <div className="text-center mt-4">
+                                    <LoadingButton
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="!bg-neutral-100 dark:!bg-neutral-700 hover:!bg-neutral-200 dark:hover:!bg-neutral-600 !text-black dark:!text-white w-full"
+                                    >
+                                        Show All Suggestions
+                                    </LoadingButton>
+                                </div>
+                            )}
                         </div>
                     </>
-                )}
-                
-                {/* Show More Button - Only on Desktop */}
-                {suggestedUsers.filter(user => !user.isFollowed).length > 3 && (
-                    <div className="hidden lg:block text-center mt-4">
-                        <LoadingButton
-                            onClick={() => setIsModalOpen(true)}
-                            className="!bg-white dark:!bg-neutral-700 hover:!bg-neutral-50 dark:hover:!bg-neutral-600 !text-black dark:!text-white"
-                        >
-                            Show More
-                        </LoadingButton>
-                    </div>
                 )}
             </div>
 

@@ -32,43 +32,18 @@ const page = () => {
             {/* Mobile Layout */}
             <div className='lg:hidden w-full pt-16 pb-20'>
                 <div className='flex flex-col space-y-4 px-4'>
-                    {/* Mobile Search */}
-                    <div className='sticky top-16 bg-neutral-50 dark:bg-neutral-900 py-3 z-30'>
-                        <Navsearch />
-                    </div>
-                    
-                    {/* Mobile Suggested Users - Horizontal Scroll */}
-                    <div className='bg-white dark:bg-neutral-800 rounded-xl p-4'>
-                        <SuggestedUsers />
-                    </div>
-                    
-                    {/* Mobile Posts Feed */}
+                    {/* Mobile Search - Non-sticky */}
+
+                    <Navsearch />
+
+
+                    {/* Mobile Posts Feed with Suggested Users after refresh button */}
                     <div className='space-y-4'>
-                        <PostsFeed />
-                    </div>
-                    
-                    {/* Mobile User Activity & Trending */}
-                    <div className='space-y-4'>
-                        <div className='bg-white dark:bg-neutral-800 rounded-xl p-4'>
-                            <UserActivity />
-                        </div>
-                        
-                        {/* Mobile Trending */}
-                        <div className='bg-white dark:bg-neutral-800 rounded-xl p-4 shadow-sm border border-neutral-100 dark:border-neutral-700'>
-                            <h3 className='text-lg font-semibold text-neutral-900 dark:text-white mb-4'>Trending</h3>
-                            <div className='space-y-2'>
-                                {['#photography', '#travel', '#food', '#art', '#nature'].map((tag, index) => (
-                                    <div key={tag} className='flex items-center justify-between'>
-                                        <span className='text-blue-500 dark:text-blue-400 text-sm font-medium cursor-pointer hover:text-blue-600 dark:hover:text-blue-300 transition-colors'>
-                                            {tag}
-                                        </span>
-                                        <span className='text-xs text-neutral-400 dark:text-neutral-500'>
-                                            {Math.floor(Math.random() * 100) + 10}K posts
-                                        </span>
-                                    </div>
-                                ))}
+                        <PostsFeed suggestedUsersComponent={
+                            <div className='bg-white dark:bg-neutral-800 rounded-xl p-4 shadow-sm border border-neutral-100 dark:border-neutral-700'>
+                                <SuggestedUsers />
                             </div>
-                        </div>
+                        } />
                     </div>
                 </div>
             </div>

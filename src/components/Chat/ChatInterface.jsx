@@ -400,10 +400,29 @@ const ChatInterface = ({ chatRoom, onBack, onUpdateChatList }) => {
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={onBack}
-                        className="md:hidden text-neutral-600 dark:text-neutral-300 p-1 sm:p-2 h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0"
+                        onClick={() => {
+                            console.log('Back button clicked');
+                            if (onBack) {
+                                onBack();
+                            } else {
+                                console.error('onBack function not provided');
+                            }
+                        }}
+                        className="md:hidden text-neutral-600 dark:text-neutral-300 p-1 sm:p-2 h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 hover:bg-neutral-100 dark:hover:bg-neutral-700"
                     >
-                        ←
+                        <svg 
+                            className="w-4 h-4" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M15 19l-7-7 7-7" 
+                            />
+                        </svg>
                     </Button>
                     {otherParticipant && (
                         <div

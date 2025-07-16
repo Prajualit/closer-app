@@ -5,7 +5,7 @@ import Post from '@/components/ui/Post'
 import { Skeleton } from '@/components/ui/skeleton'
 import LoadingButton from '@/components/LoadingButton'
 
-const PostsFeed = () => {
+const PostsFeed = ({ suggestedUsersComponent }) => {
     const [posts, setPosts] = useState([])
     const [loading, setLoading] = useState(false)
     const [hasMore, setHasMore] = useState(true)
@@ -169,7 +169,7 @@ const PostsFeed = () => {
             )}
 
             {/* Posts */}
-            <div className="">
+            <div className="space-y-3">
                 {posts.map((post, index) => (
                     <div key={`${post._id}-${post.media._id}-${index}`} className="fade-in">
                         <Post
@@ -177,6 +177,12 @@ const PostsFeed = () => {
                             onLike={handleLike}
                             onComment={handleComment}
                         />
+                        {/* Show Suggested Users after 3rd post on mobile */}
+                        {suggestedUsersComponent && index === 2 && (
+                            <div className="w-full max-w-md my-6 lg:hidden">
+                                {suggestedUsersComponent}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

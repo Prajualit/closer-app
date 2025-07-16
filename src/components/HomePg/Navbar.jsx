@@ -291,7 +291,7 @@ const Navbar = () => {
             </div>
 
             {/* Mobile Top Bar */}
-            <div className='lg:hidden fixed top-0 left-0 right-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 z-40 px-4 py-3 safe-area-pt'>
+            <div className='lg:hidden fixed top-0 left-0 right-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 z-40 px-4 py-2 '>
                 <div className='flex items-center justify-between'>
                     <Link href='/'>
                         <Image className='h-8 w-auto dark:invert dark:brightness-0 dark:saturate-0' src={logo} alt="" />

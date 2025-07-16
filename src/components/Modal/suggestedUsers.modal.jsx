@@ -20,9 +20,9 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-[95vw] sm:max-w-sm md:max-w-md max-h-[90vh] bg-white dark:bg-neutral-800 mx-4">
+            <DialogContent className="w-[95vw] max-w-[400px] sm:max-w-md max-h-[90vh] bg-white dark:bg-neutral-800 p-4 sm:p-6">
                 <DialogHeader>
-                    <DialogTitle className="text-base sm:text-lg font-semibold dark:text-white px-2">
+                    <DialogTitle className="text-base sm:text-lg font-semibold dark:text-white">
                         Suggested for you ({suggestedUsers?.filter(user => !user.isFollowed).length || 0})
                     </DialogTitle>
                 </DialogHeader>

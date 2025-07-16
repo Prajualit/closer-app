@@ -223,15 +223,15 @@ const EditModal = ({ nav, activeNav }) => {
                 </button>
             </DialogTrigger>
 
-            <DialogContent className="bg-white dark:bg-neutral-900 w-[95vw] sm:w-[85vw] md:w-[70vw] lg:w-[50vw] xl:w-[40vw] max-w-2xl border-neutral-200 dark:border-neutral-700 max-h-[90vh] overflow-y-auto">
+            <DialogContent className="bg-white dark:bg-neutral-900 w-[95vw] sm:w-[85vw] md:w-[70vw] lg:w-[50vw] xl:w-[40vw] max-w-2xl border-neutral-200 dark:border-neutral-700 h-[95vh] max-h-[95vh] overflow-hidden flex flex-col">
                 <VisuallyHidden>
                     <DialogHeader>
                         <DialogTitle className="text-lg font-semibold text-neutral-900 dark:text-white">Edit Profile</DialogTitle>
                     </DialogHeader>
                 </VisuallyHidden>
-                <div className="text-sm h-full">
-                    <Card className="w-full h-full border-none shadow-none bg-white dark:bg-neutral-900">
-                        <CardHeader>
+                <div className="text-sm h-full flex flex-col">
+                    <Card className="w-full h-full border-none shadow-none bg-white dark:bg-neutral-900 flex flex-col">
+                        <CardHeader className="flex-shrink-0">
                             <CardTitle className="text-neutral-900 dark:text-white">
                                 {changePassword
                                     ? (passwordStep === 1 ? "Verify Current Password" : "Set New Password")
@@ -248,11 +248,55 @@ const EditModal = ({ nav, activeNav }) => {
                                 }
                             </p>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="flex-1 overflow-y-auto px-4 sm:px-6">
                             {!changePassword ? (
                                 <form noValidate onSubmit={handleSubmit(onSubmit)}>
-                                    <div className="flex space-x-5 ">
-                                        <div className="w-full flex flex-col h-full">
+                                    {/* Mobile: Vertical Layout, Desktop: Horizontal Layout */}
+                                    <div className="flex flex-col lg:flex-row lg:space-x-5 space-y-5 lg:space-y-0">
+                                        {/* Profile Photo Section - First on mobile, second on desktop */}
+                                        <div className="order-1 lg:order-2 space-y-1 w-full lg:w-auto flex flex-col h-full">
+                                            <label htmlFor={"avatar"} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                                                Profile Photo <span className="text-neutral-500 dark:text-neutral-400 text-xs">(Optional)</span>
+                                            </label>
+                                            <div
+                                                onClick={handleImageClick}
+                                                className={`${!image ? "border-[1px] border-dashed border-neutral-300 dark:border-neutral-600" : "border-none"
+                                                    } rounded-xl flex items-center justify-center cursor-pointer p-3 sm:p-4 bg-white dark:bg-neutral-800`}
+                                            >
+                                                <div className='w-32 h-32 sm:w-40 sm:h-40 lg:w-[166px] lg:h-[166px] rounded-full overflow-hidden relative'>
+                                                    {image ? (
+                                                        <img
+                                                            src={URL.createObjectURL(image)}
+                                                            alt="Profile Preview"
+                                                            className="w-full h-full object-cover rounded-full"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                                                            <svg
+                                                                className="w-12 h-12 sm:w-16 sm:h-16 text-neutral-400 dark:text-neutral-500"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <input
+                                                    ref={inputRef}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                    style={{ display: "none" }}
+                                                />
+                                            </div>
+                                            {errors.avatarUrl && (
+                                                <p className="text-red-500 text-sm mt-1">{errors.avatarUrl.message}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Form Fields Section - Second on mobile, first on desktop */}
+                                        <div className="order-2 lg:order-1 w-full flex flex-col h-full">
                                             {["username", "name", "bio"].map((field) => (
                                                 <div key={field} className="mb-4 flex flex-col">
                                                     <label htmlFor={field} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
@@ -282,52 +326,13 @@ const EditModal = ({ nav, activeNav }) => {
                                                 </div>
                                             ))}
                                         </div>
-
-                                        <div className="space-y-1 w-full flex flex-col h-full">
-                                            <label htmlFor={"avatar"} className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                                                Profile Photo <span className="text-neutral-500 dark:text-neutral-400 text-xs">(Optional)</span>
-                                            </label>
-                                            <div
-                                                onClick={handleImageClick}
-                                                className={`${!image ? "border-[1px] border-dashed border-neutral-300 dark:border-neutral-600" : "border-none"
-                                                    } rounded-xl flex items-center justify-center cursor-pointer p-4 bg-white dark:bg-neutral-800`}
-                                            >
-                                                <div className='w-[166px] h-[166px] rounded-full overflow-hidden relative'>
-                                                    {image ? (
-                                                        <img
-                                                            src={URL.createObjectURL(image)}
-                                                            alt="Profile Preview"
-                                                            className="w-[166px] h-[166px] object-cover rounded-full"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-[166px] h-[166px] flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
-                                                            <svg
-                                                                className="w-16 h-16 text-neutral-400 dark:text-neutral-500"
-                                                                fill="currentColor"
-                                                                viewBox="0 0 24 24"
-                                                            >
-                                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                                            </svg>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <input
-                                                    ref={inputRef}
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleImageChange}
-                                                    style={{ display: "none" }}
-                                                />
-                                            </div>
-                                            {errors.avatarUrl && (
-                                                <p className="text-red-500 text-sm mt-1">{errors.avatarUrl.message}</p>
-                                            )}
-                                        </div>
                                     </div>
                                     {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-                                    <LoadingButton className="mt-3" pending={pending} disabled={pending}>
-                                        Update Profile
-                                    </LoadingButton>
+                                    <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+                                        <LoadingButton className="w-full sm:w-auto" pending={pending} disabled={pending}>
+                                            Update Profile
+                                        </LoadingButton>
+                                    </div>
                                 </form>
                             ) : (
                                 <form noValidate onSubmit={handleSubmit(onSubmitPassword)}>

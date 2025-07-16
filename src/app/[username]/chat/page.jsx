@@ -11,6 +11,7 @@ import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
 const ChatPage = () => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
+    const [isGoingBack, setIsGoingBack] = useState(false);
     const [isInitializing, setIsInitializing] = useState(true);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [chatRooms, setChatRooms] = useState([]);
@@ -33,34 +34,25 @@ const ChatPage = () => {
 
     // Handle query parameters to automatically open a chat
     useEffect(() => {
+        // Skip entirely if user is going back
+        if (isGoingBack) {
+            console.log('Skipping initialization - user is going back');
+            setIsInitializing(false);
+            return;
+        }
+
         const initializeChat = async () => {
             const userId = searchParams.get('userId');
             const username = searchParams.get('username');
             const chatId = searchParams.get('chatId');
 
-            // Skip if we already have a selected chat AND it matches the URL chatId (prevents re-initialization)
-            if (selectedChat && chatId && selectedChat.chatId === chatId) {
-                setIsInitializing(false);
-                return;
-            }
-
-            // If we already processed initial params and now only have chatId, skip (this means URL was updated after chat creation)
-            if (hasProcessedInitialParams.current && chatId && !userId && !username) {
-                setIsInitializing(false);
-                return;
-            }
-
-            // If we have a chatId in URL (from page refresh), let ChatList handle the auto-selection
-            if (chatId && !userId && !username && !hasProcessedInitialParams.current) {
-                setIsInitializing(false);
-                hasProcessedInitialParams.current = true;
-                return;
-            }
+            console.log('useEffect params:', { userId, username, chatId, selectedChat: selectedChat?.chatId, isGoingBack });
 
             // If no parameters at all, just finish initialization
             if (!userId && !username && !chatId) {
+                console.log('No parameters - finishing initialization');
                 setIsInitializing(false);
-                hasProcessedInitialParams.current = true;
+                hasProcessedInitialParams.current = false;
                 return;
             }
 
@@ -100,9 +92,15 @@ const ChatPage = () => {
         };
 
         initializeChat();
-    }, [searchParams, toast]); // Removed selectedChat and router from dependencies
+    }, [searchParams, toast, isGoingBack]); // Added isGoingBack to dependencies
 
     const handleSelectChat = useCallback((chatRoom) => {
+        // Don't select chat if user is going back
+        if (isGoingBack) {
+            console.log('Ignoring chat selection - user is going back');
+            return;
+        }
+        
         console.log('Selecting chat:', chatRoom.chatId);
         setSelectedChat(chatRoom);
         // Update URL to persist the selected chat, but only if it's different
@@ -112,7 +110,7 @@ const ChatPage = () => {
             const newUrl = `${window.location.pathname}?chatId=${chatRoom.chatId}`;
             window.history.replaceState(null, '', newUrl);
         }
-    }, [searchParams]);
+    }, [searchParams, isGoingBack]);
 
     // Function to update chatbot last message in chat list
     const updateChatbotLastMessage = useCallback((message) => {
@@ -134,14 +132,20 @@ const ChatPage = () => {
 
     const handleBackToList = useCallback(() => {
         console.log('Going back to chat list');
+        
+        // Immediately clear selected chat and set going back flag
         setSelectedChat(null);
-        hasProcessedInitialParams.current = false; // Reset for potential new navigation
-        // Clear chatId from URL when going back to list
-        const currentChatId = searchParams.get('chatId');
-        if (currentChatId) {
-            window.history.replaceState(null, '', window.location.pathname);
-        }
-    }, [searchParams]);
+        setIsGoingBack(true);
+        
+        // Navigate to completely clean URL
+        router.replace('/prajualit/chat');
+        
+        // Keep the flag set longer to prevent re-initialization
+        setTimeout(() => {
+            setIsGoingBack(false);
+            hasProcessedInitialParams.current = false; // Reset for future navigation
+        }, 500);
+    }, [router]);
 
     return (
         <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
