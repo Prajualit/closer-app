@@ -63,7 +63,7 @@ const Photos = () => {
   return (
     <>
       {hasPhotos ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 items-center justify-center gap-1 sm:gap-2">
+        <div className="grid grid-cols-3 max-sm:grid-cols-2 items-center justify-center gap-2">
           {user?.media
             ?.filter((m) => m.resource_type === "image")
             .map((m, i) => {
@@ -80,7 +80,7 @@ const Photos = () => {
 
 
                 return (
-                  <div className={`aspect-square bg-[#181818] dark:bg-black flex items-center justify-center overflow-hidden ${containerClass}`}>
+                  <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] dark:bg-black flex items-center justify-center overflow-hidden ${containerClass}`}>
                     <NextImage
                       src={src}
                       alt={alt}
@@ -93,11 +93,11 @@ const Photos = () => {
               return (
                 <div
                   key={i}
-                  className='group relative aspect-square cursor-pointer'
+                  className='group relative h-[12.5rem] w-[12.5rem] '
                   onClick={() => setActiveImageUrl(m.url)}
                 >
-                  <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
-                  <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
+                  <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
+                  <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200 '>
                     <SmartImage src={m.url} alt={`image-${i}`} />
                   </div>
                 </div>
@@ -125,8 +125,8 @@ const Photos = () => {
         </div>
       )}
 
-      <CreateModal 
-        open={isCreateModalOpen} 
+      <CreateModal
+        open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
       />
     </>

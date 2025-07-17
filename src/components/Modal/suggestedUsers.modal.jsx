@@ -27,7 +27,7 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
                     </DialogTitle>
                 </DialogHeader>
                 
-                <div className="max-h-[60vh] overflow-y-auto pr-2">
+                <div className="max-h-[60vh] overflow-y-auto max-sm:scrollbar-hide pr-2">
                     <div className="space-y-2 sm:space-y-3">
                         {suggestedUsers && suggestedUsers.length > 0 ? (
                             suggestedUsers.filter(user => !user.isFollowed).map((user) => (
@@ -59,7 +59,7 @@ const SuggestedUsersModal = ({ isOpen, onClose, suggestedUsers, onFollow }) => {
                                         onFollow(user._id)
                                     }}
                                     size="sm"
-                                    className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:h-8 bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0 !w-fit !h-fit transition-colors"
+                                    className="!text-xs sm:!text-sm !w-fit !h-fit !transition-colors"
                                     disabled={user.isFollowed}
                                 >
                                     {user.isFollowed ? 'Followed' : 'Follow'}

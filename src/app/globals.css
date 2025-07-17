@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import minimal scrollbar styles */
+@import '../styles/scrollbar.css';
+
 /* Safe area utilities for mobile devices */
 @layer utilities {
   .safe-area-pt {

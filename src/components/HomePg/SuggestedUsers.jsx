@@ -62,8 +62,8 @@ const SuggestedUsers = () => {
             if (response.ok) {
                 console.log('Successfully followed user:', userId) // Debug log
                 // Update the user's following status instead of removing them
-                setSuggestedUsers(prev => prev.map(user => 
-                    user._id === userId 
+                setSuggestedUsers(prev => prev.map(user =>
+                    user._id === userId
                         ? { ...user, isFollowed: true }
                         : user
                 ))
@@ -81,9 +81,7 @@ const SuggestedUsers = () => {
 
     return (
         <div className="w-full">
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Suggested for you</h3>
-            </div>
+
 
             <div className="">
                 {loading ? (
@@ -98,6 +96,7 @@ const SuggestedUsers = () => {
                     <>
                         {/* Desktop View - Vertical List */}
                         <div className="hidden lg:block space-y-2 bg-white dark:bg-neutral-800 rounded-xl p-4 shadow-sm border border-neutral-100 dark:border-neutral-700">
+                            <h3 className='text-lg font-semibold text-neutral-900 dark:text-white mb-4 px-2 pt-2'>Suggested Users</h3>
                             {suggestedUsers.slice(0, 3).filter(user => !user.isFollowed).map((user) => (
                                 <div key={user._id} className="flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-neutral-700 py-2 px-3 rounded-[8px] transition-all duration-300 cursor-pointer">
                                     <div
@@ -126,20 +125,20 @@ const SuggestedUsers = () => {
                                             e.stopPropagation()
                                             handleFollow(user._id)
                                         }}
-                                        className="px-3 py-1 text-xs font-medium !w-fit !h-fit transition-colors"
+                                        className="px-3 !text-sm font-medium !w-fit !h-fit transition-colors"
                                         disabled={user.isFollowed}
                                     >
                                         {user.isFollowed ? 'Followed' : 'Follow'}
                                     </LoadingButton>
                                 </div>
                             ))}
-                            
+
                             {/* Show More Button - Only on Desktop */}
                             {suggestedUsers.filter(user => !user.isFollowed).length > 3 && (
                                 <div className="text-center mt-4">
                                     <LoadingButton
                                         onClick={() => setIsModalOpen(true)}
-                                        className="!bg-white dark:!bg-neutral-700 hover:!bg-neutral-50 dark:hover:!bg-neutral-600 !text-black dark:!text-white"
+                                        className="!bg-white dark:!bg-neutral-700 hover:!bg-neutral-50 dark:hover:!bg-neutral-600 !text-black dark:!text-white !text-sm w-full"
                                     >
                                         Show More
                                     </LoadingButton>
@@ -184,7 +183,7 @@ const SuggestedUsers = () => {
                                     </div>
                                 ))}
                             </div>
-                            
+
                             {/* Show More Button for Mobile */}
                             {suggestedUsers.filter(user => !user.isFollowed).length > 2 && (
                                 <div className="text-center mt-4">

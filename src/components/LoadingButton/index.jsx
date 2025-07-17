@@ -9,7 +9,7 @@ export default function LoadingButton({
     return (
         <Button
             onClick={onClick}
-            className={`${className} w-full border rounded-[7px] hover:bg-white dark:hover:bg-neutral-200 hover:text-black bg-black dark:bg-neutral-700 text-white dark:text-neutral-100 dark:hover:text-black duration-300 text-sm sm:text-base py-2 sm:py-3`}
+            className={`${className} w-full border rounded-[7px] hover:bg-white dark:hover:bg-neutral-200 hover:text-black bg-black dark:bg-neutral-700 text-white dark:text-neutral-100 dark:hover:text-black duration-300 text-sm sm:text-base py-2`}
             type="submit"
             disabled={pending}
         >
