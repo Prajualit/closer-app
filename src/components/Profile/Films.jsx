@@ -88,57 +88,107 @@ const Films = () => {
   return (
     <>
       {hasFilms ? (
-        <div className="grid grid-cols-3 items-center justify-center gap-2  ">
-          {user?.media
-            ?.filter((m) => m.resource_type === "video")
-            .map((m, i) => {
-              const isPortrait = videoOrientations[m.url];
-              const videoClass = isPortrait !== undefined
-                ? isPortrait
-                  ? "object-cover"
-                  : "object-contain"
-                : "object-contain";
+        <>
+          {/* Desktop Layout - preserved as requested */}
+          <div className="hidden lg:grid lg:grid-cols-3 items-center justify-center gap-2">
+            {user?.media
+              ?.filter((m) => m.resource_type === "video")
+              .map((m, i) => {
+                const isPortrait = videoOrientations[m.url];
+                const videoClass = isPortrait !== undefined
+                  ? isPortrait
+                    ? "object-cover"
+                    : "object-contain"
+                  : "object-contain";
 
-              const videoRef = React.createRef();
+                const videoRef = React.createRef();
 
-              const handleMouseEnter = () => {
-                videoRef.current?.play();
-              };
+                const handleMouseEnter = () => {
+                  videoRef.current?.play();
+                };
 
-              const handleMouseLeave = () => {
-                videoRef.current?.pause();
-                videoRef.current.currentTime = 0; // optional: reset to start
-              };
+                const handleMouseLeave = () => {
+                  videoRef.current?.pause();
+                  videoRef.current.currentTime = 0; // optional: reset to start
+                };
 
-              return (
-                <div
-                  key={i}
-                  className="h-[20rem] w-[12.5rem] group relative cursor-pointer "
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                  onClick={() => setActiveVideoUrl(m.url)}
-                >
-                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
-                  <div className="bg-[#181818] dark:bg-black h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
-                    <video
-                      ref={videoRef}
-                      className={`w-full h-full ${videoClass}`}
-                      src={m.url}
-                      muted
-                      loop
-                      playsInline
-                    />
+                return (
+                  <div
+                    key={i}
+                    className="h-[20rem] w-[12.5rem] group relative cursor-pointer"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onClick={() => setActiveVideoUrl(m.url)}
+                  >
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
+                    <div className="bg-[#181818] dark:bg-black h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
+                      <video
+                        ref={videoRef}
+                        className={`w-full h-full ${videoClass}`}
+                        src={m.url}
+                        muted
+                        loop
+                        playsInline
+                      />
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+          </div>
+
+          {/* Mobile Layout - responsive design */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:hidden gap-1 sm:gap-2">
+            {user?.media
+              ?.filter((m) => m.resource_type === "video")
+              .map((m, i) => {
+                const isPortrait = videoOrientations[m.url];
+                const videoClass = isPortrait !== undefined
+                  ? isPortrait
+                    ? "object-cover"
+                    : "object-contain"
+                  : "object-contain";
+
+                const videoRef = React.createRef();
+
+                const handleMouseEnter = () => {
+                  videoRef.current?.play();
+                };
+
+                const handleMouseLeave = () => {
+                  videoRef.current?.pause();
+                  videoRef.current.currentTime = 0; // optional: reset to start
+                };
+
+                return (
+                  <div
+                    key={i}
+                    className="aspect-[3/4] group relative cursor-pointer"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onClick={() => setActiveVideoUrl(m.url)}
+                  >
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
+                    <div className="bg-[#181818] dark:bg-black h-full w-full flex items-center justify-center transition-transform duration-200">
+                      <video
+                        ref={videoRef}
+                        className={`w-full h-full ${videoClass}`}
+                        src={m.url}
+                        muted
+                        loop
+                        playsInline
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+
           <ImageModal
             videoUrl={activeMedia}
             onClose={() => setActiveVideoUrl(null)}
             user={user}
           />
-
-        </div>
+        </>
       ) : (
         <div className="flex flex-col items-center justify-center space-y-5">
           <FilmIcon size={100} color="black" />

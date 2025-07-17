@@ -63,52 +63,97 @@ const Photos = () => {
   return (
     <>
       {hasPhotos ? (
-        <div className="grid grid-cols-3 max-sm:grid-cols-2 items-center justify-center gap-2">
-          {user?.media
-            ?.filter((m) => m.resource_type === "image")
-            .map((m, i) => {
-              const SmartImage = ({ src, alt = "Image", containerClass = "" }) => {
-                const [isPortrait, setIsPortrait] = useState(false);
+        <>
+          {/* Desktop Layout - preserved as requested */}
+          <div className="hidden lg:grid lg:grid-cols-3 items-center justify-center gap-2">
+            {user?.media
+              ?.filter((m) => m.resource_type === "image")
+              .map((m, i) => {
+                const SmartImage = ({ src, alt = "Image", containerClass = "" }) => {
+                  const [isPortrait, setIsPortrait] = useState(false);
 
-                useEffect(() => {
-                  const img = new window.Image(); // native Image constructor
-                  img.onload = () => {
-                    setIsPortrait(img.naturalWidth < img.naturalHeight);
-                  };
-                  img.src = src;
-                }, [src]);
+                  useEffect(() => {
+                    const img = new window.Image(); // native Image constructor
+                    img.onload = () => {
+                      setIsPortrait(img.naturalWidth < img.naturalHeight);
+                    };
+                    img.src = src;
+                  }, [src]);
 
-
+                  return (
+                    <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] dark:bg-black flex items-center justify-center overflow-hidden ${containerClass}`}>
+                      <NextImage
+                        src={src}
+                        alt={alt}
+                        fill
+                        className={`${isPortrait ? "object-cover" : "object-contain"}`}
+                      />
+                    </div>
+                  );
+                };
                 return (
-                  <div className={`h-[12.5rem] w-[12.5rem] bg-[#181818] dark:bg-black flex items-center justify-center overflow-hidden ${containerClass}`}>
-                    <NextImage
-                      src={src}
-                      alt={alt}
-                      fill
-                      className={`${isPortrait ? "object-cover" : "object-contain"}`}
-                    />
+                  <div
+                    key={i}
+                    className='group relative h-[12.5rem] w-[12.5rem]'
+                    onClick={() => setActiveImageUrl(m.url)}
+                  >
+                    <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
+                    <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
+                      <SmartImage src={m.url} alt={`image-${i}`} />
+                    </div>
                   </div>
-                );
-              };
-              return (
-                <div
-                  key={i}
-                  className='group relative h-[12.5rem] w-[12.5rem] '
-                  onClick={() => setActiveImageUrl(m.url)}
-                >
-                  <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer '></div>
-                  <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200 '>
-                    <SmartImage src={m.url} alt={`image-${i}`} />
+                )
+              })}
+          </div>
+
+          {/* Mobile Layout - responsive design */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:hidden gap-1 sm:gap-2">
+            {user?.media
+              ?.filter((m) => m.resource_type === "image")
+              .map((m, i) => {
+                const SmartImage = ({ src, alt = "Image", containerClass = "" }) => {
+                  const [isPortrait, setIsPortrait] = useState(false);
+
+                  useEffect(() => {
+                    const img = new window.Image(); // native Image constructor
+                    img.onload = () => {
+                      setIsPortrait(img.naturalWidth < img.naturalHeight);
+                    };
+                    img.src = src;
+                  }, [src]);
+
+                  return (
+                    <div className={`aspect-square bg-[#181818] dark:bg-black flex items-center justify-center overflow-hidden ${containerClass}`}>
+                      <NextImage
+                        src={src}
+                        alt={alt}
+                        fill
+                        className={`${isPortrait ? "object-cover" : "object-contain"}`}
+                      />
+                    </div>
+                  );
+                };
+                return (
+                  <div
+                    key={i}
+                    className='group relative aspect-square'
+                    onClick={() => setActiveImageUrl(m.url)}
+                  >
+                    <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
+                    <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
+                      <SmartImage src={m.url} alt={`image-${i}`} />
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+          </div>
+
           <ImageModal
             imageUrl={activeMedia}
             onClose={() => setActiveImageUrl(null)}
             user={user}
           />
-        </div>
+        </>
       ) : (
         <div className="flex flex-col items-center justify-center space-y-5">
           <ProfileShareIcon size={100} color="currentColor" />
