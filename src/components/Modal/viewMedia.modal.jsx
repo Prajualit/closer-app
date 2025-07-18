@@ -14,37 +14,57 @@ import NextImage from 'next/image';
 
 
 const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
+
     // Determine which media is active: image or video
     const activeMedia = imageUrl || videoUrl;
-    // Robustly extract postId and mediaId for all user profiles and media types
+    // Always extract postId as the user _id (owner of the media), and mediaId as the media _id
     let postId = null;
     let mediaId = null;
-    if (activeMedia?.postId && activeMedia?.mediaId) {
-        postId = activeMedia.postId;
-        mediaId = activeMedia.mediaId;
-    } else if (activeMedia?.post?._id && (activeMedia?.media?._id || activeMedia?.mediaId)) {
+    // Try to get user _id from the user prop or from activeMedia.post/userInfo
+    if (user && user._id) {
+        postId = user._id;
+    } else if (activeMedia?.userInfo?._id) {
+        postId = activeMedia.userInfo._id;
+    } else if (activeMedia?.post?._id) {
         postId = activeMedia.post._id;
-        mediaId = activeMedia.media?._id || activeMedia.mediaId;
-    } else if (activeMedia?._id && (imageUrl?.mediaId || videoUrl?.mediaId)) {
-        // Sometimes mediaId is passed in the imageUrl/videoUrl object
-        postId = activeMedia._id;
-        mediaId = imageUrl?.mediaId || videoUrl?.mediaId;
-    } else if (activeMedia?._id && activeMedia?.media?._id) {
-        postId = activeMedia._id;
+    } else if (activeMedia?.postId) {
+        postId = activeMedia.postId;
+    } else if (activeMedia?.user?._id) {
+        postId = activeMedia.user._id;
+    } else if (activeMedia?.userId) {
+        postId = activeMedia.userId;
+    }
+
+    // Try to get media _id from media prop, or from imageUrl/videoUrl/mediaId
+    if (activeMedia?.media?._id) {
         mediaId = activeMedia.media._id;
-    } else if (activeMedia?._id) {
-        postId = activeMedia._id;
+    } else if (activeMedia?.mediaId) {
+        mediaId = activeMedia.mediaId;
+    } else if (imageUrl?.mediaId) {
+        mediaId = imageUrl.mediaId;
+    } else if (videoUrl?.mediaId) {
+        mediaId = videoUrl.mediaId;
+    } else if (activeMedia?._id && activeMedia?.url) {
+        // If this is a media object itself
         mediaId = activeMedia._id;
     }
-    
+
+    // Debug logs for ID extraction
     console.log('Active Media:', activeMedia);
+    console.log('Extracted postId:', postId, 'mediaId:', mediaId);
 
     // State for interactive elements
-    const [isLiked, setIsLiked] = useState(activeMedia?.isLikedByCurrentUser || false);
-    const [likesCount, setLikesCount] = useState(activeMedia?.likesCount || 0);
-    const [commentsCount, setCommentsCount] = useState(activeMedia?.commentsCount || 0);
+    const [isLiked, setIsLiked] = useState(
+        typeof activeMedia?.isLikedByCurrentUser === 'boolean' ? activeMedia.isLikedByCurrentUser : false
+    );
+    const [likesCount, setLikesCount] = useState(
+        typeof activeMedia?.likesCount === 'number' ? activeMedia.likesCount : 0
+    );
+    const [commentsCount, setCommentsCount] = useState(
+        typeof activeMedia?.commentsCount === 'number' ? activeMedia.commentsCount : 0
+    );
     const [newComment, setNewComment] = useState('');
-    const [comments, setComments] = useState( []);
+    const [comments, setComments] = useState([]);
     const [loadingComments, setLoadingComments] = useState(false);
     const [loadingLike, setLoadingLike] = useState(false);
     const [loadingComment, setLoadingComment] = useState(false);
@@ -53,19 +73,47 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
     const videoRef = useRef(null);
     const { socket } = useSocket();
 
-    // Fetch comments on open
+    // Fetch comments and likes count on open
     useEffect(() => {
         if (!postId || !mediaId) return;
         setLoadingComments(true);
+        // Fetch comments
         makeAuthenticatedRequest(API_ENDPOINTS.GET_COMMENTS(postId, mediaId), { method: 'GET' })
             .then(async (res) => {
                 if (res.ok) {
                     const data = await res.json();
-                    setComments(data.data?.comments || []);
-                    setCommentsCount(data.data?.totalComments || 0);
+                    console.log('Fetched comments data:', data);
+                    setComments(Array.isArray(data.data?.comments) ? data.data.comments : []);
+                    setCommentsCount(
+                        typeof data.data?.totalComments === 'number' ? data.data.totalComments : 0
+                    );
+                } else {
+                    console.warn('Failed to fetch comments:', res.status);
                 }
             })
+            .catch((err) => {
+                console.error('Error fetching comments:', err);
+            })
             .finally(() => setLoadingComments(false));
+
+        // Fetch likes count
+        makeAuthenticatedRequest(API_ENDPOINTS.GET_LIKES_COUNT(postId, mediaId), { method: 'GET' })
+            .then(async (res) => {
+                if (res.ok) {
+                    const data = await res.json();
+                    if (typeof data.data?.likesCount === 'number') {
+                        setLikesCount(data.data.likesCount);
+                    }
+                    if (typeof data.data?.isLikedByCurrentUser === 'boolean') {
+                        setIsLiked(data.data.isLikedByCurrentUser);
+                    }
+                } else {
+                    console.warn('Failed to fetch likes count:', res.status);
+                }
+            })
+            .catch((err) => {
+                console.error('Error fetching likes count:', err);
+            });
     }, [postId, mediaId]);
 
     // Real-time updates via socket
@@ -98,7 +146,7 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
         setLoadingLike(true);
         const newLikedState = !isLiked;
         setIsLiked(newLikedState);
-        setLikesCount((prev) => newLikedState ? prev + 1 : prev - 1);
+        setLikesCount((prev) => newLikedState ? Math.max(0, prev + 1) : Math.max(0, prev - 1));
         try {
             const endpoint = newLikedState ? API_ENDPOINTS.LIKE_POST : API_ENDPOINTS.UNLIKE_POST;
             const res = await makeAuthenticatedRequest(endpoint, {
@@ -107,15 +155,25 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
             });
             if (res.ok) {
                 const data = await res.json();
-                setLikesCount(data.data?.likesCount ?? (newLikedState ? likesCount + 1 : likesCount - 1));
-                setIsLiked(data.data?.isLikedByCurrentUser ?? newLikedState);
+                console.log('Like API response:', data);
+                setLikesCount(
+                    typeof data.data?.likesCount === 'number'
+                        ? data.data.likesCount
+                        : (newLikedState ? likesCount + 1 : Math.max(0, likesCount - 1))
+                );
+                setIsLiked(
+                    typeof data.data?.isLikedByCurrentUser === 'boolean'
+                        ? data.data.isLikedByCurrentUser
+                        : newLikedState
+                );
             } else {
                 setIsLiked(!newLikedState);
-                setLikesCount((prev) => newLikedState ? prev - 1 : prev + 1);
+                setLikesCount((prev) => newLikedState ? Math.max(0, prev - 1) : prev + 1);
             }
         } catch (e) {
             setIsLiked(!newLikedState);
-            setLikesCount((prev) => newLikedState ? prev - 1 : prev + 1);
+            setLikesCount((prev) => newLikedState ? Math.max(0, prev - 1) : prev + 1);
+            console.error('Like API error:', e);
         } finally {
             setLoadingLike(false);
         }
@@ -133,12 +191,21 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
             });
             if (res.ok) {
                 const data = await res.json();
+                console.log('Add comment API response:', data);
                 if (data.success && data.data?.comment) {
                     setComments((prev) => [data.data.comment, ...prev]);
-                    setCommentsCount(data.data?.commentsCount || (commentsCount + 1));
+                    setCommentsCount(
+                        typeof data.data?.commentsCount === 'number'
+                            ? data.data.commentsCount
+                            : commentsCount + 1
+                    );
                     setNewComment('');
                 }
+            } else {
+                console.warn('Failed to add comment:', res.status);
             }
+        } catch (e) {
+            console.error('Add comment error:', e);
         } finally {
             setLoadingComment(false);
         }
@@ -160,7 +227,8 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
     // Get the media URL - handle both object with url property and direct URL
     const getMediaUrl = (media) => {
         if (!media) return null;
-        return media.url || media;
+        if (typeof media === 'string') return media;
+        return media.url || null;
     };
 
     return (
@@ -246,26 +314,50 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                             ) : comments.length === 0 ? (
                                 <div className="text-center text-neutral-500 py-2">No comments yet.</div>
                             ) : (
-                                comments.map((comment) => (
-                                    <div key={comment._id} className="flex items-start space-x-2 mb-2">
-                                        <div className='w-[28px] h-[28px] rounded-full overflow-hidden'>
-                                            <NextImage
-                                                src={comment.userId?.avatarUrl || '/default-avatar.svg'}
-                                                width={28}
-                                                height={28}
-                                                className="rounded-full object-cover"
-                                                alt={comment.userId?.username || 'User'}
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="bg-neutral-100 dark:bg-neutral-800 rounded-[8px] px-3 py-2 space-y-1 flex flex-col">
-                                                <span className="font-semibold text-sm mr-1">{comment.userId?.username}</span>
-                                                <span className="text-sm font-light text-neutral-900 dark:text-white">{comment.text}</span>
+                                (() => {
+                                    console.log('Rendering comments:', comments);
+                                    return comments.map((comment, idx) => {
+                                        let username = 'User';
+                                        let avatarUrl = '/default-avatar.svg';
+                                        // Defensive: handle both populated and unpopulated userId
+                                        if (comment.userId && typeof comment.userId === 'object') {
+                                            username = comment.userId.username || 'User';
+                                            avatarUrl = comment.userId.avatarUrl || '/default-avatar.svg';
+                                        } else if (comment.username) {
+                                            username = comment.username;
+                                        }
+                                        // Fallback for missing text or createdAt
+                                        const text = comment.text || '[No text]';
+                                        let createdAt = '';
+                                        try {
+                                            createdAt = comment.createdAt ? new Date(comment.createdAt).toLocaleString() : '';
+                                        } catch (e) {
+                                            createdAt = '';
+                                        }
+                                        return (
+                                            <div key={comment._id || idx} className="flex items-start space-x-2 mb-2">
+                                                <div className='w-[28px] h-[28px] rounded-full overflow-hidden'>
+                                                    <NextImage
+                                                        src={avatarUrl}
+                                                        width={28}
+                                                        height={28}
+                                                        className="rounded-full object-cover"
+                                                        alt={username}
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="bg-neutral-100 dark:bg-neutral-800 rounded-[8px] px-3 py-2 space-y-1 flex flex-col">
+                                                        <span className="font-semibold text-sm mr-1">{username}</span>
+                                                        <span className="text-sm font-light text-neutral-900 dark:text-white">{text}</span>
+                                                    </div>
+                                                    {createdAt && (
+                                                        <span className="text-[10px] text-neutral-500 ml-2">{createdAt}</span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <span className="text-[10px] text-neutral-500 ml-2">{new Date(comment.createdAt).toLocaleString()}</span>
-                                        </div>
-                                    </div>
-                                ))
+                                        );
+                                    });
+                                })()
                             )}
                         </div>
 

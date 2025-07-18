@@ -6,23 +6,49 @@ import { Like } from "../models/like.model.js";
 import { Comment } from "../models/comment.model.js";
 import { notifyLike, notifyComment } from "./notification.controller.js";
 
+// Get likes count and like status for a post/media
+const getLikesCount = asyncHandler(async (req, res) => {
+  let { postId, mediaId } = req.params;
+  const userId = req.user._id;
+  postId = postId?.toString();
+  mediaId = mediaId?.toString();
+
+  // Count likes
+  const likesCount = await Like.countDocuments({ postId, mediaId });
+  // Check if current user liked
+  const isLikedByCurrentUser = !!(await Like.findOne({
+    postId,
+    mediaId,
+    userId,
+  }));
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { likesCount, isLikedByCurrentUser },
+        "Likes count fetched successfully"
+      )
+    );
+});
 // Get all posts from all users with pagination
 const getAllPosts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, type } = req.query;
   const skip = (page - 1) * limit;
   const currentUserId = req.user._id;
 
-  console.log('getAllPosts called with:', { page, limit, type, currentUserId });
+  console.log("getAllPosts called with:", { page, limit, type, currentUserId });
 
   // Build match criteria for media type filtering
   const matchCriteria = {};
-  if (type === 'video') {
-    matchCriteria['media.resource_type'] = 'video';
-  } else if (type === 'image') {
-    matchCriteria['media.resource_type'] = 'image';
+  if (type === "video") {
+    matchCriteria["media.resource_type"] = "video";
+  } else if (type === "image") {
+    matchCriteria["media.resource_type"] = "image";
   }
 
-  console.log('Match criteria:', matchCriteria);
+  console.log("Match criteria:", matchCriteria);
 
   // Get all users with their media, sorted by upload date
   const posts = await User.aggregate([
@@ -30,7 +56,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
       $unwind: "$media",
     },
     // Add type filtering if specified
-    ...(Object.keys(matchCriteria).length > 0 ? [{ $match: matchCriteria }] : []),
+    ...(Object.keys(matchCriteria).length > 0
+      ? [{ $match: matchCriteria }]
+      : []),
     {
       $lookup: {
         from: "users",
@@ -105,7 +133,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
             $sort: { createdAt: -1 },
           },
           {
-            $limit: 3,
+            $limit: 10,
           },
         ],
         as: "comments",
@@ -151,13 +179,13 @@ const getAllPosts = asyncHandler(async (req, res) => {
     },
   ]);
 
-  console.log('Posts found:', posts.length);
-  console.log('First post sample:', posts[0] ? {
-    id: posts[0]._id,
-    username: posts[0].username,
-    mediaType: posts[0].media?.resource_type,
-    mediaUrl: posts[0].media?.url
-  } : 'No posts');
+  // console.log('Posts found:', posts.length);
+  // console.log('First post sample:', posts[0] ? {
+  //   id: posts[0]._id,
+  //   username: posts[0].username,
+  //   mediaType: posts[0].media?.resource_type,
+  //   mediaUrl: posts[0].media?.url
+  // } : 'No posts');
 
   return res.status(200).json(
     new ApiResponse(
@@ -197,7 +225,7 @@ const likePost = asyncHandler(async (req, res) => {
       try {
         await notifyLike(userId, postId, postId);
       } catch (error) {
-        console.warn('Failed to send like notification:', error.message);
+        console.warn("Failed to send like notification:", error.message);
       }
     }
 
@@ -252,7 +280,7 @@ const unlikePost = asyncHandler(async (req, res) => {
 
 // Add comment to post
 const addComment = asyncHandler(async (req, res) => {
-  const { postId, mediaId, text } = req.body;
+  let { postId, mediaId, text } = req.body;
   const userId = req.user._id;
 
   if (!postId || !mediaId || !text) {
@@ -262,6 +290,10 @@ const addComment = asyncHandler(async (req, res) => {
   if (text.trim().length === 0) {
     throw new ApiError(400, "Comment cannot be empty");
   }
+
+  // Always save as strings for consistent querying
+  postId = postId.toString();
+  mediaId = mediaId.toString();
 
   const newComment = await Comment.create({
     userId,
@@ -275,7 +307,7 @@ const addComment = asyncHandler(async (req, res) => {
     try {
       await notifyComment(userId, postId, postId, newComment._id);
     } catch (error) {
-      console.warn('Failed to send comment notification:', error.message);
+      console.warn("Failed to send comment notification:", error.message);
     }
   }
 
@@ -301,18 +333,34 @@ const addComment = asyncHandler(async (req, res) => {
 
 // Get comments for a post
 const getComments = asyncHandler(async (req, res) => {
-  const { postId, mediaId } = req.params;
+  let { postId, mediaId } = req.params;
   const { page = 1, limit = 20 } = req.query;
   const skip = (page - 1) * limit;
 
-  const comments = await Comment.find({ postId, mediaId })
+  // Ensure both are strings for matching
+  postId = postId?.toString();
+  mediaId = mediaId?.toString();
+
+  console.log("getComments called with:", { postId, mediaId, page, limit });
+
+  const query = { postId, mediaId };
+  console.log("MongoDB query:", query);
+
+  const comments = await Comment.find(query)
     .populate("userId", "username avatarUrl")
     .sort({ createdAt: -1 })
     .skip(parseInt(skip))
     .limit(parseInt(limit))
     .lean();
 
-  const totalComments = await Comment.countDocuments({ postId, mediaId });
+  const totalComments = await Comment.countDocuments(query);
+
+  console.log(
+    "Comments found:",
+    comments.length,
+    "First comment:",
+    comments[0]
+  );
 
   return res.status(200).json(
     new ApiResponse(
@@ -387,4 +435,5 @@ export {
   getComments,
   getSuggestedUsers,
   getUserActivity,
+  getLikesCount,
 };

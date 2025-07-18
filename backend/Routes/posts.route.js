@@ -6,7 +6,8 @@ import {
   addComment,
   getComments,
   getSuggestedUsers,
-  getUserActivity
+  getUserActivity,
+  getLikesCount
 } from "../controllers/posts.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
@@ -21,6 +22,8 @@ router.route("/like").post(likePost);
 router.route("/unlike").post(unlikePost);
 router.route("/comment").post(addComment);
 router.route("/comments/:postId/:mediaId").get(getComments);
+// Likes count for a post/media
+router.route("/likes/:postId/:mediaId").get(getLikesCount);
 
 // User related routes
 router.route("/suggested-users").get(getSuggestedUsers);

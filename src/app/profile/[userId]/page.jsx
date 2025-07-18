@@ -17,11 +17,13 @@ const ProfilePage = () => {
     const params = useParams();
     const router = useRouter();
     const userId = params.userId;
-    
+
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [photos, setPhotos] = useState([]);
     const [films, setFilms] = useState([]);
+    // Store likes/comments for each media by id
+    const [mediaStats, setMediaStats] = useState({});
     const [isFollowing, setIsFollowing] = useState(false);
     const [activeNav, setActiveNav] = useState("PHOTOS");
     const [videoOrientations, setVideoOrientations] = useState({});
@@ -71,7 +73,7 @@ const ProfilePage = () => {
             const response = await fetch(API_ENDPOINTS.USER_PROFILE(userId), {
                 credentials: 'include',
             });
-            
+
             if (!response.ok) {
                 if (response.status === 404) {
                     toast({
@@ -171,22 +173,22 @@ const ProfilePage = () => {
             if (data.success) {
                 // Update follow status
                 setIsFollowing(!isFollowing);
-                
+
                 // Update follower count immediately
                 setProfile(prevProfile => ({
                     ...prevProfile,
-                    followersCount: isFollowing 
-                        ? (prevProfile.followersCount || 1) - 1 
+                    followersCount: isFollowing
+                        ? (prevProfile.followersCount || 1) - 1
                         : (prevProfile.followersCount || 0) + 1
                 }));
-                
+
                 // Update current user's following count in Redux
                 dispatch(updateUser({
-                    followingCount: isFollowing 
-                        ? (currentUser.followingCount || 1) - 1 
+                    followingCount: isFollowing
+                        ? (currentUser.followingCount || 1) - 1
                         : (currentUser.followingCount || 0) + 1
                 }));
-                
+
                 toast({
                     title: 'Success',
                     description: isFollowing ? 'Unfollowed successfully' : 'Following successfully',
@@ -214,9 +216,74 @@ const ProfilePage = () => {
     };
 
     const handleImageClick = (media, isVideo = false) => {
-        setSelectedMedia(isVideo ? { videoUrl: media } : { imageUrl: media });
+        // Attach postId and mediaId for modal to use
+        let modalMedia;
+        if (isVideo) {
+            modalMedia = {
+                ...media,
+                postId: profile?._id,
+                mediaId: media._id || media.mediaId || media.id || media.url,
+            };
+            setSelectedMedia({ videoUrl: modalMedia });
+        } else {
+            modalMedia = {
+                ...media,
+                postId: profile?._id,
+                mediaId: media._id || media.mediaId || media.id || media.url,
+            };
+            setSelectedMedia({ imageUrl: modalMedia });
+        }
         setSelectedUser(profile);
     };
+
+    // Fetch likes/comments for all media (photos and films)
+    useEffect(() => {
+        const fetchStats = async () => {
+            const allMedia = [
+                ...photos.map((photo) => ({
+                    type: 'photo',
+                    _id: photo._id || photo.mediaId || photo.id || photo.url, // fallback to url if no id
+                    postId: profile?._id,
+                    mediaId: photo._id || photo.mediaId || photo.id || photo.url,
+                })),
+                ...films.map((film) => ({
+                    type: 'film',
+                    _id: film._id || film.mediaId || film.id || film.url,
+                    postId: profile?._id,
+                    mediaId: film._id || film.mediaId || film.id || film.url,
+                })),
+            ];
+            const stats = {};
+            await Promise.all(
+                allMedia.map(async (media) => {
+                    try {
+                        // Likes
+                        const likesRes = await fetch(
+                            API_ENDPOINTS.GET_LIKES_COUNT(media.postId, media.mediaId),
+                            { credentials: 'include' }
+                        );
+                        const likesData = likesRes.ok ? await likesRes.json() : {};
+                        // Comments
+                        const commentsRes = await fetch(
+                            API_ENDPOINTS.GET_COMMENTS(media.postId, media.mediaId),
+                            { credentials: 'include' }
+                        );
+                        const commentsData = commentsRes.ok ? await commentsRes.json() : {};
+                        stats[media._id] = {
+                            likesCount: likesData?.data?.likesCount ?? 0,
+                            commentsCount: commentsData?.data?.totalComments ?? 0,
+                        };
+                    } catch (e) {
+                        stats[media._id] = { likesCount: 0, commentsCount: 0 };
+                    }
+                })
+            );
+            setMediaStats(stats);
+        };
+        if (profile && (photos.length > 0 || films.length > 0)) {
+            fetchStats();
+        }
+    }, [profile, photos, films]);
 
     const handleCloseModal = () => {
         setSelectedMedia(null);
@@ -492,12 +559,12 @@ const ProfilePage = () => {
                 {/* Profile section - Userdata component style */}
                 <div className="flex items-center justify-center w-full space-x-32">
                     <div className='w-[250px] h-[250px] rounded-full overflow-hidden relative'>
-                        <Image 
-                            height={250} 
-                            width={250} 
-                            className="rounded-full object-cover w-full h-full bg-center" 
-                            src={profile.avatarUrl} 
-                            alt="" 
+                        <Image
+                            height={250}
+                            width={250}
+                            className="rounded-full object-cover w-full h-full bg-center"
+                            src={profile.avatarUrl}
+                            alt=""
                         />
                     </div>
                     <div className="flex flex-col space-y-3 items-start">
@@ -519,14 +586,14 @@ const ProfilePage = () => {
                                 </LoadingButton>
                                 <Button
                                     onClick={handleMessage}
-                                    className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-5 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white" 
+                                    className="flex items-center group justify-center border border-neutral-200 dark:border-neutral-700 rounded-[5px] px-5 !w-fit hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                                 >
                                     <MessageCircle className="w-4 h-4" />
                                     <span>Message</span>
                                 </Button>
                             </div>
                         )}
-                        
+
                         {/* Stats */}
                         <div className="flex space-x-8">
                             <div className="text-center">
@@ -575,18 +642,26 @@ const ProfilePage = () => {
                     <>
                         {hasPhotos ? (
                             <div className="grid grid-cols-3 items-center justify-center gap-2">
-                                {photos.map((photo, i) => (
-                                    <div
-                                        key={i}
-                                        className='group relative h-[12.5rem] w-[12.5rem] cursor-pointer'
-                                        onClick={() => handleImageClick({ url: photo.url || photo, caption: photo.caption, uploadedAt: photo.uploadedAt })}
-                                    >
-                                        <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
-                                        <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
-                                            <SmartImage src={photo.url || photo} alt={`image-${i}`} />
+                                {photos.map((photo, i) => {
+                                    return (
+                                        <div
+                                            key={i}
+                                            className='group relative h-[12.5rem] w-[12.5rem] cursor-pointer'
+                                            onClick={() => handleImageClick({
+                                                ...photo,
+                                                url: photo.url || photo,
+                                                caption: photo.caption,
+                                                uploadedAt: photo.uploadedAt,
+                                                _id: photo._id || photo.mediaId || photo.id || photo.url,
+                                            }, false)}
+                                        >
+                                            <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
+                                            <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
+                                                <SmartImage src={photo.url || photo} alt={`image-${i}`} />
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center space-y-5">
@@ -605,31 +680,35 @@ const ProfilePage = () => {
                         {hasFilms ? (
                             <div className="grid grid-cols-3 items-center justify-center gap-2">
                                 {films.map((film, i) => {
+                                    const id = film._id || film.mediaId || film.id || film.url;
+                                    const stats = mediaStats[id] || { likesCount: 0, commentsCount: 0 };
                                     const isPortrait = videoOrientations[film.url || film];
                                     const videoClass = isPortrait !== undefined
                                         ? isPortrait
                                             ? "object-cover"
                                             : "object-contain"
                                         : "object-contain";
-
                                     const videoRef = React.createRef();
-
                                     const handleMouseEnter = () => {
                                         videoRef.current?.play();
                                     };
-
                                     const handleMouseLeave = () => {
                                         videoRef.current?.pause();
                                         videoRef.current.currentTime = 0;
                                     };
-
                                     return (
                                         <div
                                             key={i}
                                             className="h-[20rem] w-[12.5rem] group relative cursor-pointer"
                                             onMouseEnter={handleMouseEnter}
                                             onMouseLeave={handleMouseLeave}
-                                            onClick={() => handleImageClick({ url: film.url || film, caption: film.caption, uploadedAt: film.uploadedAt }, true)}
+                                            onClick={() => handleImageClick({
+                                                ...film,
+                                                url: film.url || film,
+                                                caption: film.caption,
+                                                uploadedAt: film.uploadedAt,
+                                                _id: film._id || film.mediaId || film.id || film.url,
+                                            }, true)}
                                         >
                                             <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
                                             <div className="bg-[#181818] h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
@@ -641,6 +720,11 @@ const ProfilePage = () => {
                                                     loop
                                                     playsInline
                                                 />
+                                            </div>
+                                            {/* Overlay for likes/comments */}
+                                            <div className="absolute bottom-2 left-2 flex space-x-3 bg-black/60 rounded px-2 py-1 text-white text-xs">
+                                                <span>❤️ {stats.likesCount}</span>
+                                                <span>💬 {stats.commentsCount}</span>
                                             </div>
                                         </div>
                                     );
@@ -701,7 +785,7 @@ const ProfilePage = () => {
                                 </Button>
                             </div>
                         )}
-                        
+
                         {/* Stats */}
                         <div className="flex space-x-6 sm:space-x-8">
                             <div className="text-center">
@@ -729,11 +813,10 @@ const ProfilePage = () => {
                             {navComp.map((nav) => (
                                 <button
                                     key={nav.name}
-                                    className={`flex flex-col items-center space-y-2 py-2 px-4 transition-all duration-300 ${
-                                        activeNav === nav.name 
-                                            ? "text-neutral-900 dark:text-white border-b-2 border-neutral-900 dark:border-white" 
+                                    className={`flex flex-col items-center space-y-2 py-2 px-4 transition-all duration-300 ${activeNav === nav.name
+                                            ? "text-neutral-900 dark:text-white border-b-2 border-neutral-900 dark:border-white"
                                             : "text-neutral-500 dark:text-neutral-400"
-                                    }`}
+                                        }`}
                                     onClick={() => setActiveNav(nav.name)}
                                 >
                                     {nav.icon}
@@ -753,7 +836,13 @@ const ProfilePage = () => {
                                             <div
                                                 key={i}
                                                 className='group relative aspect-square'
-                                                onClick={() => handleImageClick(photo, false)}
+                                                onClick={() => handleImageClick({
+                                                    ...photo,
+                                                    url: photo.url || photo,
+                                                    caption: photo.caption,
+                                                    uploadedAt: photo.uploadedAt,
+                                                    _id: photo._id || photo.mediaId || photo.id || photo.url,
+                                                }, false)}
                                             >
                                                 <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
                                                 <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
@@ -806,7 +895,13 @@ const ProfilePage = () => {
                                                     className="aspect-[3/4] group relative cursor-pointer"
                                                     onMouseEnter={handleMouseEnter}
                                                     onMouseLeave={handleMouseLeave}
-                                                    onClick={() => handleImageClick({ url: film.url || film, caption: film.caption, uploadedAt: film.uploadedAt }, true)}
+                                                    onClick={() => handleImageClick({
+                                                        ...film,
+                                                        url: film.url || film,
+                                                        caption: film.caption,
+                                                        uploadedAt: film.uploadedAt,
+                                                        _id: film._id || film.mediaId || film.id || film.url,
+                                                    }, true)}
                                                 >
                                                     <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
                                                     <div className="bg-[#181818] h-full w-full flex items-center justify-center transition-transform duration-200">
@@ -835,7 +930,7 @@ const ProfilePage = () => {
                     </div>
                 </div>
             </div>
-            
+
             {/* Image/Video Modal */}
             {selectedMedia && (
                 <ImageModal

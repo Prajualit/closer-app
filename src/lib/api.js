@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
   UNLIKE_POST: `${API_BASE_URL}/api/v1/posts/unlike`,
   ADD_COMMENT: `${API_BASE_URL}/api/v1/posts/comment`,
   GET_COMMENTS: (postId, mediaId) => `${API_BASE_URL}/api/v1/posts/comments/${postId}/${mediaId}`,
+  GET_LIKES_COUNT: (postId, mediaId) => `${API_BASE_URL}/api/v1/posts/likes/${postId}/${mediaId}`,
   SUGGESTED_USERS: `${API_BASE_URL}/api/v1/posts/suggested-users`,
   USER_ACTIVITY: `${API_BASE_URL}/api/v1/posts/user-activity`,
   
