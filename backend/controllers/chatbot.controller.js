@@ -107,6 +107,10 @@ const getChatbotMessages = asyncHandler(async (req, res) => {
 
 const getChatbotResponse = asyncHandler(async (req, res) => {
     try {
+        // Debug: Log if Gemini API key is present
+        if (!process.env.GEMINI_API_KEY) {
+            console.error('Gemini API key is missing!');
+        }
         const { message } = req.body;
         const currentUserId = req.user._id;
         const chatId = `chatbot-${currentUserId}`;
@@ -160,8 +164,16 @@ const getChatbotResponse = asyncHandler(async (req, res) => {
             },
         ];
 
-        // Use chat history if available, otherwise use initial context
-        const chatHistoryToUse = historyFormatted.length > 0 ? historyFormatted : initialHistory;
+        // Ensure chat history always starts with a 'user' role (Gemini API requirement)
+        let chatHistoryToUse;
+        if (historyFormatted.length === 0) {
+            chatHistoryToUse = initialHistory;
+        } else if (historyFormatted[0].role !== 'user') {
+            // Prepend the initial user prompt if first message is not from user
+            chatHistoryToUse = [initialHistory[0], ...historyFormatted];
+        } else {
+            chatHistoryToUse = historyFormatted;
+        }
 
         // Create a chat session with context
         const chat = model.startChat({
@@ -200,8 +212,11 @@ const getChatbotResponse = asyncHandler(async (req, res) => {
         );
 
     } catch (error) {
+        // Log error with stack trace for better debugging
         console.error('Chatbot error:', error);
-        
+        if (error && error.stack) {
+            console.error('Error stack:', error.stack);
+        }
         // Fallback response if AI fails
         const fallbackResponses = [
             "Aw, I'm having a bit of trouble thinking right now! 😅 Could you try asking me that again? I really want to help!",
