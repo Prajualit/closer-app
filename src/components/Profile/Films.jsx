@@ -120,7 +120,7 @@ const Films = () => {
                     onMouseLeave={handleMouseLeave}
                     onClick={() => setActiveVideoUrl(m.url)}
                   >
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 group-focus-within:opacity-60 cursor-pointer transition-opacity duration-300 "></div>
                     <div className="bg-[#181818] dark:bg-black h-[20rem] w-[12.5rem] flex items-center justify-center transition-transform duration-200">
                       <video
                         ref={videoRef}
@@ -167,7 +167,7 @@ const Films = () => {
                     onMouseLeave={handleMouseLeave}
                     onClick={() => setActiveVideoUrl(m.url)}
                   >
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer"></div>
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 group-focus-within:opacity-60 cursor-pointer transition-opacity duration-300 "></div>
                     <div className="bg-[#181818] dark:bg-black h-full w-full flex items-center justify-center transition-transform duration-200">
                       <video
                         ref={videoRef}
