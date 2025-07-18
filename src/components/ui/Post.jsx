@@ -211,7 +211,7 @@ const Post = ({ post, onLike, onComment }) => {
     }
 
     return (
-        <div className='w-full max-w-[470px] sm:max-w-[500px] bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700'>
+        <div className='w-full  bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700'>
             {/* Post Header */}
             <div className='p-3 sm:p-4 flex items-center justify-start space-x-2 sm:space-x-3'>
                 <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
@@ -221,7 +221,9 @@ const Post = ({ post, onLike, onComment }) => {
                         src={post.avatarUrl || '/default-avatar.svg'}
                         alt={`${post.username}'s avatar`}
                         onError={(e) => {
-                            e.target.src = '/default-avatar.svg'
+                            if (e && e.target) {
+                                e.target.src = '/default-avatar.svg';
+                            }
                         }}
                     />
                 </div>
@@ -245,8 +247,12 @@ const Post = ({ post, onLike, onComment }) => {
                         playsInline
                         preload="metadata"
                         onError={(e) => {
-                            e.target.style.display = 'none'
-                            e.target.nextSibling.style.display = 'flex'
+                            if (e && e.target) {
+                                e.target.style.display = 'none';
+                                if (e.target.nextSibling) {
+                                    e.target.nextSibling.style.display = 'flex';
+                                }
+                            }
                         }}
                     >
                         <source src={post.media.url} type="video/mp4" />
@@ -259,7 +265,9 @@ const Post = ({ post, onLike, onComment }) => {
                         src={post.media.url || '/placeholder-image.svg'}
                         alt={post.media.caption || 'Post media'}
                         onError={(e) => {
-                            e.target.src = '/placeholder-image.svg'
+                            if (e && e.target) {
+                                e.target.src = '/placeholder-image.svg';
+                            }
                         }}
                     />
                 )}
