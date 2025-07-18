@@ -212,15 +212,15 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
     return (
         <Dialog open={!!imageUrl || !!videoUrl} onOpenChange={onClose}>
             <DialogContent
-                className="w-[95vw] sm:w-[90vw] lg:w-[85vw] xl:w-[80vw] max-w-7xl h-auto max-h-[90vh] border-none p-0 gap-0 !rounded-lg overflow-hidden bg-transparent outline-none"
+                className="w-[95vw] sm:w-[90vw] lg:w-[85vw] xl:w-[80vw] max-w-7xl h-[90vh] max-h-[90vh] border-none p-0 gap-0 !rounded-lg overflow-hidden bg-transparent outline-none flex flex-col"
             >
                 <DialogTitle>
                     <span style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>
                         Media Viewer
                     </span>
                 </DialogTitle>
-                <div className="flex flex-col lg:flex-row w-full h-full max-h-[90vh]">
-                    <div className="w-full lg:flex-1 bg-black rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none flex max-lg:h-full items-center justify-center overflow-hidden">
+                <div className="flex flex-col lg:flex-row w-full h-full min-h-0 max-h-[90vh] flex-1">
+                    <div className="w-full lg:flex-1 h-full min-h-0 bg-black rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none flex items-center justify-center overflow-hidden">
                         {videoUrl ? (
                             <video
                                 src={getMediaUrl(videoUrl)}
@@ -243,8 +243,8 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                             <span className="text-white">No media available</span>
                         )}
                     </div>
-                    <div className="w-full lg:w-80 xl:w-96 bg-white dark:bg-neutral-900 rounded-b-lg lg:rounded-r-lg max-lg:h-[90%] lg:rounded-bl-none overflow-hidden flex flex-col">
-                        <div className="flex-1 overflow-y-auto">
+                    <div className="w-full lg:w-80 xl:w-96 h-full min-h-0 bg-white dark:bg-neutral-900 rounded-b-lg lg:rounded-r-lg max-lg:h-[90%] lg:rounded-bl-none overflow-hidden flex flex-col">
+                        <div className="flex-1 min-h-0 overflow-y-auto">
                             <div className="flex-shrink-0 h-14 flex max-lg:hidden items-center px-4 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10">
                                 <div className='relative w-10 h-10 flex-shrink-0 mr-3'>
                                     <NextImage
