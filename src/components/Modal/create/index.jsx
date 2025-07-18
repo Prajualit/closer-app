@@ -126,7 +126,7 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange, isMobile }) => {
                 </DialogTrigger>
             )}
 
-            <DialogContent className="bg-white dark:bg-neutral-900 h-[95vh] w-[98vw] sm:h-[85vh] sm:w-[80vw] md:w-[60vw] lg:w-[45vw] xl:w-[35vw] border-neutral-200 dark:border-neutral-700 max-w-none sm:max-w-[600px] p-3 sm:p-6 overflow-y-auto">
+            <DialogContent className="bg-white dark:bg-neutral-900 h-[85vh] w-[90vw] sm:w-[80vw] md:w-[60vw] lg:w-[45vw] xl:w-[35vw] border-neutral-200 dark:border-neutral-700 max-w-none sm:max-w-[600px] p-3 sm:p-6 overflow-y-auto">
                 <DialogHeader className="pb-2 sm:pb-4">
                     <DialogTitle className="text-neutral-900 dark:text-white text-base sm:text-lg md:text-xl">Create New Post</DialogTitle>
                 </DialogHeader>
@@ -188,7 +188,7 @@ const CreateModal = ({ nav, activeNav, open, onOpenChange, isMobile }) => {
                             <Button
                                 variant="outline"
                                 onClick={() => inputRef.current?.click()}
-                                className="rounded-[8px] hover:bg-black hover:text-white text-black duration-300 dark:hover:bg-neutral-200 dark:hover:text-black dark:text-neutral-100 w-full sm:w-auto text-xs sm:text-sm px-3 py-2 sm:px-4"
+                                className="rounded-[8px] hover:bg-black hover:text-white text-black duration-300 dark:hover:bg-neutral-200 dark:hover:text-black dark:text-neutral-100 w-auto text-xs sm:text-sm px-3 py-2 sm:px-4"
                             >
                                 {file ? "Change File" : "Select from Computer"}
                             </Button>
