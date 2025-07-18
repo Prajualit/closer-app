@@ -211,48 +211,41 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
 
     return (
         <Dialog open={!!imageUrl || !!videoUrl} onOpenChange={onClose}>
-            <DialogContent className="w-[95vw] sm:w-[90vw] lg:w-[85vw] xl:w-[80vw] max-w-7xl h-[90vh] border-none p-0 gap-0 !rounded-lg overflow-hidden bg-transparent outline-none">
-                <DialogTitle className="sr-only">Media Viewer</DialogTitle>
+            <DialogContent
+                className="w-[95vw] sm:w-[90vw] lg:w-[85vw] xl:w-[80vw] max-w-7xl h-auto max-h-[90vh] border-none p-0 gap-0 !rounded-lg overflow-hidden bg-transparent outline-none"
+            >
+                <DialogTitle>
+                    <span style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>
+                        Media Viewer
+                    </span>
+                </DialogTitle>
                 <div className="flex flex-col lg:flex-row w-full h-full max-h-[90vh]">
-                    {/* Media Section */}
-                    <div className="w-full lg:flex-1 bg-black rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none overflow-hidden flex items-center justify-center">
+                    <div className="w-full lg:flex-1 bg-black rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none flex max-lg:h-full items-center justify-center overflow-hidden">
                         {videoUrl ? (
-                            <div className="w-full h-full flex items-center justify-center">
-                                <video
-                                    ref={videoRef}
-                                    src={getMediaUrl(videoUrl)}
-                                    controls
-                                    playsInline
-                                    autoPlay={false}
-                                    className="object-contain bg-black w-full h-full max-h-[90vh] max-w-full"
-                                    style={{ background: 'black', display: 'block' }}
-                                />
-                            </div>
+                            <video
+                                src={getMediaUrl(videoUrl)}
+                                controls
+                                playsInline
+                                className="object-contain w-full h-full max-h-[calc(90vh-250px)] lg:max-h-[90vh]"
+                            />
                         ) : imageUrl ? (
-                            <div className="relative w-full h-full flex items-center justify-center">
+                            <div className="relative w-full h-full min-h-[300px] lg:min-h-full">
                                 <NextImage
                                     src={getMediaUrl(imageUrl)}
-                                    alt={`Enlarged view of ${user?.name || 'the media'}`}
+                                    alt={`Enlarged view`}
                                     fill
                                     className="object-contain"
                                     priority
-                                    sizes="(max-width: 1024px) 100vw, (max-width: 1920px) 70vw, 60vw"
+                                    sizes="(max-width: 1024px) 100vw, 50vw"
                                 />
                             </div>
                         ) : (
-                            <div className="flex items-center justify-center w-full h-full">
-                                <span className="text-white text-sm">No media available</span>
-                            </div>
+                            <span className="text-white">No media available</span>
                         )}
                     </div>
-
-                    {/* Info Section - FIXED HEIGHT WITH SCROLLABLE CONTENT */}
-                    <div className="w-full lg:w-80 xl:w-96 bg-white dark:bg-neutral-900 rounded-b-lg lg:rounded-r-lg lg:rounded-bl-none overflow-hidden flex flex-col h-full max-h-[90vh] lg:max-h-[90vh]">
-
-                        {/* Scrollable Content Container */}
+                    <div className="w-full lg:w-80 xl:w-96 bg-white dark:bg-neutral-900 rounded-b-lg lg:rounded-r-lg max-lg:h-[90%] lg:rounded-bl-none overflow-hidden flex flex-col">
                         <div className="flex-1 overflow-y-auto">
-                            {/* Header with User Info */}
-                            <div className="flex-shrink-0 h-14 flex items-center px-4 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10">
+                            <div className="flex-shrink-0 h-14 flex max-lg:hidden items-center px-4 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10">
                                 <div className='relative w-10 h-10 flex-shrink-0 mr-3'>
                                     <NextImage
                                         src={user?.avatarUrl || '/default-avatar.svg'}
@@ -265,10 +258,8 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                                     {user?.name || user?.username || 'Unknown User'}
                                 </span>
                             </div>
-
-                            {/* Caption Section */}
                             <div className="flex-shrink-0 p-4 pb-2">
-                                <div className="mb-1">
+                                <div className="mb-1 ">
                                     <span className="font-semibold text-sm text-neutral-900 dark:text-white mr-2">
                                         {user?.username || user?.name || 'unknown'}
                                     </span>
@@ -286,8 +277,6 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                                     </div>
                                 )}
                             </div>
-
-                            {/* Comments Section */}
                             <div className="border-t border-neutral-200 dark:border-neutral-700">
                                 <div className="px-4 pt-4 pb-2">
                                     <h1 className='text-lg font-semibold'>Comments</h1>
@@ -343,10 +332,7 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Fixed Bottom Section - Like/Comment/Share + Input */}
                         <div className="flex-shrink-0 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700">
-                            {/* Like, Comment, Share Row */}
                             <div className="p-4 pb-2">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-4">
@@ -377,8 +363,6 @@ const ImageModal = ({ imageUrl, onClose, user, videoUrl }) => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Comment Input */}
                             <div className="p-4 pt-0">
                                 <div className="flex items-center space-x-3">
                                     <div className="relative w-8 h-8 flex-shrink-0">
