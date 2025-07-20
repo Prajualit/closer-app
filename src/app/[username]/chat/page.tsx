@@ -95,12 +95,28 @@ const ChatPage = () => {
                         });
                     }
                 } catch (error) {
-                    console.error('Error opening chat from profile:', error);
-                    toast({
-                        title: 'Error',
-                        description: `Failed to open chat with ${username}`,
-                        variant: 'destructive',
-                    });
+                    if (
+                        error &&
+                        typeof error === 'object' &&
+                        'name' in error &&
+                        typeof (error as any).name === 'string' &&
+                        (error as any).name !== 'AbortError'
+                    ) {
+                        console.error('Error opening chat from profile:', error);
+                        toast({
+                            title: 'Error',
+                            description: `Failed to open chat with ${username}`,
+                            variant: 'destructive',
+                        });
+                    } else {
+                        // Fallback for non-object or unknown errors
+                        console.error('Error opening chat from profile:', error);
+                        toast({
+                            title: 'Error',
+                            description: `Failed to open chat with ${username}`,
+                            variant: 'destructive',
+                        });
+                    }
                 }
             }
             setIsInitializing(false);
@@ -195,7 +211,10 @@ const ChatPage = () => {
                                 onSelectChat={handleSelectChat}
                                 selectedChatId={selectedChat?.chatId}
                                 refreshTrigger={refreshTrigger}
-                                autoSelectChatId={searchParams.get('chatId')}
+                                autoSelectChatId={(() => {
+                                  const id = searchParams.get('chatId');
+                                  return typeof id === 'string' ? id : undefined;
+                                })()}
                                 chatRooms={chatRooms}
                                 setChatRooms={setChatRooms}
                             />
