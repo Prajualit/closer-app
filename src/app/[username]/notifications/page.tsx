@@ -1,8 +1,8 @@
-import React from 'react'
-import Navbar from '@/components/HomePg/Navbar'
-import NotificationsContainer from '@/components/Notifications/NotificationsContainer'
+import React, { FC } from 'react';
+import Navbar from '@/components/HomePg/Navbar';
+import NotificationsContainer from '@/components/Notifications/NotificationsContainer';
 
-const page = () => {
+const NotificationsPage: FC = () => {
     return (
         <div className='min-h-screen bg-white dark:bg-neutral-900'>
             <Navbar />
@@ -14,7 +14,6 @@ const page = () => {
                     </div>
                 </div>
             </div>
-            
             {/* Mobile Layout */}
             <div className='lg:hidden w-full pt-16 pb-20'>
                 <div className='px-4 py-6'>
@@ -24,7 +23,7 @@ const page = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default page
+export default NotificationsPage;

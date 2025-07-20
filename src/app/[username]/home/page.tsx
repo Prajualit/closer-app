@@ -1,12 +1,12 @@
 import React from 'react'
-import Navbar from '@/components/HomePg/Navbar.jsx'
-import Navsearch from '@/components/HomePg/Navsearch.jsx'
-import PostsFeed from '@/components/HomePg/PostsFeed.jsx'
-import SuggestedUsers from '@/components/HomePg/SuggestedUsers.jsx'
-import UserActivity from '@/components/HomePg/UserActivity.jsx'
-import BackToTop from '@/components/ui/BackToTop.jsx'
+import Navbar from '@/components/HomePg/Navbar'
+import Navsearch from '@/components/HomePg/Navsearch'
+import PostsFeed from '@/components/HomePg/PostsFeed'
+import SuggestedUsers from '@/components/HomePg/SuggestedUsers'
+import UserActivity from '@/components/HomePg/UserActivity'
+import BackToTop from '@/components/ui/BackToTop'
 
-const page = () => {
+const Page: React.FC = () => {
     return (
         <div className='flex min-h-screen bg-neutral-50 dark:bg-neutral-900'>
             <Navbar />
@@ -52,4 +52,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page

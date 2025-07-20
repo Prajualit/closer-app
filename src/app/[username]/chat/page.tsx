@@ -8,14 +8,29 @@ import ChatInterface from '@/components/Chat/ChatInterface';
 import { useToast } from '@/hooks/use-toast';
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
 
+
+interface Participant {
+    _id: string;
+    username?: string;
+    name: string;
+    avatarUrl: string;
+}
+
+interface ChatRoom {
+    chatId: string;
+    isChatbot?: boolean;
+    participants: Participant[];
+    [key: string]: any;
+}
+
 const ChatPage = () => {
-    const [selectedChat, setSelectedChat] = useState(null);
-    const [isMobile, setIsMobile] = useState(false);
-    const [isGoingBack, setIsGoingBack] = useState(false);
-    const [isInitializing, setIsInitializing] = useState(true);
-    const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [chatRooms, setChatRooms] = useState([]);
-    const hasProcessedInitialParams = useRef(false);
+    const [selectedChat, setSelectedChat] = useState<ChatRoom | null>(null);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [isGoingBack, setIsGoingBack] = useState<boolean>(false);
+    const [isInitializing, setIsInitializing] = useState<boolean>(true);
+    const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+    const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+    const hasProcessedInitialParams = useRef<boolean>(false);
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -92,9 +107,9 @@ const ChatPage = () => {
         };
 
         initializeChat();
-    }, [searchParams, toast, isGoingBack]); // Added isGoingBack to dependencies
+    }, [searchParams, toast, isGoingBack, selectedChat?.chatId]);
 
-    const handleSelectChat = useCallback((chatRoom) => {
+    const handleSelectChat = useCallback((chatRoom: ChatRoom) => {
         // Don't select chat if user is going back
         if (isGoingBack) {
             console.log('Ignoring chat selection - user is going back');
@@ -113,7 +128,7 @@ const ChatPage = () => {
     }, [searchParams, isGoingBack]);
 
     // Function to update chatbot last message in chat list
-    const updateChatbotLastMessage = useCallback((message) => {
+    const updateChatbotLastMessage = useCallback((message: string) => {
         setChatRooms(prev => 
             prev.map(room => 
                 room.chatId === 'chatbot' 
@@ -201,7 +216,10 @@ const ChatPage = () => {
                                 </div>
                             ) : selectedChat ? (
                                 <ChatInterface
-                                    chatRoom={selectedChat}
+                                    chatRoom={{
+                                        ...selectedChat,
+                                        participants: selectedChat.participants || []
+                                    }}
                                     onBack={handleBackToList}
                                     onUpdateChatList={updateChatbotLastMessage}
                                 />) : (

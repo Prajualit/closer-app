@@ -1,17 +1,22 @@
 "use client";
-import { useEffect, useState } from "react";
-import Navbar from "@/components/HomePg/Navbar.jsx";
+import { useEffect, useState, FC } from "react";
+import Navbar from "@/components/HomePg/Navbar";
 import Userdata from "@/components/Profile/Userdata";
 import { useSelector } from "react-redux";
+import type { RootState } from '@/redux/Store';
 import Image from "next/image";
-import Posts from "@/components/Profile/Photos.jsx";
-import Films from "@/components/Profile/Films.jsx";
+import Posts from "@/components/Profile/Photos";
+import Films from "@/components/Profile/Films";
 
-const Page = ({ params }) => {
-    const userDetails = useSelector((state) => state.user.user);
-    const [activeNav, setActiveNav] = useState("PHOTOS")
+interface PageProps {
+  params: Record<string, string>;
+}
 
-    const GridIcon = ({ size = 18, color = "currentColor" }) => {
+const Page: FC<PageProps> = ({ params }) => {
+    const userDetails = useSelector((state: RootState) => state.user.user);
+    const [activeNav, setActiveNav] = useState<'PHOTOS' | 'FILMS'>("PHOTOS");
+
+    const GridIcon: FC<{ size?: number; color?: string }> = ({ size = 18, color = "currentColor" }) => {
         return (
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +55,7 @@ const Page = ({ params }) => {
         );
     };
 
-    const CameraVideoIcon = ({ size = 20, color = "currentColor" }) => {
+    const CameraVideoIcon: FC<{ size?: number; color?: string }> = ({ size = 20, color = "currentColor" }) => {
         return (
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +106,7 @@ const Page = ({ params }) => {
     const navComp = [
         { name: "PHOTOS", icon: <GridIcon /> },
         { name: "FILMS", icon: <CameraVideoIcon /> },
-    ];
+    ] as const;
 
     return (
         <div className="flex bg-white dark:bg-neutral-900 min-h-screen">
@@ -120,7 +125,7 @@ const Page = ({ params }) => {
                                     ></div>
                                     <button
                                         className={`transition-all duration-300 text-[14px] flex items-center space-x-2 ${activeNav === nav.name ? "text-black dark:text-white" : "text-neutral-500 dark:text-neutral-400"}`}
-                                        onClick={() => setActiveNav(nav.name)}
+                                        onClick={() => setActiveNav(nav.name as 'PHOTOS' | 'FILMS')}
                                     >
                                         {nav.icon}
                                         <span>{nav.name}</span>
@@ -151,7 +156,7 @@ const Page = ({ params }) => {
                                                     ? "text-black dark:text-white border-b-2 border-black dark:border-white" 
                                                     : "text-neutral-500 dark:text-neutral-400"
                                             }`}
-                                            onClick={() => setActiveNav(nav.name)}
+                                            onClick={() => setActiveNav(nav.name as 'PHOTOS' | 'FILMS')}
                                         >
                                             {nav.icon}
                                             <span className="text-sm font-medium">{nav.name}</span>

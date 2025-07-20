@@ -10,24 +10,30 @@ import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/slice/userSlice.js";
 import { API_ENDPOINTS } from "@/lib/api";
 
-const page = () => {
 
+interface LoginFormData {
+  username: string;
+  password: string;
+}
+
+const Page = () => {
   const dispatch = useDispatch();
-
   const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState(null);
+  const [pending, setPending] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm<LoginFormData>();
 
-  const onSubmit = async (data) => {
+  const fields: (keyof LoginFormData)[] = ["username", "password"];
+
+  const onSubmit = async (data: LoginFormData) => {
     setPending(true);
     try {
       console.log("🚀 Making login request to:", API_ENDPOINTS.LOGIN);
-      
+
       const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: "POST",
         headers: {
@@ -42,17 +48,22 @@ const page = () => {
 
       console.log("📡 Login response status:", response.status);
       console.log("🍪 Set-Cookie headers:", response.headers.get('set-cookie'));
-      console.log("🍪 All response headers:", [...response.headers.entries()]);
+      // Use for...of for compatibility with Headers.entries()
+      const allHeaders: [string, string][] = [];
+      for (const entry of response.headers as any) {
+        allHeaders.push(entry);
+      }
+      console.log("🍪 All response headers:", allHeaders);
 
       const responseData = await response.json();
       console.log("📦 Response data:", responseData);
-      
+
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
         console.log("✅ Login successful, dispatching user data");
         dispatch(setUser(responseData.data.user));
-        
+
         // EMERGENCY FIX: Store tokens in localStorage as backup
         if (responseData.data.accessToken) {
           localStorage.setItem('accessToken', responseData.data.accessToken);
@@ -60,17 +71,17 @@ const page = () => {
         if (responseData.data.refreshToken) {
           localStorage.setItem('refreshToken', responseData.data.refreshToken);
         }
-        
+
         // Check if cookies were actually set
         console.log("🍪 Cookies after login:", document.cookie);
         console.log("💾 Stored tokens in localStorage as backup");
-        
+
         router.push(`/${responseData.data.user.username}/home`);
       }
     }
-    catch (error) {
-      setError(error.message);
-      console.log("Error during login:", error.message);
+    catch (error: any) {
+      setError(error?.message || "Unknown error");
+      console.log("Error during login:", error?.message);
     }
     finally {
       setPending(false);
@@ -78,7 +89,6 @@ const page = () => {
   };
 
   return (
-
     <div className="min-h-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-900 px-4 py-6 sm:px-6 lg:px-8">
       <Card className="w-full max-w-sm sm:max-w-md rounded-xl shadow-md bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
         <CardHeader className="px-4 sm:px-6 pt-6 pb-4">
@@ -87,7 +97,7 @@ const page = () => {
         </CardHeader>
         <CardContent className="px-4 sm:px-6 pb-6">
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            {["username", "password"].map((field) => (
+            {fields.map((field) => (
               <div key={field} className="mb-4">
                 <label htmlFor={field} className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                   {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -103,14 +113,13 @@ const page = () => {
                   disabled={pending}
                   className={`bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 text-sm sm:text-base h-10 sm:h-11 ${errors[field] ? "border-red-500 dark:border-red-500" : ""}`}
                 />
-                {errors[field] && (
+                {typeof errors[field]?.message === 'string' && (
                   <p className="text-red-500 text-xs sm:text-sm mt-1">
-                    {errors[field].message}
+                    {errors[field]?.message}
                   </p>
                 )}
               </div>
             ))}
-            
             {/* General error message */}
             {error && (
               <div className="mb-4">
@@ -119,7 +128,6 @@ const page = () => {
                 </p>
               </div>
             )}
-            
             <LoadingButton
               type="submit"
               pending={pending}
@@ -127,34 +135,16 @@ const page = () => {
             >
               Sign In
             </LoadingButton>
-            {/* <div className="text-center text-[16px] text-gray-700 font-medium w-full my-2 flex items-center justify-between">
-              <span className="w-[45%] border-[1px] "></span>
-              <span>
-                or
-              </span>
-              <span className="w-[45%] border-[1px] "></span>
-            </div>
-            <LoadingButton
-                type="submit"
-                pending={pending}
-                href={API_ENDPOINTS.GOOGLE_AUTH}>
-                Sign In with Google
-              </LoadingButton>
-            <GoogleLogin
-              clientId={`${process.env.GOOGLE_CLIENT_ID}`}
-              onSuccess={(res) => console.log(res)}
-              onError={() => "Login Failed"}
-            /> */}
           </form>
           <div className="mt-4 text-center">
             <Link href="/sign-up" className="text-blue-600 dark:text-blue-400 hover:underline text-xs sm:text-sm">
-              Don't have an account? Sign up
+              Don&apos;t have an account? Sign up
             </Link>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default Page;

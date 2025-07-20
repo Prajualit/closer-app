@@ -1,15 +1,15 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import FilmsViewer from '@/components/Films/FilmsViewer';
+import FilmsViewer, { Film } from '@/components/Films/FilmsViewer';
 import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 const FilmsPage = () => {
     const { username } = useParams();
-    const [films, setFilms] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [films, setFilms] = useState<Film[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         loadInitialFilms();
@@ -27,7 +27,7 @@ const FilmsPage = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                setFilms(data.data?.posts || []);
+                setFilms((data.data?.posts as Film[]) || []);
             } else {
                 setError('Failed to load films');
             }
@@ -63,7 +63,7 @@ const FilmsPage = () => {
         );
     }
 
-    return <FilmsViewer initialFilms={films} username={username} />;
+    return <FilmsViewer initialFilms={films} username={typeof username === 'string' ? username : ''} />;
 };
 
 export default FilmsPage;

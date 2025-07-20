@@ -1,6 +1,25 @@
+// --- Types for user profile and media ---
+interface UserProfile {
+  _id: string;
+  username: string;
+  name: string;
+  bio?: string;
+  avatarUrl?: string;
+  followersCount?: number;
+  followingCount?: number;
+}
+
+interface MediaItem {
+  _id?: string;
+  mediaId?: string;
+  id?: string;
+  url: string;
+  caption?: string;
+  uploadedAt?: string;
+}
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -18,37 +37,24 @@ const ProfilePage = () => {
     const router = useRouter();
     const userId = params.userId;
 
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [photos, setPhotos] = useState([]);
-    const [films, setFilms] = useState([]);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [photos, setPhotos] = useState<MediaItem[]>([]);
+    const [films, setFilms] = useState<MediaItem[]>([]);
     // Store likes/comments for each media by id
-    const [mediaStats, setMediaStats] = useState({});
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [activeNav, setActiveNav] = useState("PHOTOS");
-    const [videoOrientations, setVideoOrientations] = useState({});
-    const [selectedMedia, setSelectedMedia] = useState(null);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [mediaStats, setMediaStats] = useState<Record<string, { likesCount: number; commentsCount: number }>>({});
+    const [isFollowing, setIsFollowing] = useState<boolean>(false);
+    const [activeNav, setActiveNav] = useState<'PHOTOS' | 'FILMS'>("PHOTOS");
+    const [videoOrientations, setVideoOrientations] = useState<Record<string, boolean>>({});
+    const [selectedMedia, setSelectedMedia] = useState<{ imageUrl?: MediaItem; videoUrl?: MediaItem } | null>(null);
+    const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
     const { toast } = useToast();
-    const currentUser = useSelector((state) => state.user.user);
+    const currentUser = useSelector((state: any) => state.user.user);
     const dispatch = useDispatch();
 
     const handleBack = () => {
         router.back();
     };
-
-    useEffect(() => {
-        if (userId) {
-            fetchProfile();
-        }
-    }, [userId]);
-
-    useEffect(() => {
-        if (profile) {
-            fetchUserMedia();
-            checkFollowStatus();
-        }
-    }, [profile]);
 
     // Add video orientation detection
     useEffect(() => {
@@ -56,18 +62,18 @@ const ProfilePage = () => {
 
         films.forEach((film) => {
             const video = document.createElement("video");
-            video.src = film.url || film;
+            video.src = film.url;
             video.onloadedmetadata = () => {
                 const isPortrait = video.videoWidth < video.videoHeight;
                 setVideoOrientations((prev) => ({
                     ...prev,
-                    [film.url || film]: isPortrait,
+                    [film.url]: isPortrait,
                 }));
             };
         });
     }, [films]);
 
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         try {
             setLoading(true);
             const response = await fetch(API_ENDPOINTS.USER_PROFILE(userId), {
@@ -115,10 +121,11 @@ const ProfilePage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [userId, toast]);
 
-    const fetchUserMedia = async () => {
+    const fetchUserMedia = useCallback(async () => {
         try {
+            if (!profile) return;
             const [photosResponse, filmsResponse] = await Promise.all([
                 fetch(API_ENDPOINTS.USER_PHOTOS(profile._id), {
                     credentials: 'include',
@@ -140,10 +147,11 @@ const ProfilePage = () => {
         } catch (error) {
             console.error('Error fetching user media:', error);
         }
-    };
+    }, [profile]);
 
-    const checkFollowStatus = async () => {
+    const checkFollowStatus = useCallback(async () => {
         try {
+            if (!profile) return;
             const response = await fetch(API_ENDPOINTS.FOLLOW_STATUS(profile._id), {
                 credentials: 'include',
             });
@@ -155,10 +163,26 @@ const ProfilePage = () => {
         } catch (error) {
             console.error('Error checking follow status:', error);
         }
-    };
+    }, [profile]);
+
+    // useEffect to fetch profile when userId changes
+    useEffect(() => {
+        if (userId) {
+            fetchProfile();
+        }
+    }, [userId, fetchProfile]);
+
+    // useEffect to fetch user media and follow status when profile changes
+    useEffect(() => {
+        if (profile) {
+            fetchUserMedia();
+            checkFollowStatus();
+        }
+    }, [profile, fetchUserMedia, checkFollowStatus]);
 
     const handleFollow = async () => {
         try {
+            if (!profile) return;
             const response = await fetch(isFollowing ? API_ENDPOINTS.UNFOLLOW : API_ENDPOINTS.FOLLOW, {
                 method: 'POST',
                 headers: {
@@ -175,12 +199,15 @@ const ProfilePage = () => {
                 setIsFollowing(!isFollowing);
 
                 // Update follower count immediately
-                setProfile(prevProfile => ({
-                    ...prevProfile,
-                    followersCount: isFollowing
-                        ? (prevProfile.followersCount || 1) - 1
-                        : (prevProfile.followersCount || 0) + 1
-                }));
+                setProfile(prevProfile => {
+                    if (!prevProfile) return prevProfile;
+                    return {
+                        ...prevProfile,
+                        followersCount: isFollowing
+                            ? (prevProfile.followersCount || 1) - 1
+                            : (prevProfile.followersCount || 0) + 1
+                    };
+                });
 
                 // Update current user's following count in Redux
                 dispatch(updateUser({
@@ -212,25 +239,21 @@ const ProfilePage = () => {
 
     const handleMessage = () => {
         // Navigate to chat with this user using query parameters
+        if (!profile) return;
         router.push(`/${currentUser.username}/chat?userId=${profile._id}&username=${profile.username}`);
     };
 
-    const handleImageClick = (media, isVideo = false) => {
+    const handleImageClick = (media: MediaItem, isVideo = false) => {
+        if (!profile) return;
         // Attach postId and mediaId for modal to use
-        let modalMedia;
+        let modalMedia = {
+            ...media,
+            postId: profile._id,
+            mediaId: media._id || media.mediaId || media.id || media.url,
+        };
         if (isVideo) {
-            modalMedia = {
-                ...media,
-                postId: profile?._id,
-                mediaId: media._id || media.mediaId || media.id || media.url,
-            };
             setSelectedMedia({ videoUrl: modalMedia });
         } else {
-            modalMedia = {
-                ...media,
-                postId: profile?._id,
-                mediaId: media._id || media.mediaId || media.id || media.url,
-            };
             setSelectedMedia({ imageUrl: modalMedia });
         }
         setSelectedUser(profile);
@@ -239,21 +262,22 @@ const ProfilePage = () => {
     // Fetch likes/comments for all media (photos and films)
     useEffect(() => {
         const fetchStats = async () => {
+            if (!profile) return;
             const allMedia = [
                 ...photos.map((photo) => ({
                     type: 'photo',
-                    _id: photo._id || photo.mediaId || photo.id || photo.url, // fallback to url if no id
-                    postId: profile?._id,
+                    _id: photo._id || photo.mediaId || photo.id || photo.url,
+                    postId: profile._id,
                     mediaId: photo._id || photo.mediaId || photo.id || photo.url,
                 })),
                 ...films.map((film) => ({
                     type: 'film',
                     _id: film._id || film.mediaId || film.id || film.url,
-                    postId: profile?._id,
+                    postId: profile._id,
                     mediaId: film._id || film.mediaId || film.id || film.url,
                 })),
             ];
-            const stats = {};
+            const stats: Record<string, { likesCount: number; commentsCount: number }> = {};
             await Promise.all(
                 allMedia.map(async (media) => {
                     try {
@@ -269,12 +293,12 @@ const ProfilePage = () => {
                             { credentials: 'include' }
                         );
                         const commentsData = commentsRes.ok ? await commentsRes.json() : {};
-                        stats[media._id] = {
+                        stats[String(media._id)] = {
                             likesCount: likesData?.data?.likesCount ?? 0,
                             commentsCount: commentsData?.data?.totalComments ?? 0,
                         };
                     } catch (e) {
-                        stats[media._id] = { likesCount: 0, commentsCount: 0 };
+                        stats[String(media._id)] = { likesCount: 0, commentsCount: 0 };
                     }
                 })
             );
@@ -470,7 +494,7 @@ const ProfilePage = () => {
         );
     };
 
-    const navComp = [
+    const navComp: { name: 'PHOTOS' | 'FILMS'; icon: React.ReactElement }[] = [
         { name: "PHOTOS", icon: <GridIcon /> },
         { name: "FILMS", icon: <CameraVideoIcon /> },
     ];
@@ -503,7 +527,7 @@ const ProfilePage = () => {
     // Photos component logic
     const hasPhotos = photos.length > 0;
 
-    const SmartImage = ({ src, alt = "Image", containerClass = "" }) => {
+    const SmartImage = ({ src, alt = "Image", containerClass = "" }: { src: string; alt?: string; containerClass?: string }) => {
         const [isPortrait, setIsPortrait] = useState(false);
 
         useEffect(() => {
@@ -563,7 +587,7 @@ const ProfilePage = () => {
                             height={250}
                             width={250}
                             className="rounded-full object-cover w-full h-full bg-center"
-                            src={profile.avatarUrl}
+                            src={profile.avatarUrl || '/default-avatar.svg'}
                             alt=""
                         />
                     </div>
@@ -578,7 +602,7 @@ const ProfilePage = () => {
                             <div className="flex space-x-3 mb-6">
                                 <LoadingButton
                                     onClick={handleFollow}
-                                    variant={isFollowing ? "outline" : "default"}
+                                    pending={false}
                                     className="flex items-center space-x-2 dark:!bg-neutral-800 dark:!text-white dark:hover:!bg-neutral-700 transition-all "
                                 >
                                     {isFollowing ? <UserMinus className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
@@ -647,17 +671,17 @@ const ProfilePage = () => {
                                         <div
                                             key={i}
                                             className='group relative h-[12.5rem] w-[12.5rem] cursor-pointer'
-                                            onClick={() => handleImageClick({
-                                                ...photo,
-                                                url: photo.url || photo,
-                                                caption: photo.caption,
-                                                uploadedAt: photo.uploadedAt,
-                                                _id: photo._id || photo.mediaId || photo.id || photo.url,
-                                            }, false)}
+                                        onClick={() => handleImageClick({
+                                            ...photo,
+                                            url: photo.url,
+                                            caption: photo.caption,
+                                            uploadedAt: photo.uploadedAt,
+                                            _id: photo._id || photo.mediaId || photo.id || photo.url,
+                                        }, false)}
                                         >
                                             <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
                                             <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
-                                                <SmartImage src={photo.url || photo} alt={`image-${i}`} />
+                                                <SmartImage src={photo.url} alt={`image-${i}`} />
                                             </div>
                                         </div>
                                     );
@@ -682,19 +706,21 @@ const ProfilePage = () => {
                                 {films.map((film, i) => {
                                     const id = film._id || film.mediaId || film.id || film.url;
                                     const stats = mediaStats[id] || { likesCount: 0, commentsCount: 0 };
-                                    const isPortrait = videoOrientations[film.url || film];
+                                    const isPortrait = videoOrientations[film.url];
                                     const videoClass = isPortrait !== undefined
                                         ? isPortrait
                                             ? "object-cover"
                                             : "object-contain"
                                         : "object-contain";
-                                    const videoRef = React.createRef();
+                                    const videoRef = React.createRef<HTMLVideoElement>();
                                     const handleMouseEnter = () => {
                                         videoRef.current?.play();
                                     };
                                     const handleMouseLeave = () => {
-                                        videoRef.current?.pause();
-                                        videoRef.current.currentTime = 0;
+                                        if (videoRef.current) {
+                                            videoRef.current.pause();
+                                            videoRef.current.currentTime = 0;
+                                        }
                                     };
                                     return (
                                         <div
@@ -704,7 +730,7 @@ const ProfilePage = () => {
                                             onMouseLeave={handleMouseLeave}
                                             onClick={() => handleImageClick({
                                                 ...film,
-                                                url: film.url || film,
+                                                url: film.url,
                                                 caption: film.caption,
                                                 uploadedAt: film.uploadedAt,
                                                 _id: film._id || film.mediaId || film.id || film.url,
@@ -715,7 +741,7 @@ const ProfilePage = () => {
                                                 <video
                                                     ref={videoRef}
                                                     className={`w-full h-full ${videoClass}`}
-                                                    src={film.url || film}
+                                                    src={film.url}
                                                     muted
                                                     loop
                                                     playsInline
@@ -770,7 +796,7 @@ const ProfilePage = () => {
                             <div className="flex space-x-3">
                                 <LoadingButton
                                     onClick={handleFollow}
-                                    variant={isFollowing ? "outline" : "default"}
+                                    pending={false}
                                     className="flex items-center space-x-2 dark:!bg-neutral-800 dark:!text-white dark:hover:!bg-neutral-700 transition-all text-sm px-4 py-2"
                                 >
                                     {isFollowing ? <UserMinus className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
@@ -838,7 +864,7 @@ const ProfilePage = () => {
                                                 className='group relative aspect-square'
                                                 onClick={() => handleImageClick({
                                                     ...photo,
-                                                    url: photo.url || photo,
+                                                    url: photo.url,
                                                     caption: photo.caption,
                                                     uploadedAt: photo.uploadedAt,
                                                     _id: photo._id || photo.mediaId || photo.id || photo.url,
@@ -847,7 +873,7 @@ const ProfilePage = () => {
                                                 <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-10 group-focus-within:opacity-10 cursor-pointer'></div>
                                                 <div className='bg-[#181818] dark:bg-black h-full flex items-center justify-center transition-transform duration-200'>
                                                     <Image
-                                                        src={photo.url || photo}
+                                                        src={photo.url}
                                                         alt="User photo"
                                                         fill
                                                         className="object-cover"
@@ -871,22 +897,24 @@ const ProfilePage = () => {
                                 {hasFilms ? (
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2">
                                         {films.map((film, i) => {
-                                            const isPortrait = videoOrientations[film.url || film];
+                                            const isPortrait = videoOrientations[film.url];
                                             const videoClass = isPortrait !== undefined
                                                 ? isPortrait
                                                     ? "object-cover"
                                                     : "object-contain"
                                                 : "object-contain";
 
-                                            const videoRef = React.createRef();
+                                            const videoRef = React.createRef<HTMLVideoElement>();
 
                                             const handleMouseEnter = () => {
                                                 videoRef.current?.play();
                                             };
 
                                             const handleMouseLeave = () => {
-                                                videoRef.current?.pause();
+                                            if (videoRef.current) {
+                                                videoRef.current.pause();
                                                 videoRef.current.currentTime = 0;
+                                            }
                                             };
 
                                             return (
@@ -897,7 +925,7 @@ const ProfilePage = () => {
                                                     onMouseLeave={handleMouseLeave}
                                                     onClick={() => handleImageClick({
                                                         ...film,
-                                                        url: film.url || film,
+                                                        url: film.url,
                                                         caption: film.caption,
                                                         uploadedAt: film.uploadedAt,
                                                         _id: film._id || film.mediaId || film.id || film.url,
@@ -908,7 +936,7 @@ const ProfilePage = () => {
                                                         <video
                                                             ref={videoRef}
                                                             className={`w-full h-full ${videoClass}`}
-                                                            src={film.url || film}
+                                                            src={film.url}
                                                             muted
                                                             loop
                                                             playsInline
