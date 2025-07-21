@@ -8,9 +8,12 @@ import jwt from "jsonwebtoken";
 import { access } from "fs";
 import { notifyFollow } from "./notification.controller.js";
 
-const generateAccessAndRefreshTokens = async (userId) => {
+const generateAccessAndRefreshTokens = async (userId: string): Promise<{ accessToken: string; refreshToken: string }> => {
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(String(userId));
+    if (!user) {
+      throw new ApiError(404, "User not found while generating tokens");
+    }
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
@@ -18,7 +21,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
     await user.save({ validateBeforeSave: false });
 
     return { accessToken, refreshToken };
-  } catch (error) {
+  } catch (error: any) {
     throw new ApiError(
       500,
       error?.message ||
@@ -27,7 +30,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
   }
 };
 
-const registerUser = asyncHandler(async (req, res) => {
+const registerUser = asyncHandler(async (req: any, res: any) => {
   console.log("🔥 Registration attempt started");
   console.log("📦 Request body:", req.body);
   console.log("📁 Request file:", req.file);
@@ -87,7 +90,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Generate tokens to automatically log the user in
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-    user._id
+    String(user._id)
   );
 
   const options = {
@@ -113,13 +116,13 @@ const registerUser = asyncHandler(async (req, res) => {
     );
 });
 
-const getCurrentUser = asyncHandler(async (req, res) => {
+const getCurrentUser = asyncHandler(async (req: any, res: any) => {
   return res
     .status(200)
     .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
 
-const loginUser = asyncHandler(async (req, res) => {
+const loginUser = asyncHandler(async (req: any, res: any) => {
   // get the body
   const { username, password } = req.body;
 
@@ -143,7 +146,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // generate tokens
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-    user._id
+    String(user._id)
   );
 
   const loggedInUser = await User.findById(user._id).select(
@@ -173,9 +176,9 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-const logoutUser = asyncHandler(async (req, res) => {
+const logoutUser = asyncHandler(async (req: any, res: any) => {
   await User.findByIdAndUpdate(
-    req.user._id,
+    String(req.user._id),
     { $set: { refreshToken: undefined } },
     { new: true }
   );
@@ -195,22 +198,22 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
-const editUser = asyncHandler(async (req, res) => {
+const editUser = asyncHandler(async (req: any, res: any) => {
   const { name, bio, username } = req.body;
 
-  const updateFields = {};
+  const updateFields: Record<string, any> = {};
 
   if (username && username.trim()) {
     const normalizedUsername = username.trim().toLowerCase();
-    updateFields.username = normalizedUsername;
+    updateFields["username"] = normalizedUsername;
   }
 
   if (name !== undefined && name !== null && name.trim()) {
-    updateFields.name = name;
+    updateFields["name"] = name;
   }
 
   if (bio !== undefined && bio !== null && bio.trim()) {
-    updateFields.bio = bio;
+    updateFields["bio"] = bio;
   }
 
   if (req.file?.path) {
@@ -221,7 +224,7 @@ const editUser = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Avatar upload failed");
     }
 
-    updateFields.avatarUrl = avatarUpload.secure_url;
+    updateFields["avatarUrl"] = avatarUpload.secure_url;
   }
 
   if (Object.keys(updateFields).length === 0) {
@@ -229,7 +232,7 @@ const editUser = asyncHandler(async (req, res) => {
   }
 
   const updateResult = await User.updateOne(
-    { _id: req.user._id },
+    { _id: String(req.user._id) },
     { $set: updateFields }
   );
 
@@ -242,14 +245,14 @@ const editUser = asyncHandler(async (req, res) => {
   }
 
   // Get the updated user
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(String(req.user._id));
 
   if (!user) {
     throw new ApiError(500, "Something went wrong while fetching updated user");
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-    user._id
+    String(user._id)
   );
 
   const options = {
@@ -274,7 +277,7 @@ const editUser = asyncHandler(async (req, res) => {
     );
 });
 
-const refreshAccessToken = asyncHandler(async (req, res) => {
+const refreshAccessToken = asyncHandler(async (req: any, res: any) => {
   const incomingRefreshToken =
     req.cookies.refreshToken || req.body.refreshToken;
 
@@ -283,12 +286,16 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 
   try {
+    const secret = process.env.REFRESH_TOKEN_SECRET;
+    if (!secret) {
+      throw new ApiError(500, "Refresh token secret is not configured");
+    }
     const decodedToken = jwt.verify(
       incomingRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
+      secret
+    ) as { _id: string };
 
-    const user = await User.findById(decodedToken?._id);
+    const user = await User.findById(String(decodedToken._id));
 
     if (!user) {
       throw new ApiError(401, "Invalid refresh token");
@@ -308,7 +315,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     };
 
     const { accessToken, refreshToken: newRefreshToken } =
-      await generateAccessAndRefreshTokens(user._id);
+      await generateAccessAndRefreshTokens(String(user._id));
 
     return res
       .status(200)
@@ -321,12 +328,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
           "Access token refreshed"
         )
       );
-  } catch (error) {
-    throw new ApiError(401, error?.message || "Invalid refresh token");
+  } catch (error: any) {
+    throw new ApiError(401, error && error.message ? error.message : "Invalid refresh token");
   }
 });
 
-const verifyPassword = asyncHandler(async (req, res) => {
+const verifyPassword = asyncHandler(async (req: any, res: any) => {
   const { currentPassword } = req.body;
 
   // Validation
@@ -335,7 +342,7 @@ const verifyPassword = asyncHandler(async (req, res) => {
   }
 
   // Get user from database
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(String(req.user._id));
   if (!user) {
     throw new ApiError(404, "User not found");
   }
@@ -351,7 +358,7 @@ const verifyPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password verified successfully"));
 });
 
-const changePassword = asyncHandler(async (req, res) => {
+const changePassword = asyncHandler(async (req: any, res: any) => {
   const { currentPassword, newPassword } = req.body;
 
   // Validation
@@ -371,7 +378,7 @@ const changePassword = asyncHandler(async (req, res) => {
   }
 
   // Get user from database
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(String(req.user._id));
   if (!user) {
     throw new ApiError(404, "User not found");
   }
@@ -391,8 +398,8 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
-const deleteUserAccount = asyncHandler(async (req, res) => {
-  const user = await User.findByIdAndDelete(req.user._id);
+const deleteUserAccount = asyncHandler(async (req: any, res: any) => {
+  const user = await User.findByIdAndDelete(String(req.user._id));
   if (!user) {
     throw new ApiError(404, "User not found");
   }
@@ -413,7 +420,7 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User account deleted successfully"));
 });
 
-const searchUsers = asyncHandler(async (req, res) => {
+const searchUsers = asyncHandler(async (req: any, res: any) => {
   const { query } = req.query;
 
   if (!query || query.trim().length < 2) {
@@ -424,7 +431,7 @@ const searchUsers = asyncHandler(async (req, res) => {
 
   const users = await User.find({
     $or: [{ username: searchRegex }, { name: searchRegex }],
-    _id: { $ne: req.user._id }, // Exclude current user
+    _id: { $ne: String(req.user._id) }, // Exclude current user
   })
     .select("username name avatarUrl bio")
     .limit(20);
@@ -435,15 +442,15 @@ const searchUsers = asyncHandler(async (req, res) => {
 });
 
 // Get user profile by ID
-const getUserProfile = asyncHandler(async (req, res) => {
+const getUserProfile = asyncHandler(async (req: any, res: any) => {
   const { userId } = req.params;
 
   // Validate if userId is a valid MongoDB ObjectId
-  if (!userId || !userId.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!userId || typeof userId !== "string" || !userId.match(/^[0-9a-fA-F]{24}$/)) {
     throw new ApiError(400, "Invalid user ID format");
   }
 
-  const user = await User.findById(userId)
+  const user = await User.findById(String(userId))
     .select("-password -refreshToken")
     .populate('followers', 'username name avatarUrl')
     .populate('following', 'username name avatarUrl');
@@ -464,23 +471,26 @@ const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 // Follow a user
-const followUser = asyncHandler(async (req, res) => {
+const followUser = asyncHandler(async (req: any, res: any) => {
   const { userId } = req.body;
-  const currentUserId = req.user._id;
+  const currentUserId = String(req.user._id);
 
-  if (userId === currentUserId.toString()) {
+  if (userId === currentUserId) {
     throw new ApiError(400, "You cannot follow yourself");
   }
 
-  const userToFollow = await User.findById(userId);
+  const userToFollow = await User.findById(String(userId));
   const currentUser = await User.findById(currentUserId);
 
   if (!userToFollow) {
     throw new ApiError(404, "User not found");
   }
+  if (!currentUser) {
+    throw new ApiError(404, "Current user not found");
+  }
 
   // Check if already following
-  if (currentUser.following.includes(userId)) {
+  if (currentUser.following.map((id: any) => id.toString()).includes(userId)) {
     throw new ApiError(400, "You are already following this user");
   }
 
@@ -493,7 +503,7 @@ const followUser = asyncHandler(async (req, res) => {
 
   // Create follow notification
   try {
-    await notifyFollow(currentUserId, userId);
+    await notifyFollow(currentUserId, String(userId));
   } catch (error) {
     console.error("Failed to create follow notification:", error);
     // Don't fail the follow operation if notification fails
@@ -505,29 +515,32 @@ const followUser = asyncHandler(async (req, res) => {
 });
 
 // Unfollow a user
-const unfollowUser = asyncHandler(async (req, res) => {
+const unfollowUser = asyncHandler(async (req: any, res: any) => {
   const { userId } = req.body;
-  const currentUserId = req.user._id;
+  const currentUserId = String(req.user._id);
 
-  if (userId === currentUserId.toString()) {
+  if (userId === currentUserId) {
     throw new ApiError(400, "You cannot unfollow yourself");
   }
 
-  const userToUnfollow = await User.findById(userId);
+  const userToUnfollow = await User.findById(String(userId));
   const currentUser = await User.findById(currentUserId);
 
   if (!userToUnfollow) {
     throw new ApiError(404, "User not found");
   }
+  if (!currentUser) {
+    throw new ApiError(404, "Current user not found");
+  }
 
   // Check if not following
-  if (!currentUser.following.includes(userId)) {
+  if (!currentUser.following.map((id: any) => id.toString()).includes(userId)) {
     throw new ApiError(400, "You are not following this user");
   }
 
   // Remove from following/followers
-  currentUser.following = currentUser.following.filter(id => id.toString() !== userId);
-  userToUnfollow.followers = userToUnfollow.followers.filter(id => id.toString() !== currentUserId.toString());
+  currentUser.following = currentUser.following.filter((id: any) => id.toString() !== userId);
+  userToUnfollow.followers = userToUnfollow.followers.filter((id: any) => id.toString() !== currentUserId);
 
   await currentUser.save();
   await userToUnfollow.save();
@@ -538,12 +551,15 @@ const unfollowUser = asyncHandler(async (req, res) => {
 });
 
 // Get follow status
-const getFollowStatus = asyncHandler(async (req, res) => {
+const getFollowStatus = asyncHandler(async (req: any, res: any) => {
   const { userId } = req.params;
-  const currentUserId = req.user._id;
+  const currentUserId = String(req.user._id);
 
   const currentUser = await User.findById(currentUserId);
-  const isFollowing = currentUser.following.includes(userId);
+  if (!currentUser) {
+    throw new ApiError(404, "Current user not found");
+  }
+  const isFollowing = currentUser.following.map((id: any) => id.toString()).includes(userId);
 
   return res.status(200).json(
     new ApiResponse(200, { isFollowing }, "Follow status fetched successfully")
@@ -551,19 +567,21 @@ const getFollowStatus = asyncHandler(async (req, res) => {
 });
 
 // Get user photos
-const getUserPhotos = asyncHandler(async (req, res) => {
+const getUserPhotos = asyncHandler(async (req: any, res: any) => {
   const { userId } = req.params;
 
-  const user = await User.findById(userId);
+  const user = await User.findById(String(userId));
   if (!user) {
     throw new ApiError(404, "User not found");
   }
 
-  const photos = user.media.filter(item => 
-    item.resource_type === 'image' || 
-    !item.resource_type || 
-    item.url.match(/\.(jpeg|jpg|gif|png)$/i)
-  );
+  const photos = Array.isArray(user.media)
+    ? user.media.filter((item: any) => 
+        item.resource_type === 'image' || 
+        !item.resource_type || 
+        (typeof item.url === 'string' && item.url.match(/\.(jpeg|jpg|gif|png)$/i))
+      )
+    : [];
 
   return res.status(200).json(
     new ApiResponse(200, { photos }, "User photos fetched successfully")
@@ -571,18 +589,20 @@ const getUserPhotos = asyncHandler(async (req, res) => {
 });
 
 // Get user films/videos
-const getUserFilms = asyncHandler(async (req, res) => {
+const getUserFilms = asyncHandler(async (req: any, res: any) => {
   const { userId } = req.params;
 
-  const user = await User.findById(userId);
+  const user = await User.findById(String(userId));
   if (!user) {
     throw new ApiError(404, "User not found");
   }
 
-  const films = user.media.filter(item => 
-    item.resource_type === 'video' || 
-    item.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)
-  );
+  const films = Array.isArray(user.media)
+    ? user.media.filter((item: any) => 
+        item.resource_type === 'video' || 
+        (typeof item.url === 'string' && item.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i))
+      )
+    : [];
 
   return res.status(200).json(
     new ApiResponse(200, { films }, "User films fetched successfully")

@@ -1,13 +1,7 @@
 
 import { Request, Response } from "express";
 
-// Extend Express Request to include user property
-interface AuthRequest extends Request {
-  user: {
-    _id: string;
-    [key: string]: any;
-  };
-}
+// Express Request is globally extended to include user
 import { User } from "../models/user.model.js";
 import Notification from "../models/notification.model.js";
 import { ChatRoom, Message } from "../models/chat.model.js";
@@ -17,7 +11,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendNotificationToUser, sendUnreadCountUpdate } from "../utils/socket.js";
 
 // Get all notifications for a user
-const getNotifications = asyncHandler(async (req: AuthRequest, res: Response) => {
+const getNotifications = asyncHandler(async (req: Request, res: Response) => {
   try {
     // Parse query params safely
     const page = typeof req.query.page === 'string' ? parseInt(req.query.page, 10) : 1;
@@ -73,7 +67,7 @@ const getNotifications = asyncHandler(async (req: AuthRequest, res: Response) =>
 });
 
 // Mark notification as read
-const markAsRead = asyncHandler(async (req: AuthRequest, res: Response) => {
+const markAsRead = asyncHandler(async (req: Request, res: Response) => {
   const { notificationId } = req.params;
   const userId = req.user._id;
 
@@ -107,7 +101,7 @@ const markAsRead = asyncHandler(async (req: AuthRequest, res: Response) => {
 });
 
 // Mark all notifications as read
-const markAllAsRead = asyncHandler(async (req: AuthRequest, res: Response) => {
+const markAllAsRead = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user._id;
 
   await Notification.updateMany(
@@ -130,7 +124,7 @@ const markAllAsRead = asyncHandler(async (req: AuthRequest, res: Response) => {
 });
 
 // Delete a notification
-const deleteNotification = asyncHandler(async (req: AuthRequest, res: Response) => {
+const deleteNotification = asyncHandler(async (req: Request, res: Response) => {
   const { notificationId } = req.params;
   const userId = req.user._id;
 
@@ -219,7 +213,7 @@ const createNotification = async (
 };
 
 // Get unread count
-const getUnreadCount = asyncHandler(async (req: AuthRequest, res: Response) => {
+const getUnreadCount = asyncHandler(async (req: Request, res: Response) => {
   try {
     const userId = req.user._id;
 

@@ -6,10 +6,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import { ApiError } from '../utils/apiError.js';
 import { Message, ChatRoom } from '../models/chat.model.js';
 
-// Extend Express Request to include user
-interface AuthRequest extends Request {
-  user: { _id: string; [key: string]: any };
-}
+// Express Request is globally extended to include user
 
 // Initialize Gemini AI
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -19,7 +16,7 @@ if (!GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY as string);
 
 // Get or create chatbot room for a user
-const getOrCreateChatbotRoom = asyncHandler(async (req: AuthRequest, res: Response) => {
+const getOrCreateChatbotRoom = asyncHandler(async (req: Request, res: Response) => {
     const currentUserId = req.user._id;
     const chatId = `chatbot-${currentUserId}`;
 
@@ -61,7 +58,7 @@ const getOrCreateChatbotRoom = asyncHandler(async (req: AuthRequest, res: Respon
 });
 
 // Get chatbot messages with chat history
-const getChatbotMessages = asyncHandler(async (req: AuthRequest, res: Response) => {
+const getChatbotMessages = asyncHandler(async (req: Request, res: Response) => {
     const currentUserId = req.user._id;
     const chatId = `chatbot-${currentUserId}`;
     const page = typeof req.query.page === 'string' ? parseInt(req.query.page, 10) : 1;
@@ -126,7 +123,7 @@ const getChatbotMessages = asyncHandler(async (req: AuthRequest, res: Response) 
     );
 });
 
-const getChatbotResponse = asyncHandler(async (req: AuthRequest, res: Response) => {
+const getChatbotResponse = asyncHandler(async (req: Request, res: Response) => {
     try {
         // Debug: Log if Gemini API key is present
         if (!process.env.GEMINI_API_KEY) {

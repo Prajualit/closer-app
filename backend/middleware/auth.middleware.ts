@@ -5,14 +5,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { User, UserDocument } from "../models/user.model.js";
 
 
-interface AuthRequest extends Request {
-  user?: UserDocument;
-}
-
-
-
 export const verifyJWT = asyncHandler(
-  async (req: AuthRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       // If cookies is undefined, fallback to empty object
       const cookies = (req as any).cookies || {};

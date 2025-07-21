@@ -6,8 +6,18 @@ import { Like } from "../models/like.model.js";
 import { Comment } from "../models/comment.model.js";
 import { notifyLike, notifyComment } from "./notification.controller.js";
 
+import type { Request, Response } from "express";
+import type { ObjectId } from "mongoose";
+interface AuthUser {
+  _id: ObjectId | string;
+  [key: string]: any;
+}
+interface AuthRequest extends Request {
+  user: AuthUser;
+}
+
 // Get likes count and like status for a post/media
-const getLikesCount = asyncHandler(async (req, res) => {
+const getLikesCount = asyncHandler(async (req: AuthRequest, res: Response) => {
   let { postId, mediaId } = req.params;
   const userId = req.user._id;
   postId = postId?.toString();
@@ -33,15 +43,23 @@ const getLikesCount = asyncHandler(async (req, res) => {
     );
 });
 // Get all posts from all users with pagination
-const getAllPosts = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, type } = req.query;
+const getAllPosts = asyncHandler(async (req: AuthRequest, res: Response) => {
+  // Parse page and limit as numbers, handling arrays and undefined
+  function toNum(val: any, def: number) {
+    if (Array.isArray(val)) val = val[0];
+    const n = Number(val);
+    return isNaN(n) ? def : n;
+  }
+  const page = toNum(req.query.page, 1);
+  const limit = toNum(req.query.limit, 10);
+  const type = req.query.type;
   const skip = (page - 1) * limit;
   const currentUserId = req.user._id;
 
   console.log("getAllPosts called with:", { page, limit, type, currentUserId });
 
   // Build match criteria for media type filtering
-  const matchCriteria = {};
+  const matchCriteria: Record<string, any> = {};
   if (type === "video") {
     matchCriteria["media.resource_type"] = "video";
   } else if (type === "image") {
@@ -172,10 +190,10 @@ const getAllPosts = asyncHandler(async (req, res) => {
       $sort: { "media.uploadedAt": -1 },
     },
     {
-      $skip: parseInt(skip),
+      $skip: skip,
     },
     {
-      $limit: parseInt(limit),
+      $limit: limit,
     },
   ]);
 
@@ -192,8 +210,8 @@ const getAllPosts = asyncHandler(async (req, res) => {
       200,
       {
         posts,
-        currentPage: parseInt(page),
-        hasMore: posts.length === parseInt(limit),
+        currentPage: page,
+        hasMore: posts.length === limit,
       },
       "Posts fetched successfully"
     )
@@ -201,7 +219,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 });
 
 // Like a post
-const likePost = asyncHandler(async (req, res) => {
+const likePost = asyncHandler(async (req: AuthRequest, res: Response) => {
   const { postId, mediaId } = req.body;
   const userId = req.user._id;
 
@@ -223,9 +241,14 @@ const likePost = asyncHandler(async (req, res) => {
     // Send notification to post owner (if not liking own post)
     if (userId.toString() !== postId.toString()) {
       try {
-        await notifyLike(userId, postId, postId);
+        await notifyLike(
+          String(userId),
+          String(postId),
+          String(postId)
+        );
       } catch (error) {
-        console.warn("Failed to send like notification:", error.message);
+        const err = error as any;
+        console.warn("Failed to send like notification:", err?.message ?? err);
       }
     }
 
@@ -242,7 +265,8 @@ const likePost = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    if (error.code === 11000) {
+    const err = error as any;
+    if (typeof err === "object" && err !== null && "code" in err && err.code === 11000) {
       throw new ApiError(400, "Post already liked");
     }
     throw error;
@@ -250,7 +274,7 @@ const likePost = asyncHandler(async (req, res) => {
 });
 
 // Unlike a post
-const unlikePost = asyncHandler(async (req, res) => {
+const unlikePost = asyncHandler(async (req: AuthRequest, res: Response) => {
   const { postId, mediaId } = req.body;
   const userId = req.user._id;
 
@@ -279,7 +303,7 @@ const unlikePost = asyncHandler(async (req, res) => {
 });
 
 // Add comment to post
-const addComment = asyncHandler(async (req, res) => {
+const addComment = asyncHandler(async (req: AuthRequest, res: Response) => {
   let { postId, mediaId, text } = req.body;
   const userId = req.user._id;
 
@@ -305,9 +329,15 @@ const addComment = asyncHandler(async (req, res) => {
   // Send notification to post owner (if not commenting on own post)
   if (userId.toString() !== postId.toString()) {
     try {
-      await notifyComment(userId, postId, postId, newComment._id);
+      await notifyComment(
+        String(userId),
+        String(postId),
+        String(postId),
+        String(newComment._id)
+      );
     } catch (error) {
-      console.warn("Failed to send comment notification:", error.message);
+      const err = error as any;
+      console.warn("Failed to send comment notification:", err?.message ?? err);
     }
   }
 
@@ -332,14 +362,20 @@ const addComment = asyncHandler(async (req, res) => {
 });
 
 // Get comments for a post
-const getComments = asyncHandler(async (req, res) => {
+const getComments = asyncHandler(async (req: AuthRequest, res: Response) => {
   let { postId, mediaId } = req.params;
-  const { page = 1, limit = 20 } = req.query;
+  function toNum(val: any, def: number) {
+    if (Array.isArray(val)) val = val[0];
+    const n = Number(val);
+    return isNaN(n) ? def : n;
+  }
+  const page = toNum(req.query.page, 1);
+  const limit = toNum(req.query.limit, 20);
   const skip = (page - 1) * limit;
 
   // Ensure both are strings for matching
-  postId = postId?.toString();
-  mediaId = mediaId?.toString();
+  postId = String(postId);
+  mediaId = String(mediaId);
 
   console.log("getComments called with:", { postId, mediaId, page, limit });
 
@@ -349,8 +385,8 @@ const getComments = asyncHandler(async (req, res) => {
   const comments = await Comment.find(query)
     .populate("userId", "username avatarUrl")
     .sort({ createdAt: -1 })
-    .skip(parseInt(skip))
-    .limit(parseInt(limit))
+    .skip(skip)
+    .limit(limit)
     .lean();
 
   const totalComments = await Comment.countDocuments(query);
@@ -376,12 +412,12 @@ const getComments = asyncHandler(async (req, res) => {
 });
 
 // Get suggested users (users not followed by current user)
-const getSuggestedUsers = asyncHandler(async (req, res) => {
+const getSuggestedUsers = asyncHandler(async (req: AuthRequest, res: Response) => {
   const currentUserId = req.user._id;
   const { limit = 5 } = req.query;
 
   const currentUser = await User.findById(currentUserId);
-  const followingIds = currentUser.following || [];
+  const followingIds = currentUser?.following || [];
 
   // Get users not followed by current user and exclude current user
   const suggestedUsers = await User.find({
@@ -390,13 +426,13 @@ const getSuggestedUsers = asyncHandler(async (req, res) => {
     },
   })
     .select("username name avatarUrl bio followers")
-    .limit(parseInt(limit))
+    .limit(typeof limit === "number" ? limit : Array.isArray(limit) ? parseInt(limit[0] as string) : parseInt(limit as string))
     .lean();
 
   // Add followers count to each user
   const usersWithFollowersCount = suggestedUsers.map((user) => ({
     ...user,
-    followersCount: user.followers ? user.followers.length : 0,
+    followersCount: user && user.followers ? user.followers.length : 0,
   }));
 
   return res
@@ -411,15 +447,19 @@ const getSuggestedUsers = asyncHandler(async (req, res) => {
 });
 
 // Get user activity stats
-const getUserActivity = asyncHandler(async (req, res) => {
+const getUserActivity = asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.user._id;
 
   const user = await User.findById(userId);
 
-  const stats = {
+  const stats = user ? {
     postsCount: user.media ? user.media.length : 0,
     followersCount: user.followers ? user.followers.length : 0,
     followingCount: user.following ? user.following.length : 0,
+  } : {
+    postsCount: 0,
+    followersCount: 0,
+    followingCount: 0,
   };
 
   return res

@@ -7,18 +7,8 @@ import { User } from "../models/user.model.js";
 import path from "path";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
-// Extend Express Request to include user and file
-interface AuthRequest extends Request {
-  user?: { _id: string; [key: string]: any };
-  file?: Express.Multer.File;
-  body: {
-    caption?: string;
-    [key: string]: any;
-  };
-}
 
-
-const uploadMedia = asyncHandler(async (req: AuthRequest, res: Response) => {
+const uploadMedia = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?._id;
   if (!userId) {
     throw new ApiError(401, "Unauthorized: User not authenticated.");
