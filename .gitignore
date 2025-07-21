@@ -23,7 +23,9 @@
 /build
 
 # backend TypeScript build output
-backend\dist
+backend/dist
+
+md/
 
 # misc
 .DS_Store

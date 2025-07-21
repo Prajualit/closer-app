@@ -1,0 +1,11 @@
+services:
+  backend:
+    type: web
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm run start
+    rootDir: backend
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
