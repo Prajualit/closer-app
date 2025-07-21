@@ -2,9 +2,8 @@ services:
   backend:
     type: web
     env: node
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm run start
-    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm run start
     autoDeploy: true
     envVars:
       - key: NODE_ENV
