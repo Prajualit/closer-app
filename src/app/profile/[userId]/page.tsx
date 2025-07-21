@@ -965,7 +965,12 @@ const ProfilePage = () => {
                     imageUrl={selectedMedia.imageUrl}
                     videoUrl={selectedMedia.videoUrl}
                     onClose={handleCloseModal}
-                    user={selectedUser}
+                    user={selectedUser ? {
+                        _id: selectedUser._id,
+                        name: selectedUser.name,
+                        username: selectedUser.username,
+                        avatarUrl: selectedUser.avatarUrl,
+                    } : undefined}
                 />
             )}
         </div>
