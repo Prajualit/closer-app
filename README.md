@@ -31,10 +31,11 @@ git clone https://github.com/Prajualit/Social-Media-App-Closer-Mern.git
 cd Social-Media-App-Closer-Mern
 ```
 
+
 ### Backend Setup
-1. Navigate to the `server` directory:
+1. Navigate to the `backend` directory:
    ```sh
-   cd server
+   cd backend
    ```
 2. Install dependencies:
    ```sh
@@ -52,9 +53,9 @@ cd Social-Media-App-Closer-Mern
    The backend will run on `http://localhost:5000`.
 
 ### Frontend Setup
-1. Navigate to the `client` directory:
+1. Navigate to the `frontend` directory:
    ```sh
-   cd ../client
+   cd frontend
    ```
 2. Install dependencies:
    ```sh
@@ -62,7 +63,7 @@ cd Social-Media-App-Closer-Mern
    ```
 3. Start the frontend:
    ```sh
-   npm start
+   npm run dev
    ```
    The frontend will run on `http://localhost:3000`.
 
