@@ -106,7 +106,7 @@ const Photos: React.FC = () => {
         <>
           {/* Desktop Layout */}
           <div className="hidden lg:grid lg:grid-cols-3 items-center justify-center gap-2">
-            {imageMedia.map((m, i) => (
+            {imageMedia.reverse().map((m, i) => (
               <div
                 key={i}
                 className="group relative h-[12.5rem] w-[12.5rem] cursor-pointer"
@@ -124,7 +124,7 @@ const Photos: React.FC = () => {
 
           {/* Mobile Layout */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:hidden gap-1 sm:gap-2">
-            {imageMedia.map((m, i) => (
+            {imageMedia.reverse().map((m, i) => (
               <div
                 key={i}
                 className="group relative aspect-square cursor-pointer"

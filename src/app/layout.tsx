@@ -1,6 +1,3 @@
-// Ensure this is a client component if any child is a client component
-'use client';
-
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";

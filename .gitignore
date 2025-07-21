@@ -14,12 +14,16 @@
 # testing
 /coverage
 
+
 # next.js
 /.next/
 /out/
 
 # production
 /build
+
+# backend TypeScript build output
+backend\dist
 
 # misc
 .DS_Store

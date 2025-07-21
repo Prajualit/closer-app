@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/redux/slice/userSlice.js";
+import { setUser } from "@/redux/slice/userSlice";
 import { API_ENDPOINTS } from "@/lib/api";
 import Image from "next/image";
 

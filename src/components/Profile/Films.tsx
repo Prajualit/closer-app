@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import ImageModal from '@/components/Modal/viewMedia.modal';
-import CreateModal from '@/components/Modal/create';
-import LoadingButton from '@/components/LoadingButton';
+import React, { useEffect, useState, useRef } from "react";
+import { useSelector } from "react-redux";
+import ImageModal from "@/components/Modal/viewMedia.modal";
+import CreateModal from "@/components/Modal/create";
+import LoadingButton from "@/components/LoadingButton";
 
 interface MediaItem {
   url: string;
@@ -17,7 +17,9 @@ interface UserType {
 }
 
 const Films = () => {
-  const user = useSelector((state: { user: { user: UserType } }) => state.user.user);
+  const user = useSelector(
+    (state: { user: { user: UserType } }) => state.user.user
+  );
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
 
@@ -25,7 +27,9 @@ const Films = () => {
     Array.isArray(user?.media) &&
     user.media.some((item: MediaItem) => item.resource_type === "video");
 
-  const [videoOrientations, setVideoOrientations] = useState<Record<string, boolean>>({});
+  const [videoOrientations, setVideoOrientations] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     if (!user?.media) return;
@@ -94,14 +98,18 @@ const Films = () => {
     );
   };
 
-  const activeMedia = user?.media?.find((m: MediaItem) => m.url === activeVideoUrl);
+  const activeMedia = user?.media?.find(
+    (m: MediaItem) => m.url === activeVideoUrl
+  );
 
   // Prepare refs for all videos (React Hook compliant)
   const videoRefs = useRef<Array<React.RefObject<HTMLVideoElement | null>>>([]);
 
   // Update refs array length when user.media changes
   useEffect(() => {
-    const videoCount = user?.media?.filter((m: MediaItem) => m.resource_type === "video").length || 0;
+    const videoCount =
+      user?.media?.filter((m: MediaItem) => m.resource_type === "video")
+        .length || 0;
     // Only update if length changes
     if (videoRefs.current.length !== videoCount) {
       videoRefs.current = Array(videoCount)
@@ -116,15 +124,17 @@ const Films = () => {
         <>
           {/* Desktop Layout - preserved as requested */}
           <div className="hidden lg:grid lg:grid-cols-3 items-center justify-center gap-2">
-            {user?.media
-              ?.filter((m: MediaItem) => m.resource_type === "video")
+            {[...(user?.media ?? [])]
+              .reverse()
+              .filter((m: MediaItem) => m.resource_type === "video")
               .map((m: MediaItem, i: number) => {
                 const isPortrait = videoOrientations[m.url];
-                const videoClass = isPortrait !== undefined
-                  ? isPortrait
-                    ? "object-cover"
-                    : "object-contain"
-                  : "object-contain";
+                const videoClass =
+                  isPortrait !== undefined
+                    ? isPortrait
+                      ? "object-cover"
+                      : "object-contain"
+                    : "object-contain";
 
                 const videoRef = videoRefs.current[i];
 
@@ -163,15 +173,17 @@ const Films = () => {
 
           {/* Mobile Layout - responsive design */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:hidden gap-1 sm:gap-2">
-            {user?.media
-              ?.filter((m: MediaItem) => m.resource_type === "video")
+            {[...(user?.media ?? [])]
+              .reverse()
+              .filter((m: MediaItem) => m.resource_type === "video")
               .map((m: MediaItem, i: number) => {
                 const isPortrait = videoOrientations[m.url];
-                const videoClass = isPortrait !== undefined
-                  ? isPortrait
-                    ? "object-cover"
-                    : "object-contain"
-                  : "object-contain";
+                const videoClass =
+                  isPortrait !== undefined
+                    ? isPortrait
+                      ? "object-cover"
+                      : "object-contain"
+                    : "object-contain";
 
                 const videoRef = videoRefs.current[i];
 
@@ -211,14 +223,18 @@ const Films = () => {
           <ImageModal
             videoUrl={activeMedia}
             onClose={() => setActiveVideoUrl(null)}
-            user={user && user._id ? user as Required<UserType> : undefined}
+            user={user && user._id ? (user as Required<UserType>) : undefined}
           />
         </>
       ) : (
         <div className="flex flex-col items-center justify-center space-y-5">
           <FilmIcon size={100} color="black" />
-          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">No Films Yet</h1>
-          <p className="text-neutral-500">When you share films, they will appear on your profile.</p>
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">
+            No Films Yet
+          </h1>
+          <p className="text-neutral-500">
+            When you share films, they will appear on your profile.
+          </p>
           <LoadingButton
             onClick={() => setIsCreateModalOpen(true)}
             className="!w-fit"
@@ -239,6 +255,3 @@ const Films = () => {
 };
 
 export default Films;
-
-
-

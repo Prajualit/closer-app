@@ -141,7 +141,7 @@ const CreateModal: React.FC<CreateModalProps> = ({ nav, activeNav, open, onOpenC
                 </DialogTrigger>
             )}
 
-            <DialogContent>
+            <DialogContent className="xl:w-[40%] h-[90%] sm:w-[90%] w-[95%] ">
                 <DialogHeader>
                     <DialogTitle>Create New Post</DialogTitle>
                     <DialogDescription></DialogDescription>

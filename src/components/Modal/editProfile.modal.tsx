@@ -13,7 +13,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
 import { useDispatch } from "react-redux";
-import { updateUser } from "@/redux/slice/userSlice.js";
+import { updateUser } from "@/redux/slice/userSlice";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import Image from "next/image";

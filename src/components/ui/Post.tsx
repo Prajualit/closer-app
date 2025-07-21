@@ -43,6 +43,7 @@ const Post: React.FC<PostProps> = ({ post, onLike, onComment }) => {
     const [showComments, setShowComments] = useState<boolean>(false)
     const [newComment, setNewComment] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(false)
+    const [videoError, setVideoError] = useState<boolean>(false)
 
     const handleLike = async () => {
         const newLikedState = !isLiked
@@ -272,23 +273,27 @@ const ShareIcon: React.FC<IconProps> = ({ size = 24, color = "currentColor" }) =
             {/* Post Media */}
             <div className='relative w-full aspect-square bg-neutral-100 dark:bg-neutral-900'>
                 {isVideo(post.media?.url) ? (
-                    <video
-                        className='w-full h-full object-contain'
-                        controls
-                        playsInline
-                        preload="metadata"
-                        onError={(e: any) => {
-                            if (e && e.target) {
-                                (e.target as HTMLVideoElement).style.display = 'none';
-                                if ((e.target as HTMLVideoElement).nextSibling) {
-                                    ((e.target as HTMLVideoElement).nextSibling as HTMLElement).style.display = 'flex';
-                                }
-                            }
-                        }}
-                    >
-                        <source src={post.media?.url || ''} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
+                    videoError ? (
+                        <div className="w-full h-full flex items-center justify-center bg-neutral-200 dark:bg-neutral-900">
+                            <div className="text-center text-neutral-500 dark:text-neutral-400">
+                                <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                                </svg>
+                                <p className="text-sm text-neutral-600 dark:text-neutral-400">Media unavailable</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <video
+                            className='w-full h-full object-contain'
+                            controls
+                            playsInline
+                            preload="metadata"
+                            onError={() => setVideoError(true)}
+                        >
+                            <source src={post.media?.url || ''} type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
+                    )
                 ) : (
                     <Image
                         fill
@@ -302,15 +307,6 @@ const ShareIcon: React.FC<IconProps> = ({ size = 24, color = "currentColor" }) =
                         }}
                     />
                 )}
-                {/* Video error fallback */}
-                <div className="hidden w-full h-full items-center justify-center bg-neutral-200 dark:bg-neutral-900">
-                    <div className="text-center text-neutral-500 dark:text-neutral-400">
-                        <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                        </svg>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Media unavailable</p>
-                    </div>
-                </div>
             </div>
 
             {/* Post Actions */}

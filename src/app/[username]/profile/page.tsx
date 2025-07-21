@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, FC } from "react";
+import { useParams } from "next/navigation";
 import Navbar from "@/components/HomePg/Navbar";
 import Userdata from "@/components/Profile/Userdata";
 import { useSelector } from "react-redux";
@@ -8,11 +9,9 @@ import Image from "next/image";
 import Posts from "@/components/Profile/Photos";
 import Films from "@/components/Profile/Films";
 
-interface PageProps {
-  params: Record<string, string>;
-}
 
-const Page: FC<PageProps> = ({ params }) => {
+const Page = () => {
+    const params = useParams();
     const userDetails = useSelector((state: RootState) => state.user.user);
     const [activeNav, setActiveNav] = useState<'PHOTOS' | 'FILMS'>("PHOTOS");
 
