@@ -111,18 +111,35 @@ const Post: React.FC<PostProps> = ({ post, onLike, onComment }) => {
     }
 
     const handleShare = () => {
-        const shareUrl = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000") + `/public/media-viewer/${post._id}`;
+        let shareUrl = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+        let shareText = '';
+        let isVideo = false;
+        if (post.media && post.media.url) {
+            isVideo = Boolean(post.media.url.match(/\.(mp4|webm|mov)$/i)) || post.media.url.includes('video');
+            if (isVideo) {
+                shareText = post.media.caption ? `Watch this video: ${post.media.caption}` : 'Check out this video!';
+                // Use media._id for video
+                shareUrl += `/public/media-viewer/${post.media._id ?? post._id}`;
+            } else {
+                shareText = post.media.caption ? post.media.caption : 'Amazing post!';
+                // Use post._id for images/other
+                shareUrl += `/public/media-viewer/${post._id}`;
+            }
+        } else {
+            shareText = 'Check out this post!';
+            shareUrl += `/public/media-viewer/${post._id}`;
+        }
         if (navigator.share) {
             navigator.share({
                 title: `Check out ${post.username}'s post`,
-                text: post.media.caption || 'Amazing post!',
+                text: shareText,
                 url: shareUrl
-            })
+            });
         } else {
-            navigator.clipboard.writeText(shareUrl)
-            alert('Link copied to clipboard!')
+            navigator.clipboard.writeText(shareUrl);
+            alert('Link copied to clipboard!');
         }
-    }
+    };
 
 interface IconProps {
     size?: number;

@@ -47,13 +47,11 @@ const Media: React.FC = () => {
   const [comments, setComments] = useState<CommentType[]>(post?.comments || []);
   const [showComments, setShowComments] = useState<boolean>(false);
   const [newComment, setNewComment] = useState<string>("");
-  const [videoError, setVideoError] = useState<boolean>(false);
   const [loadingLike, setLoadingLike] = useState(false);
   const [loadingComment, setLoadingComment] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    // Extract postId from the URL (expects .../media-viewer/:postId)
     const match = pathname?.match(/([\w-]+)$/);
     const postId = match ? match[1] : null;
     if (!postId) {
@@ -63,7 +61,6 @@ const Media: React.FC = () => {
     }
     setLoading(true);
     setError(null);
-    // Fetch all posts and find the one with the matching postId
     makeAuthenticatedRequest(`${API_ENDPOINTS.POSTS}`, {
       method: "GET",
     })
@@ -72,12 +69,18 @@ const Media: React.FC = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         if (data.success && data.data.posts) {
-          // Find the post with the matching postId
-          const found = data.data.posts.find(
-            (p: any) => p._id?.toString() === postId
-          );
+          let found = data.data.posts.find((p: any) => p._id?.toString() === postId);
+          if (!found) {
+            found = data.data.posts.find((p: any) =>
+              p.media && (p.media._id?.toString() === postId)
+            );
+          }
           if (found) {
             setPost(found);
+            setIsLiked(found.isLikedByCurrentUser || false);
+            setLikesCount(found.likesCount || 0);
+            setCommentsCount(found.commentsCount || 0);
+            setComments(found.comments || []);
           } else {
             throw new Error("Post not found");
           }
@@ -91,7 +94,6 @@ const Media: React.FC = () => {
       .finally(() => setLoading(false));
   }, [pathname]);
 
-  // Debug: print the media URL to the console
   if (post && post.media?.resource_type === "image") {
     console.log("MEDIA URL:", post.media?.url);
   }
@@ -132,9 +134,9 @@ const Media: React.FC = () => {
   };
 
   const handleAddComment = async () => {
-    if (!newComment.trim() || loading) return;
+    if (!newComment.trim() || loadingComment) return;
 
-    setLoading(true);
+    setLoadingComment(true);
     try {
       const response = await makeAuthenticatedRequest(
         API_ENDPOINTS.ADD_COMMENT,
@@ -160,7 +162,7 @@ const Media: React.FC = () => {
     } catch (error) {
       console.error("Error adding comment:", error);
     } finally {
-      setLoading(false);
+      setLoadingComment(false);
     }
   };
 
@@ -255,13 +257,13 @@ const Media: React.FC = () => {
                       <h1 className="text-lg font-semibold">Comments</h1>
                     </div>
                     <div className="px-4 pb-4">
-                      {post.commentsCount === 0 ? (
+                      {commentsCount === 0 ? (
                         <div className="text-center text-neutral-500 py-4">
                           No comments yet.
                         </div>
-                      ) : post.comments && post.comments.length > 0 ? (
+                      ) : comments && comments.length > 0 ? (
                         <div className="space-y-3">
-                          {post.comments.map(
+                          {comments.map(
                             (comment: CommentType, idx: number) => {
                               let username = comment.userId?.username || comment.user?.username || "User";
                               let avatarUrl = "/default-avatar.svg";
@@ -330,16 +332,16 @@ const Media: React.FC = () => {
                           className="flex items-center space-x-2 transition-colors hover:text-red-500 disabled:opacity-50"
                         >
                           <Heart
-                            className={`w-6 h-6 ${post.isLikedByCurrentUser ? "text-red-500 fill-red-500" : "text-neutral-600 dark:text-neutral-400"}`}
+                            className={`w-6 h-6 ${isLiked ? "text-red-500 fill-red-500" : "text-neutral-600 dark:text-neutral-400"}`}
                           />
-                          <span>{post.likesCount}</span>
+                          <span>{likesCount}</span>
                         </button>
                         <button
                           onClick={() => setShowComments((prev) => !prev)}
                           className="flex items-center space-x-2 transition-colors hover:text-blue-500"
                         >
                           <MessageCircle className="w-6 h-6 text-neutral-600 dark:text-neutral-400" />
-                          <span>{post.commentsCount}</span>
+                          <span>{commentsCount}</span>
                         </button>
                         <button
                           onClick={handleShare}
