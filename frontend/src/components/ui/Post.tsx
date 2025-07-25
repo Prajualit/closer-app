@@ -111,15 +111,15 @@ const Post: React.FC<PostProps> = ({ post, onLike, onComment }) => {
     }
 
     const handleShare = () => {
+        const shareUrl = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000") + `/public/media-viewer/${post._id}`;
         if (navigator.share) {
             navigator.share({
                 title: `Check out ${post.username}'s post`,
                 text: post.media.caption || 'Amazing post!',
-                url: window.location.href
+                url: shareUrl
             })
         } else {
-            // Fallback: copy to clipboard
-            navigator.clipboard.writeText(window.location.href)
+            navigator.clipboard.writeText(shareUrl)
             alert('Link copied to clipboard!')
         }
     }
