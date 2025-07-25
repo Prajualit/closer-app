@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 import { API_ENDPOINTS } from "./api";
@@ -13,10 +13,17 @@ interface AuthGuardProps {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [loading, setLoading] = useState<boolean>(true);
   const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
+    // Skip auth check for /public routes
+    if (pathname && pathname.startsWith("/public")) {
+      setLoading(false);
+      return;
+    }
+
     async function checkAuth() {
       setDebugInfo("Starting auth check...");
 
@@ -108,7 +115,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     }
 
     checkAuth();
-  }, [router]);
+  }, [router, pathname]);
 
   if (loading) {
     return (

@@ -20,6 +20,7 @@ interface APIEndpoints {
   VERIFY_PASSWORD: string;
   CHANGE_PASSWORD: string;
   POSTS: string;
+  GET_SINGLE_POST: EndpointFn;
   LIKE_POST: string;
   UNLIKE_POST: string;
   ADD_COMMENT: string;
@@ -64,6 +65,7 @@ export const API_ENDPOINTS: APIEndpoints = {
   CHANGE_PASSWORD: `${API_BASE_URL}/api/v1/users/change-password`,
   // Posts endpoints
   POSTS: `${API_BASE_URL}/api/v1/posts`,
+  GET_SINGLE_POST: (postId: string, mediaId: string) => `${API_BASE_URL}/api/v1/posts/${postId}/${mediaId}`,
   LIKE_POST: `${API_BASE_URL}/api/v1/posts/like`,
   UNLIKE_POST: `${API_BASE_URL}/api/v1/posts/unlike`,
   ADD_COMMENT: `${API_BASE_URL}/api/v1/posts/comment`,
