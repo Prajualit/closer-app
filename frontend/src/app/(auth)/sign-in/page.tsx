@@ -1,6 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import LoadingButton from "@/components/LoadingButton";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -9,7 +15,8 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/slice/userSlice";
 import { API_ENDPOINTS } from "@/lib/api";
-
+import Image from "next/image";
+import logo from "@/assets/logo.png";
 
 interface LoginFormData {
   username: string;
@@ -47,7 +54,7 @@ const Page = () => {
       });
 
       console.log("📡 Login response status:", response.status);
-      console.log("🍪 Set-Cookie headers:", response.headers.get('set-cookie'));
+      console.log("🍪 Set-Cookie headers:", response.headers.get("set-cookie"));
       // Use for...of for compatibility with Headers.entries()
       const allHeaders: [string, string][] = [];
       for (const entry of response.headers as any) {
@@ -66,10 +73,10 @@ const Page = () => {
 
         // EMERGENCY FIX: Store tokens in localStorage as backup
         if (responseData.data.accessToken) {
-          localStorage.setItem('accessToken', responseData.data.accessToken);
+          localStorage.setItem("accessToken", responseData.data.accessToken);
         }
         if (responseData.data.refreshToken) {
-          localStorage.setItem('refreshToken', responseData.data.refreshToken);
+          localStorage.setItem("refreshToken", responseData.data.refreshToken);
         }
 
         // Check if cookies were actually set
@@ -78,42 +85,57 @@ const Page = () => {
 
         router.push(`/${responseData.data.user.username}/home`);
       }
-    }
-    catch (error: any) {
+    } catch (error: any) {
       setError(error?.message || "Unknown error");
       console.log("Error during login:", error?.message);
-    }
-    finally {
+    } finally {
       setPending(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-900 px-4 py-6 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-sm sm:max-w-md rounded-xl shadow-md bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
+    <div className="min-h-screen flex flex-col space-y-10 justify-center items-center bg-neutral-50 dark:bg-neutral-900 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex justify-center items-center pt-6">
+        <Image
+          className="w-[200px] dark:invert dark:brightness-0 dark:saturate-0"
+          src={logo}
+          alt=""
+        />
+      </div>
+      <Card className="w-full max-w-sm sm:max-w-md rounded-xl shadow-md bg-white dark:bg-neutral-900 ">
         <CardHeader className="px-4 sm:px-6 pt-6 pb-4">
-          <CardTitle className="text-lg sm:text-xl text-neutral-900 dark:text-white text-center">Sign In</CardTitle>
-          <CardDescription className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 text-center">Log Into Your Account</CardDescription>
+          <CardTitle className="text-lg sm:text-xl text-neutral-900 dark:text-white text-center">
+            Sign In
+          </CardTitle>
+          <CardDescription className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 text-center">
+            Log Into Your Account
+          </CardDescription>
         </CardHeader>
         <CardContent className="px-4 sm:px-6 pb-6">
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             {fields.map((field) => (
               <div key={field} className="mb-4">
-                <label htmlFor={field} className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                <label
+                  htmlFor={field}
+                  className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+                >
                   {field.charAt(0).toUpperCase() + field.slice(1)}
                 </label>
                 <Input
                   type={field === "password" ? "password" : "text"}
                   label={field}
                   {...register(field, {
-                    required: field === "username" ? "Username is required" : "Password is required",
+                    required:
+                      field === "username"
+                        ? "Username is required"
+                        : "Password is required",
                   })}
                   placeholder={`Enter your ${field}`}
                   error={errors[field]}
                   disabled={pending}
                   className={`bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border-neutral-300 dark:border-neutral-600 text-sm sm:text-base h-10 sm:h-11 ${errors[field] ? "border-red-500 dark:border-red-500" : ""}`}
                 />
-                {typeof errors[field]?.message === 'string' && (
+                {typeof errors[field]?.message === "string" && (
                   <p className="text-red-500 text-xs sm:text-sm mt-1">
                     {errors[field]?.message}
                   </p>
@@ -137,7 +159,10 @@ const Page = () => {
             </LoadingButton>
           </form>
           <div className="mt-4 text-center">
-            <Link href="/sign-up" className="text-blue-600 dark:text-blue-400 hover:underline text-xs sm:text-sm">
+            <Link
+              href="/sign-up"
+              className="text-blue-600 dark:text-blue-400 hover:underline text-xs sm:text-sm"
+            >
               Don&apos;t have an account? Sign up
             </Link>
           </div>

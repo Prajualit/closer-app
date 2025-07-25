@@ -18,11 +18,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
-    // Skip auth check for /public routes
-    if (pathname && pathname.startsWith("/public")) {
-      setLoading(false);
-      return;
-    }
 
     async function checkAuth() {
       setDebugInfo("Starting auth check...");

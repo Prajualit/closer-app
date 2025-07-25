@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
@@ -51,6 +53,7 @@ const Media: React.FC = () => {
   const [loadingComment, setLoadingComment] = useState(false);
   const pathname = usePathname();
 
+
   useEffect(() => {
     const match = pathname?.match(/([\w-]+)$/);
     const postId = match ? match[1] : null;
@@ -69,10 +72,12 @@ const Media: React.FC = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         if (data.success && data.data.posts) {
-          let found = data.data.posts.find((p: any) => p._id?.toString() === postId);
+          let found = data.data.posts.find(
+            (p: any) => p._id?.toString() === postId
+          );
           if (!found) {
-            found = data.data.posts.find((p: any) =>
-              p.media && (p.media._id?.toString() === postId)
+            found = data.data.posts.find(
+              (p: any) => p.media && p.media._id?.toString() === postId
             );
           }
           if (found) {
@@ -263,56 +268,65 @@ const Media: React.FC = () => {
                         </div>
                       ) : comments && comments.length > 0 ? (
                         <div className="space-y-3">
-                          {comments.map(
-                            (comment: CommentType, idx: number) => {
-                              let username = comment.userId?.username || comment.user?.username || "User";
-                              let avatarUrl = "/default-avatar.svg";
-                              if (comment.userId && typeof comment.userId === "object" && (comment.userId as any).avatarUrl) {
-                                avatarUrl = (comment.userId as any).avatarUrl;
-                              } else if (comment.user && typeof comment.user === "object" && (comment.user as any).avatarUrl) {
-                                avatarUrl = (comment.user as any).avatarUrl;
-                              }
-                              const text = comment.text || "[No text]";
-                              let createdAt = "";
-                              try {
-                                createdAt = comment.createdAt
-                                  ? new Date(comment.createdAt).toLocaleString()
-                                  : "";
-                              } catch (e) {
-                                createdAt = "";
-                              }
-                              return (
-                                <div
-                                  key={comment._id || idx}
-                                  className="flex items-start space-x-3"
-                                >
-                                  <div className="w-7 h-7 rounded-full relative overflow-hidden flex-shrink-0">
-                                    <Image
-                                      src={avatarUrl}
-                                      fill
-                                      className="rounded-full object-cover"
-                                      alt={username}
-                                    />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="bg-neutral-100 dark:bg-neutral-800 rounded-2xl px-3 py-2">
-                                      <div className="font-semibold text-sm text-neutral-900 dark:text-white">
-                                        {username}
-                                      </div>
-                                      <div className="text-sm text-neutral-700 dark:text-neutral-300 break-words">
-                                        {text}
-                                      </div>
-                                    </div>
-                                    {createdAt && (
-                                      <div className="text-xs text-neutral-500 ml-3 mt-1">
-                                        {createdAt}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              );
+                          {comments.map((comment: CommentType, idx: number) => {
+                            let username =
+                              comment.userId?.username ||
+                              comment.user?.username ||
+                              "User";
+                            let avatarUrl = "/default-avatar.svg";
+                            if (
+                              comment.userId &&
+                              typeof comment.userId === "object" &&
+                              (comment.userId as any).avatarUrl
+                            ) {
+                              avatarUrl = (comment.userId as any).avatarUrl;
+                            } else if (
+                              comment.user &&
+                              typeof comment.user === "object" &&
+                              (comment.user as any).avatarUrl
+                            ) {
+                              avatarUrl = (comment.user as any).avatarUrl;
                             }
-                          )}
+                            const text = comment.text || "[No text]";
+                            let createdAt = "";
+                            try {
+                              createdAt = comment.createdAt
+                                ? new Date(comment.createdAt).toLocaleString()
+                                : "";
+                            } catch (e) {
+                              createdAt = "";
+                            }
+                            return (
+                              <div
+                                key={comment._id || idx}
+                                className="flex items-start space-x-3"
+                              >
+                                <div className="w-7 h-7 rounded-full relative overflow-hidden flex-shrink-0">
+                                  <Image
+                                    src={avatarUrl}
+                                    fill
+                                    className="rounded-full object-cover"
+                                    alt={username}
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="bg-neutral-100 dark:bg-neutral-800 rounded-2xl px-3 py-2">
+                                    <div className="font-semibold text-sm text-neutral-900 dark:text-white">
+                                      {username}
+                                    </div>
+                                    <div className="text-sm text-neutral-700 dark:text-neutral-300 break-words">
+                                      {text}
+                                    </div>
+                                  </div>
+                                  {createdAt && (
+                                    <div className="text-xs text-neutral-500 ml-3 mt-1">
+                                      {createdAt}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       ) : (
                         <div className="text-center text-neutral-500 py-4">
