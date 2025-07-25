@@ -14,6 +14,18 @@ const nextConfig = {
                 port: '',
                 pathname: '/**',
             },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'localhost',
+                port: '',
+                pathname: '/**',
+            },
         ],
     },
     webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
