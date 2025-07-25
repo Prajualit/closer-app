@@ -8,7 +8,8 @@ import {
   getComments,
   getSuggestedUsers,
   getUserActivity,
-  getLikesCount
+  getLikesCount,
+  getSinglePost
 } from "../controllers/posts.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
@@ -25,6 +26,9 @@ router.route("/comment").post(addComment);
 router.route("/comments/:postId/:mediaId").get(getComments);
 // Likes count for a post/media
 router.route("/likes/:postId/:mediaId").get(getLikesCount);
+
+// Get a single post with a specific media item
+router.route("/:postId/:mediaId").get(getSinglePost);
 
 // User related routes
 router.route("/suggested-users").get(getSuggestedUsers);

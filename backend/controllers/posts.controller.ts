@@ -16,6 +16,65 @@ interface AuthRequest extends Request {
   user: AuthUser;
 }
 
+// Get a single post (with a specific media item) by postId and mediaId
+const getSinglePost = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { postId, mediaId } = req.params;
+  const currentUserId = req.user._id;
+
+  if (!postId || !mediaId) {
+    throw new ApiError(400, "Post ID and Media ID are required");
+  }
+
+  // Find the user (post owner) and the specific media item
+  const user = await User.findById(postId).lean();
+  if (!user) {
+    throw new ApiError(404, "Post not found");
+  }
+  const media = user.media?.find((m: any) => m._id?.toString() === mediaId);
+  if (!media) {
+    throw new ApiError(404, "Media not found for this post");
+  }
+
+  // Get likes and comments for this post/media
+  const likes = await Like.find({ postId, mediaId });
+  const comments = await Comment.find({ postId, mediaId })
+    .populate("userId", "username avatarUrl")
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .lean();
+
+  const likesCount = likes.length;
+  const commentsCount = comments.length;
+  const isLikedByCurrentUser = likes.some((like: any) => like.userId.toString() === currentUserId.toString());
+
+  const post = {
+    _id: user._id,
+    username: user.username,
+    avatarUrl: user.avatarUrl,
+    media: {
+      _id: media._id,
+      url: media.url,
+      caption: media.caption,
+      resource_type: media.resource_type,
+      uploadedAt: media.uploadedAt,
+    },
+    title: media.caption, // or user.title if you have it
+    content: media.caption, // or user.content if you have it
+    likesCount,
+    commentsCount,
+    isLikedByCurrentUser,
+    comments: comments.map((c: any) => ({
+      _id: c._id,
+      text: c.text,
+      user: c.userId,
+    })),
+  };
+
+  return res.status(200).json(
+    new ApiResponse(200, { post }, "Post fetched successfully")
+  );
+});
+
 // Get likes count and like status for a post/media
 const getLikesCount = asyncHandler(async (req: AuthRequest, res: Response) => {
   let { postId, mediaId } = req.params;
@@ -476,4 +535,5 @@ export {
   getSuggestedUsers,
   getUserActivity,
   getLikesCount,
+  getSinglePost,
 };
