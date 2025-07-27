@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/slice/userSlice";
 import { API_ENDPOINTS } from "@/lib/api";
 import Image from "next/image";
+import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 
 interface SignUpFormData {
@@ -155,8 +156,15 @@ const Page = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-900 px-4 py-6 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-lg rounded-xl shadow-md bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
+    <div className="min-h-screen flex flex-col space-y-10 justify-center items-center bg-neutral-50 dark:bg-neutral-900 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex justify-center items-center pt-6">
+        <Image
+          className="w-[200px] dark:invert dark:brightness-0 dark:saturate-0"
+          src={logo}
+          alt=""
+        />
+      </div>
+      <Card className="w-full max-w-md rounded-xl shadow-md bg-white dark:bg-neutral-900">
         <CardHeader className="px-4 sm:px-6 pt-6 pb-4">
           <CardTitle className="text-lg sm:text-xl text-neutral-900 dark:text-white text-center">
             Sign Up
@@ -175,7 +183,7 @@ const Page = () => {
                     <div className="mb-4 flex flex-col">
                       <label
                         htmlFor="username"
-                        className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 "
+                        className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
                       >
                         Username
                       </label>
@@ -200,7 +208,7 @@ const Page = () => {
                     <div className="mb-4 flex flex-col">
                       <label
                         htmlFor="name"
-                        className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 "
+                        className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
                       >
                         Name
                       </label>
@@ -226,7 +234,7 @@ const Page = () => {
                     <div className="mb-4 flex flex-col">
                       <label
                         htmlFor="password"
-                        className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 "
+                        className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
                       >
                         Password
                       </label>
@@ -250,7 +258,7 @@ const Page = () => {
                     <div className="mb-4 flex flex-col">
                       <label
                         htmlFor="confirmPassword"
-                        className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 "
+                        className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
                       >
                         Confirm Password
                       </label>
@@ -289,7 +297,7 @@ const Page = () => {
             {isNext && (
               <LoadingButton
                 pending={pending}
-                className="mt-2 h-10 sm:h-12 text-sm sm:text-base w-full"
+                className="mb-2 h-10 sm:h-12 text-sm sm:text-base w-full"
                 type="submit"
               >
                 Signup
@@ -301,7 +309,7 @@ const Page = () => {
                 e.preventDefault();
                 setIsNext(!isNext);
               }}
-              className="mt-2 h-10 sm:h-12 text-sm sm:text-base w-full dark:bg-neutral-700 dark:hover:bg-neutral-100 dark:hover:text-black duration-300 dark:text-white"
+              className=" h-10 sm:h-12 text-sm sm:text-base w-full dark:bg-neutral-700 dark:hover:bg-neutral-100 dark:hover:text-black duration-300 dark:text-white"
               type="button"
             >
               {!isNext ? "Next" : "Back"}

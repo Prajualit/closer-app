@@ -1,13 +1,21 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useInView } from 'react-intersection-observer';
-import { useDispatch, useSelector } from 'react-redux';
-import { Heart, MessageCircle, Share, MoreHorizontal, Play, Pause, VolumeX, Volume2 } from 'lucide-react';
-import Image from 'next/image';
-import { formatDistanceToNow } from 'date-fns';
-import { API_ENDPOINTS, makeAuthenticatedRequest } from '@/lib/api';
-import { useToast } from '@/hooks/use-toast';
-import CommentModal from './CommentModal';
-
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useInView } from "react-intersection-observer";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Heart,
+  MessageCircle,
+  Share,
+  MoreHorizontal,
+  Play,
+  Pause,
+  VolumeX,
+  Volume2,
+} from "lucide-react";
+import Image from "next/image";
+import { formatDistanceToNow } from "date-fns";
+import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import CommentModal from "./CommentModal";
 
 interface Media {
   _id: string | number;
@@ -41,20 +49,24 @@ interface FilmItemProps {
   onMuteToggle: () => void;
 }
 
-const FilmItem: React.FC<FilmItemProps> = ({ 
-  film, 
-  isActive, 
-  onLike, 
-  onComment, 
-  onShare, 
+const FilmItem: React.FC<FilmItemProps> = ({
+  film,
+  isActive,
+  onLike,
+  onComment,
+  onShare,
   onVideoEnd,
   muted,
-  onMuteToggle 
+  onMuteToggle,
 }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [isLiked, setIsLiked] = useState<boolean>(film.isLikedByCurrentUser || false);
+  const [isLiked, setIsLiked] = useState<boolean>(
+    film.isLikedByCurrentUser || false
+  );
   const [likesCount, setLikesCount] = useState<number>(film.likesCount || 0);
-  const [commentsCount, setCommentsCount] = useState<number>(film.commentsCount || 0);
+  const [commentsCount, setCommentsCount] = useState<number>(
+    film.commentsCount || 0
+  );
   const [showComments, setShowComments] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -85,14 +97,14 @@ const FilmItem: React.FC<FilmItemProps> = ({
           // Wait for video to be ready
           await new Promise<void>((resolve) => {
             const handleCanPlay = () => {
-              video.removeEventListener('canplay', handleCanPlay);
+              video.removeEventListener("canplay", handleCanPlay);
               resolve();
             };
-            
+
             if (video.readyState >= 3) {
               resolve();
             } else {
-              video.addEventListener('canplay', handleCanPlay);
+              video.addEventListener("canplay", handleCanPlay);
               // Fallback timeout
               setTimeout(resolve, 2000);
             }
@@ -114,7 +126,7 @@ const FilmItem: React.FC<FilmItemProps> = ({
         // Start new play promise
         playPromiseRef.current = video.play();
         await playPromiseRef.current;
-        
+
         if (isMounted) {
           setIsPlaying(true);
         }
@@ -122,13 +134,13 @@ const FilmItem: React.FC<FilmItemProps> = ({
       } catch (error) {
         if (
           error &&
-          typeof error === 'object' &&
-          'name' in error &&
-          typeof (error as any).name === 'string' &&
-          (error as any).name !== 'AbortError' &&
+          typeof error === "object" &&
+          "name" in error &&
+          typeof (error as any).name === "string" &&
+          (error as any).name !== "AbortError" &&
           isMounted
         ) {
-          console.warn('Video autoplay failed:', error);
+          console.warn("Video autoplay failed:", error);
         }
         playPromiseRef.current = null;
       }
@@ -143,13 +155,13 @@ const FilmItem: React.FC<FilmItemProps> = ({
           });
           playPromiseRef.current = null;
         }
-        
+
         if (isMounted) {
           video.pause();
           setIsPlaying(false);
         }
       } catch (error) {
-        console.warn('Video pause failed:', error);
+        console.warn("Video pause failed:", error);
       }
     };
 
@@ -174,20 +186,20 @@ const FilmItem: React.FC<FilmItemProps> = ({
       onVideoEnd?.();
     };
 
-    video.addEventListener('ended', handleEnded);
-    return () => video.removeEventListener('ended', handleEnded);
+    video.addEventListener("ended", handleEnded);
+    return () => video.removeEventListener("ended", handleEnded);
   }, [onVideoEnd]);
 
   const handlePlayPause = useCallback(async () => {
     const video = videoRef.current;
     if (!video) {
-      console.warn('Video element not found');
+      console.warn("Video element not found");
       return;
     }
 
-    console.log('Play/Pause clicked. Current playing state:', isPlaying);
-    console.log('Video source:', video.src);
-    console.log('Video ready state:', video.readyState);
+    console.log("Play/Pause clicked. Current playing state:", isPlaying);
+    console.log("Video source:", video.src);
+    console.log("Video ready state:", video.readyState);
 
     try {
       if (isPlaying) {
@@ -198,58 +210,58 @@ const FilmItem: React.FC<FilmItemProps> = ({
         }
         video.pause();
         setIsPlaying(false);
-        console.log('Video paused');
+        console.log("Video paused");
       } else {
         // Cancel any previous play promise
         if (playPromiseRef.current) {
           await playPromiseRef.current.catch(() => {});
         }
-        
+
         // Check if video is ready to play
         if (video.readyState < 3) {
-          console.log('Video not ready, waiting...');
+          console.log("Video not ready, waiting...");
           await new Promise<void>((resolve) => {
             const handleCanPlay = () => {
-              video.removeEventListener('canplay', handleCanPlay);
-              console.log('Video ready to play');
+              video.removeEventListener("canplay", handleCanPlay);
+              console.log("Video ready to play");
               resolve();
             };
-            
+
             if (video.readyState >= 3) {
               resolve();
             } else {
-              video.addEventListener('canplay', handleCanPlay);
+              video.addEventListener("canplay", handleCanPlay);
               // Fallback timeout
               setTimeout(() => {
-                console.log('Video ready timeout');
+                console.log("Video ready timeout");
                 resolve();
               }, 3000);
             }
           });
         }
-        
+
         // Start new play promise
-        console.log('Starting video play...');
+        console.log("Starting video play...");
         playPromiseRef.current = video.play();
         await playPromiseRef.current;
         setIsPlaying(true);
         playPromiseRef.current = null;
-        console.log('Video playing');
+        console.log("Video playing");
       }
     } catch (error) {
-      console.error('Video play/pause error:', error);
+      console.error("Video play/pause error:", error);
       if (
         error &&
-        typeof error === 'object' &&
-        'name' in error &&
-        typeof (error as any).name === 'string' &&
-        (error as any).name !== 'AbortError'
+        typeof error === "object" &&
+        "name" in error &&
+        typeof (error as any).name === "string" &&
+        (error as any).name !== "AbortError"
       ) {
-        console.warn('Video play/pause failed:', error);
+        console.warn("Video play/pause failed:", error);
         toast({
-          title: 'Playback Error',
-          description: 'Failed to play video. Please try again.',
-          variant: 'destructive',
+          title: "Playback Error",
+          description: "Failed to play video. Please try again.",
+          variant: "destructive",
         });
       }
       playPromiseRef.current = null;
@@ -258,20 +270,22 @@ const FilmItem: React.FC<FilmItemProps> = ({
 
   const handleLike = async () => {
     if (loading) return;
-    
+
     const newLikedState = !isLiked;
     setIsLiked(newLikedState);
-    setLikesCount(prev => newLikedState ? prev + 1 : prev - 1);
+    setLikesCount((prev) => (newLikedState ? prev + 1 : prev - 1));
     setLoading(true);
 
     try {
-      const endpoint = newLikedState ? API_ENDPOINTS.LIKE_POST : API_ENDPOINTS.UNLIKE_POST;
+      const endpoint = newLikedState
+        ? API_ENDPOINTS.LIKE_POST
+        : API_ENDPOINTS.UNLIKE_POST;
       const response = await makeAuthenticatedRequest(endpoint, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({
           postId: film._id,
-          mediaId: film.media._id.toString()
-        })
+          mediaId: film.media._id.toString(),
+        }),
       });
 
       if (response.ok) {
@@ -283,16 +297,16 @@ const FilmItem: React.FC<FilmItemProps> = ({
       } else {
         // Revert on error
         setIsLiked(!newLikedState);
-        setLikesCount(prev => newLikedState ? prev - 1 : prev + 1);
+        setLikesCount((prev) => (newLikedState ? prev - 1 : prev + 1));
       }
     } catch (error) {
-      console.error('Error liking film:', error);
+      console.error("Error liking film:", error);
       setIsLiked(!newLikedState);
-      setLikesCount(prev => newLikedState ? prev - 1 : prev + 1);
+      setLikesCount((prev) => (newLikedState ? prev - 1 : prev + 1));
       toast({
-        title: 'Error',
-        description: 'Failed to like film',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to like film",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -313,27 +327,31 @@ const FilmItem: React.FC<FilmItemProps> = ({
       if (navigator.share) {
         await navigator.share({
           title: `Check out ${film.username}'s film`,
-          text: film.caption || 'Amazing film!',
-          url: `${window.location.origin}/film/${film._id}`
+          text: film.caption || "Amazing film!",
+          url: `${window.location.origin}/film/${film._id}`,
         });
       } else {
-        await navigator.clipboard.writeText(`${window.location.origin}/film/${film._id}`);
+        await navigator.clipboard.writeText(
+          `${window.location.origin}/film/${film._id}`
+        );
         toast({
-          title: 'Link copied!',
-          description: 'Film link copied to clipboard',
+          title: "Link copied!",
+          description: "Film link copied to clipboard",
         });
       }
       onShare?.(film._id);
     } catch (error) {
-      console.error('Error sharing film:', error);
+      console.error("Error sharing film:", error);
     }
   };
 
   const formatTimeAgo = (dateString: string | undefined) => {
     try {
-      return formatDistanceToNow(new Date(dateString ?? ''), { addSuffix: true });
+      return formatDistanceToNow(new Date(dateString ?? ""), {
+        addSuffix: true,
+      });
     } catch {
-      return 'Recently';
+      return "Recently";
     }
   };
 
@@ -356,23 +374,39 @@ const FilmItem: React.FC<FilmItemProps> = ({
       <div className="flex-1 flex flex-col justify-end p-3 sm:p-4 text-white z-10 min-w-0">
         {/* User Info */}
         <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
-          <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex-shrink-0">
-            <Image
-              fill
-              className="rounded-full object-cover border-2 border-white"
-              src={film.avatarUrl || '/default-avatar.svg'}
-              alt={`${film.username}'s avatar`}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement | null;
-                if (target && typeof target.src === 'string') {
-                  target.src = '/default-avatar.svg';
-                }
-              }}
-            />
-          </div>
+          {film.avatarUrl ? (
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex-shrink-0">
+              <Image
+                fill
+                className="rounded-full object-cover border-2 border-white"
+                src={film.avatarUrl || "/default-avatar.svg"}
+                alt={`${film.username}'s avatar`}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement | null;
+                  if (target && typeof target.src === "string") {
+                    target.src = "/default-avatar.svg";
+                  }
+                }}
+              />
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+              <svg
+                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </svg>
+            </div>
+          )}
           <div className="min-w-0">
-            <h3 className="font-semibold text-xs sm:text-sm truncate">{film.username}</h3>
-            <p className="text-xs opacity-75 truncate">{formatTimeAgo(film.media?.uploadedAt || film.uploadedAt)}</p>
+            <h3 className="font-semibold text-xs sm:text-sm truncate">
+              {film.username}
+            </h3>
+            <p className="text-xs opacity-75 truncate">
+              {formatTimeAgo(film.media?.uploadedAt || film.uploadedAt)}
+            </p>
           </div>
         </div>
 
@@ -387,10 +421,14 @@ const FilmItem: React.FC<FilmItemProps> = ({
         {film.hashtags && film.hashtags.length > 0 && (
           <div className="flex flex-wrap gap-1 sm:gap-2">
             {film.hashtags.slice(0, 3).map((tag, index) => (
-              <span key={index} className="text-xs text-blue-300">#{tag}</span>
+              <span key={index} className="text-xs text-blue-300">
+                #{tag}
+              </span>
             ))}
             {film.hashtags.length > 3 && (
-              <span className="text-xs text-neutral-400">+{film.hashtags.length - 3} more</span>
+              <span className="text-xs text-neutral-400">
+                +{film.hashtags.length - 3} more
+              </span>
             )}
           </div>
         )}
@@ -408,27 +446,30 @@ const FilmItem: React.FC<FilmItemProps> = ({
           playsInline
           preload="metadata"
           onClick={handlePlayPause}
-          onLoadStart={() => console.log('Video load started')}
-          onLoadedData={() => console.log('Video data loaded')}
-          onCanPlay={() => console.log('Video can play')}
+          onLoadStart={() => console.log("Video load started")}
+          onLoadedData={() => console.log("Video data loaded")}
+          onCanPlay={() => console.log("Video can play")}
           onError={(e) => {
-            console.error('Video error:', e);
+            console.error("Video error:", e);
             toast({
-              title: 'Video Error',
-              description: 'Failed to load video',
-              variant: 'destructive',
+              title: "Video Error",
+              description: "Failed to load video",
+              variant: "destructive",
             });
           }}
         />
 
         {/* Play/Pause Overlay */}
         {!isPlaying && (
-          <div 
+          <div
             className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer rounded-lg"
             onClick={handlePlayPause}
           >
             <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center">
-              <Play className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white opacity-90" fill="white" />
+              <Play
+                className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white opacity-90"
+                fill="white"
+              />
             </div>
           </div>
         )}
@@ -456,16 +497,18 @@ const FilmItem: React.FC<FilmItemProps> = ({
               onClick={handleLike}
               disabled={loading}
               className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110 ${
-                isLiked 
-                  ? 'bg-red-500 bg-opacity-80' 
-                  : 'bg-white bg-opacity-20 hover:bg-opacity-30'
+                isLiked
+                  ? "bg-red-500 bg-opacity-80"
+                  : "bg-white bg-opacity-20 hover:bg-opacity-30"
               }`}
             >
-              <Heart 
-                className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${isLiked ? 'text-white fill-white' : 'text-white'}`}
+              <Heart
+                className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${isLiked ? "text-white fill-white" : "text-white"}`}
               />
             </button>
-            <span className="text-white text-xs mt-1 font-medium">{likesCount}</span>
+            <span className="text-white text-xs mt-1 font-medium">
+              {likesCount}
+            </span>
           </div>
 
           {/* Comment */}
@@ -476,7 +519,9 @@ const FilmItem: React.FC<FilmItemProps> = ({
             >
               <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
             </button>
-            <span className="text-white text-xs mt-1 font-medium">{commentsCount}</span>
+            <span className="text-white text-xs mt-1 font-medium">
+              {commentsCount}
+            </span>
           </div>
 
           {/* Share */}

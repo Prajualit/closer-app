@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
@@ -52,7 +50,6 @@ const Media: React.FC = () => {
   const [loadingLike, setLoadingLike] = useState(false);
   const [loadingComment, setLoadingComment] = useState(false);
   const pathname = usePathname();
-
 
   useEffect(() => {
     const match = pathname?.match(/([\w-]+)$/);
@@ -223,14 +220,26 @@ const Media: React.FC = () => {
               <div className="w-full lg:w-80 xl:w-96 h-full min-h-0 bg-white dark:bg-neutral-900 rounded-b-lg lg:rounded-r-lg max-lg:h-[90%] lg:rounded-bl-none overflow-hidden flex flex-col">
                 <div className="flex-1 min-h-0 overflow-y-auto">
                   <div className="flex-shrink-0 h-14 flex max-lg:hidden items-center px-4 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10">
-                    <div className="relative w-10 h-10 flex-shrink-0 mr-3">
-                      <Image
-                        src={post?.avatarUrl || "/default-avatar.svg"}
-                        fill
-                        className="rounded-full object-cover"
-                        alt={post?.username || "User"}
-                      />
-                    </div>
+                    {post?.avatarUrl ? (
+                      <div className="relative w-10 h-10 flex-shrink-0 mr-3">
+                        <Image
+                          src={post?.avatarUrl || "/default-avatar.svg"}
+                          fill
+                          className="rounded-full object-cover"
+                          alt={post?.username || "User"}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                        <svg
+                          className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                      </div>
+                    )}
                     <span className="truncate text-base font-medium text-neutral-900 dark:text-white">
                       {post?.username || "Unknown User"}
                     </span>
@@ -301,14 +310,26 @@ const Media: React.FC = () => {
                                 key={comment._id || idx}
                                 className="flex items-start space-x-3"
                               >
-                                <div className="w-7 h-7 rounded-full relative overflow-hidden flex-shrink-0">
-                                  <Image
-                                    src={avatarUrl}
-                                    fill
-                                    className="rounded-full object-cover"
-                                    alt={username}
-                                  />
-                                </div>
+                                {avatarUrl ? (
+                                  <div className="w-7 h-7 rounded-full relative overflow-hidden flex-shrink-0">
+                                    <Image
+                                      src={avatarUrl}
+                                      fill
+                                      className="rounded-full object-cover"
+                                      alt={username}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                                    <svg
+                                      className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
+                                      fill="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
+                                  </div>
+                                )}
                                 <div className="flex-1 min-w-0">
                                   <div className="bg-neutral-100 dark:bg-neutral-800 rounded-2xl px-3 py-2">
                                     <div className="font-semibold text-sm text-neutral-900 dark:text-white">
@@ -368,14 +389,26 @@ const Media: React.FC = () => {
                   </div>
                   <div className="p-4 pt-0">
                     <div className="flex items-center space-x-3">
-                      <div className="relative w-8 h-8 flex-shrink-0">
-                        <Image
-                          src={post?.avatarUrl || "/default-avatar.svg"}
-                          fill
-                          className="rounded-full object-cover"
-                          alt="Your avatar"
-                        />
-                      </div>
+                      {post?.avatarUrl ? (
+                        <div className="relative w-8 h-8 flex-shrink-0">
+                          <Image
+                            src={post?.avatarUrl || "/default-avatar.svg"}
+                            fill
+                            className="rounded-full object-cover"
+                            alt="Your avatar"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                          <svg
+                            className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                          </svg>
+                        </div>
+                      )}
                       <div className="flex-1 relative">
                         <input
                           type="text"

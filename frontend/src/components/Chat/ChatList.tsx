@@ -383,15 +383,27 @@ const ChatList: React.FC<ChatListProps> = ({
                       key={user._id}
                       className="w-full bg-white dark:bg-neutral-700 flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 hover:shadow-lg shadow-md rounded-[10px] transition-all duration-300"
                     >
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex-shrink-0">
-                        <Image
-                          src={user.avatarUrl}
-                          alt={user.name}
-                          width={40}
-                          height={40}
-                          className="object-cover bg-center rounded-full w-full h-full"
-                        />
-                      </div>
+                      {user.avatarUrl ? (
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex-shrink-0">
+                          <Image
+                            src={user.avatarUrl}
+                            alt={user.name}
+                            width={40}
+                            height={40}
+                            className="object-cover bg-center rounded-full w-full h-full"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                          <svg
+                            className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                          </svg>
+                        </div>
+                      )}
                       <div className="flex-1 text-left min-w-0">
                         <p className="font-medium text-sm sm:text-base text-neutral-900 dark:text-white truncate">
                           {user.name}
@@ -516,15 +528,27 @@ const ChatList: React.FC<ChatListProps> = ({
                     className="flex items-center space-x-3 flex-1"
                   >
                     <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                      <Image
-                        src={
-                          otherParticipant?.avatarUrl || "/default-avatar.png"
-                        }
-                        alt={otherParticipant?.name || "User"}
-                        width={48}
-                        height={48}
-                        className="object-cover bg-center rounded-full"
-                      />
+                      {otherParticipant?.avatarUrl ? (
+                        <Image
+                          src={
+                            otherParticipant?.avatarUrl || "/default-avatar.png"
+                          }
+                          alt={otherParticipant?.name || "User"}
+                          width={48}
+                          height={48}
+                          className="object-cover bg-center rounded-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
+                          <svg
+                            className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                          </svg>
+                        </div>
+                      )}
                       {/* Unread count badge on avatar */}
                       {unreadCount > 0 && (
                         <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
