@@ -133,33 +133,31 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
   };
 
   const getNotificationLink = () => {
+    const sender = notification.sender;
+    const senderId = sender?._id || "unknown";
+    const senderUsername = sender?.username || "unknown";
     switch (notification.type) {
       case "follow":
-        return `/profile/${notification.sender._id}`;
+        return `/profile/${senderId}`;
       case "like":
-        // Navigate to the post that was liked
         if (notification.data?.postId) {
-          return `/${notification.sender.username}/home?postId=${notification.data.postId}`;
+          return `/${senderUsername}/home?postId=${notification.data.postId}`;
         }
-        return `/profile/${notification.sender._id}`;
+        return `/profile/${senderId}`;
       case "comment":
-        // Navigate to the post that was commented on
         if (notification.data?.postId) {
-          return `/${notification.sender.username}/home?postId=${notification.data.postId}`;
+          return `/${senderUsername}/home?postId=${notification.data.postId}`;
         }
-        return `/profile/${notification.sender._id}`;
+        return `/profile/${senderId}`;
       case "message":
-        // If we have a chatId, navigate directly to that specific chat
         if (notification.data?.chatId) {
-          // Handle both populated and non-populated chatId
           const chatIdValue =
             typeof notification.data.chatId === "object"
               ? notification.data.chatId.chatId
               : notification.data.chatId;
-          return `/${notification.sender.username}/chat?chatId=${chatIdValue}`;
+          return `/${senderUsername}/chat?chatId=${chatIdValue}`;
         }
-        // Fallback to general chat page with userId for creating/finding chat
-        return `/${notification.sender.username}/chat?userId=${notification.sender._id}&username=${notification.sender.username}`;
+        return `/${senderUsername}/chat?userId=${senderId}&username=${senderUsername}`;
       default:
         return "#";
     }
@@ -194,10 +192,10 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
       >
         {/* Sender Avatar */}
         <div className="flex-shrink-0">
-          {notification.sender.avatarUrl ? (
+          {notification.sender && notification.sender.avatarUrl ? (
             <Image
               src={notification.sender.avatarUrl}
-              alt={notification.sender.name}
+              alt={notification.sender.name || "User"}
               width={40}
               height={40}
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
