@@ -36,10 +36,10 @@ const registerUser = asyncHandler(async (req: any, res: any) => {
   console.log("📁 Request file:", req.file);
   
   // Requesting User Data from frontend
-  const { username, password, name, bio } = req.body;
+  const { username, password, name } = req.body;
 
   // Validation of the body
-  if ([username, password, name, bio].some((field) => field?.trim() === "")) {
+  if ([username, password, name].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "All fields are required");
   }
   const normalizedUsername = username.trim().toLowerCase();
@@ -56,28 +56,27 @@ const registerUser = asyncHandler(async (req: any, res: any) => {
   // }else if(!req.files?.avatarUrl[0]) {
   //   avatarLocalPath = path.normalize(req.files?.avatarUrl.path);
   // }
-  const avatarLocalPath = req.file?.path ? path.normalize(req.file.path) : null;
-  if (!avatarLocalPath || !req.file) {
-    console.error("❌ Avatar upload failed:", {
-      file: req.file,
-      body: req.body,
-      files: req.files
-    });
-    throw new ApiError(400, "Avatar is required and upload failed");
-  }
+  // const avatarLocalPath = req.file?.path ? path.normalize(req.file.path) : null;
+  // if (!avatarLocalPath || !req.file) {
+  //   console.error("❌ Avatar upload failed:", {
+  //     file: req.file,
+  //     body: req.body,
+  //     files: req.files
+  //   });
+  //   throw new ApiError(400, "Avatar is required and upload failed");
+  // }
 
-  const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
-  if (!avatarUpload || !avatarUpload.secure_url) {
-    throw new ApiError(400, `Avatar upload failed ${avatarUpload}`);
-  }
+  // const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
+  // if (!avatarUpload || !avatarUpload.secure_url) {
+  //   throw new ApiError(400, `Avatar upload failed ${avatarUpload}`);
+  // }
 
   //   create user in database
   const user = await User.create({
     username: normalizedUsername,
     password,
     name,
-    bio,
-    avatarUrl: avatarUpload.secure_url || "",
+    // avatarUrl: avatarUpload.secure_url || "",
   });
 
   //   remove password and refreshtoken from response
