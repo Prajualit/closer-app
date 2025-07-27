@@ -1,3 +1,6 @@
+"use client";
+
+
 // --- Types for user profile and media ---
 interface UserProfile {
   _id: string;
@@ -17,7 +20,6 @@ interface MediaItem {
   caption?: string;
   uploadedAt?: string;
 }
-("use client");
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
