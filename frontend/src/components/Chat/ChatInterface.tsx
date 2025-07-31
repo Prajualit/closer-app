@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, MoreVertical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
+import DefaultAvatar from "@/components/ui/defaultAvatar";
 
 interface Participant {
   _id: string;
@@ -560,15 +561,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   />
                 </div>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
-                  <svg
-                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
-                </div>
+                <DefaultAvatar />
               )}
               <div className="min-w-0">
                 <h3 className="font-semibold text-sm sm:text-base text-neutral-900 dark:text-white truncate">
@@ -638,15 +631,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
-                          <svg
-                            className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                          </svg>
-                        </div>
+                        <DefaultAvatar />
                       ))}
                     {!isOwnMessage && !showAvatar && (
                       <div className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0" />
@@ -677,21 +662,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           {(typingUsers.length > 0 || aiTyping) && (
             <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden">
-                <Image
-                  src={
-                    aiTyping
-                      ? "/chatbot.png"
-                      : otherParticipant?.avatarUrl || "/default-avatar.svg"
-                  }
-                  alt={
-                    aiTyping
-                      ? "Your AI Friend"
-                      : otherParticipant?.name || "User"
-                  }
-                  width={32}
-                  height={32}
-                  className="object-cover w-full h-full"
-                />
+                {otherParticipant?.avatarUrl ? (
+                  <Image
+                    src={
+                      aiTyping ? "/chatbot.png" : otherParticipant?.avatarUrl
+                    }
+                    alt={
+                      aiTyping
+                        ? "Your AI Friend"
+                        : otherParticipant?.name || "User"
+                    }
+                    width={32}
+                    height={32}
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <DefaultAvatar />
+                )}
               </div>
               <div className="bg-neutral-100 dark:bg-neutral-700 px-3 sm:px-4 py-2 rounded-lg">
                 <div className="flex space-x-1">

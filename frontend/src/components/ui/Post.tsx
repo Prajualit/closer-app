@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
+import DefaultAvatar from "@/components/ui/defaultAvatar";
 
 interface MediaType {
   _id?: string | number;
@@ -293,7 +294,7 @@ const Post: React.FC<PostProps> = ({ post, onLike, onComment }) => {
   };
 
   return (
-    <div className="w-full  bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700">
+    <div className="w-full bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700">
       {/* Post Header */}
       <div className="p-3 sm:p-4 flex items-center justify-start space-x-2 sm:space-x-3">
         {post.avatarUrl ? (
@@ -311,15 +312,7 @@ const Post: React.FC<PostProps> = ({ post, onLike, onComment }) => {
             />
           </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
-            <svg
-              className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
-          </div>
+          <DefaultAvatar />
         )}
         <div className="flex-1 min-w-0">
           <h2 className="font-semibold text-xs sm:text-sm text-neutral-900 dark:text-white truncate">

@@ -6,6 +6,7 @@ import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
 import { useSelector } from "react-redux";
 import LoadingButton from "@/components/LoadingButton";
 import SuggestedUsersModal from "../Modal/suggestedUsers.modal";
+import DefaultAvatar from "@/components/ui/defaultAvatar";
 
 interface SuggestedUser {
   _id: string;
@@ -143,15 +144,7 @@ const SuggestedUsers = () => {
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
-                          <svg
-                            className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                          </svg>
-                        </div>
+                        <DefaultAvatar />
                       )}
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium text-neutral-900 dark:text-white truncate">
@@ -213,15 +206,7 @@ const SuggestedUsers = () => {
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 rounded-full">
-                          <svg
-                            className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-neutral-400 dark:text-neutral-500"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                          </svg>
-                        </div>
+                        <DefaultAvatar />
                       )}
                       <div className="text-center w-full">
                         <h4 className="text-sm font-medium text-neutral-900 dark:text-white truncate mb-1">
