@@ -294,7 +294,7 @@ const Post: React.FC<PostProps> = ({ post, onLike, onComment }) => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700">
+    <div className="w-full sm:min-w-[500px] bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-700">
       {/* Post Header */}
       <div className="p-3 sm:p-4 flex items-center justify-start space-x-2 sm:space-x-3">
         {post.avatarUrl ? (
