@@ -97,10 +97,6 @@ const Media: React.FC = () => {
       .finally(() => setLoading(false));
   }, [pathname]);
 
-  if (post && post.media?.resource_type === "image") {
-    console.log("MEDIA URL:", post.media?.url);
-  }
-
   const handleLike = async () => {
     const newLikedState = !isLiked;
     setIsLiked(newLikedState);

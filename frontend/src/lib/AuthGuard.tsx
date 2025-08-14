@@ -15,13 +15,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState<boolean>(true);
-  const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
 
     async function checkAuth() {
-      setDebugInfo("Starting auth check...");
-
       // Check if we have any refresh token in cookies first
       const cookies = document.cookie.split(';');
       const refreshTokenCookie = cookies.find(cookie => 
@@ -31,20 +28,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       // EMERGENCY FIX: Also check localStorage
       const refreshTokenLS = localStorage.getItem('refreshToken');
       
-      console.log("🍪 All cookies:", document.cookie);
-      console.log("🔍 Refresh token cookie found:", !!refreshTokenCookie);
-      console.log("💾 Refresh token in localStorage:", !!refreshTokenLS);
-      
       if (!refreshTokenCookie && !refreshTokenLS) {
-        console.log("No refresh token found anywhere, redirecting to sign-in");
-        setDebugInfo("No refresh token found in cookies or localStorage");
         router.push("/sign-in");
         return;
       }
 
       try {
-        console.log("📡 Making refresh token request...");
-        
         // Try to get refresh token from cookies first, fallback to localStorage
         const refreshToken = refreshTokenCookie ? 
           refreshTokenCookie.split('=')[1] : 
@@ -67,8 +56,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           }
         );
 
-        setDebugInfo(`Response status: ${res.status}`);
-
         if (res.ok) {
           const data = await res.json();
           
@@ -80,13 +67,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
             localStorage.setItem('refreshToken', data.data.refreshToken);
           }
           
-          setDebugInfo("Auth successful!");
           setLoading(false);
         } else {
-          const errorText = await res.text();
-          console.log("Auth failed, redirecting to sign-in");
-          setDebugInfo(`Auth failed: ${errorText}`);
-
           // Clear any existing cookies by calling logout
           try {
             await fetch(API_ENDPOINTS.LOGOUT, {
@@ -94,7 +76,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
               credentials: "include",
             });
           } catch (logoutError) {
-            console.log("Logout failed, but continuing to redirect");
+            // Silently handle logout errors during cleanup
           }
           
           // Clear localStorage tokens
@@ -104,12 +86,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           router.push("/sign-in");
         }
       } catch (error) {
-        console.error("💥 Auth check failed:", error);
-        let message = "Unknown error";
-        if (error instanceof Error) {
-          message = error.message;
-        }
-        setDebugInfo(`Error: ${message}`);
+        console.error("Auth check failed:", error);
         router.push("/sign-in");
       }
     }

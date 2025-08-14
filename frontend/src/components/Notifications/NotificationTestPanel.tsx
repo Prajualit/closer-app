@@ -32,7 +32,6 @@ const NotificationTestPanel = () => {
   const handleTestConnection = () => {
     if (socket) {
       socket.emit('user_online');
-      console.log('Test ping sent to server');
     }
   };
 

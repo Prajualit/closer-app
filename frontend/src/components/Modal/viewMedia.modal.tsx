@@ -81,9 +81,6 @@ const ImageModal: React.FC<ImageModalProps> = ({
     mediaId = activeMedia._id;
   }
 
-  console.log("Active Media:", activeMedia);
-  console.log("Extracted postId:", postId, "mediaId:", mediaId);
-
   const [isLiked, setIsLiked] = useState(
     typeof activeMedia?.isLikedByCurrentUser === "boolean"
       ? activeMedia.isLikedByCurrentUser
@@ -115,7 +112,6 @@ const ImageModal: React.FC<ImageModalProps> = ({
       .then(async (res) => {
         if (res.ok) {
           const data = await res.json();
-          console.log("Fetched comments data:", data);
           setComments(
             Array.isArray(data.data?.comments) ? data.data.comments : []
           );
@@ -204,7 +200,6 @@ const ImageModal: React.FC<ImageModalProps> = ({
       });
       if (res.ok) {
         const data = await res.json();
-        console.log("Like API response:", data);
         setLikesCount(
           typeof data.data?.likesCount === "number"
             ? data.data.likesCount
@@ -244,7 +239,6 @@ const ImageModal: React.FC<ImageModalProps> = ({
       });
       if (res.ok) {
         const data = await res.json();
-        console.log("Add comment API response:", data);
         if (data.success && data.data?.comment) {
           setComments((prev: Comment[]) => [data.data.comment, ...prev]);
           setCommentsCount(

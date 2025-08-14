@@ -47,7 +47,6 @@ const UserButton = () => {
         method: "POST",
       });
       const data = await response.json();
-      console.log("Data:", data);
       if (data.success) {
         router.push("/sign-in");
         toast({
@@ -92,7 +91,6 @@ const UserButton = () => {
         method: "DELETE",
       });
       const data = await response.json();
-      console.log("Data:", data);
       if (data.success) {
         router.push("/sign-in");
         toast({

@@ -111,9 +111,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     // Request notification permission on mount
     useEffect(() => {
         if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission().then((permission) => {
-                console.log('Notification permission:', permission);
-            });
+            Notification.requestPermission();
         }
     }, []);
 

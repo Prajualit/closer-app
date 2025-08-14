@@ -79,7 +79,6 @@ const ChatPage = () => {
   useEffect(() => {
     // Skip entirely if user is going back
     if (isGoingBack) {
-      console.log("Skipping initialization - user is going back");
       setIsInitializing(false);
       return;
     }
@@ -89,17 +88,8 @@ const ChatPage = () => {
       const username = searchParams.get("username");
       const chatId = searchParams.get("chatId");
 
-      console.log("useEffect params:", {
-        userId,
-        username,
-        chatId,
-        selectedChat: selectedChat?.chatId,
-        isGoingBack,
-      });
-
       // If no parameters at all, just finish initialization
       if (!userId && !username && !chatId) {
-        console.log("No parameters - finishing initialization");
         setIsInitializing(false);
         hasProcessedInitialParams.current = false;
         return;
@@ -165,11 +155,9 @@ const ChatPage = () => {
     (chatRoom: ChatRoom) => {
       // Don't select chat if user is going back
       if (isGoingBack) {
-        console.log("Ignoring chat selection - user is going back");
         return;
       }
 
-      console.log("Selecting chat:", chatRoom.chatId);
       setSelectedChat(chatRoom);
       // Update URL to persist the selected chat, but only if it's different
       const currentChatId = searchParams.get("chatId");
@@ -201,8 +189,6 @@ const ChatPage = () => {
   }, []);
 
   const handleBackToList = useCallback(() => {
-    console.log("Going back to chat list");
-
     // Immediately clear selected chat and set going back flag
     setSelectedChat(null);
     setIsGoingBack(true);

@@ -131,7 +131,6 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
             if (!responseData.success) {
                 throw new Error(responseData.message);
             } else {
-                console.log("Profile Updated successfully");
                 dispatch(updateUser(responseData.data.user));
                 toast({
                     title: "Profile Updated",
@@ -145,10 +144,10 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
             }
         } catch (error) {
             if (typeof error === "object" && error !== null && "message" in error && typeof (error as any).message === "string") {
-                console.log("Error during profile update:", (error as any).message);
+                console.error("Error during profile update:", (error as any).message);
                 setError((error as any).message);
             } else {
-                console.log("Error during profile update:", error);
+                console.error("Error during profile update:", error);
                 setError("Unknown error");
             }
         } finally {
@@ -209,7 +208,6 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
                 if (!responseData.success) {
                     throw new Error(responseData.message);
                 } else {
-                    console.log("Password changed successfully");
                     toast({
                         title: "Password Changed",
                         description: "Your password has been successfully updated.",
@@ -220,10 +218,10 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
             }
         } catch (error) {
             if (typeof error === "object" && error !== null && "message" in error && typeof (error as any).message === "string") {
-                console.log("Error during password operation:", (error as any).message);
+                console.error("Error during password operation:", (error as any).message);
                 setError((error as any).message);
             } else {
-                console.log("Error during password operation:", error);
+                console.error("Error during password operation:", error);
                 setError("Unknown error");
             }
         } finally {

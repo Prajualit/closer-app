@@ -37,9 +37,7 @@ const SuggestedUsers = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Suggested users response:", data); // Debug log
           if (data.success && data.data.users) {
-            console.log("Setting suggested users:", data.data.users); // Debug log
             setSuggestedUsers(
               data.data.users.map((user: any) => ({
                 ...user,
@@ -49,8 +47,6 @@ const SuggestedUsers = () => {
                     : false,
               }))
             );
-          } else {
-            console.log("No users in response or unsuccessful:", data);
           }
         } else {
           console.error(
@@ -81,7 +77,6 @@ const SuggestedUsers = () => {
       });
 
       if (response.ok) {
-        console.log("Successfully followed user:", userId); // Debug log
         // Update the user's following status instead of removing them
         setSuggestedUsers((prev) =>
           prev.map((user) =>

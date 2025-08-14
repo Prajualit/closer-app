@@ -39,8 +39,6 @@ const Page = () => {
   const onSubmit = async (data: LoginFormData) => {
     setPending(true);
     try {
-      console.log("🚀 Making login request to:", API_ENDPOINTS.LOGIN);
-
       const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: "POST",
         headers: {
@@ -53,46 +51,26 @@ const Page = () => {
         }),
       });
 
-      console.log("📡 Login response status:", response.status);
-      console.log("🍪 Set-Cookie headers:", response.headers.get("set-cookie"));
-      // Use for...of for compatibility with Headers.entries()
-      const allHeaders: [string, string][] = [];
-      for (const entry of response.headers as any) {
-        allHeaders.push(entry);
-      }
-      console.log("🍪 All response headers:", allHeaders);
-
       const responseData = await response.json();
-      console.log("📦 Response data:", responseData);
 
       if (!responseData.success) {
         throw new Error(responseData.message);
       } else {
-        console.log("✅ Login successful, dispatching user data");
         dispatch(setUser(responseData.data.user));
 
         // Store tokens in localStorage as backup - CRITICAL for production
         if (responseData.data.accessToken) {
           localStorage.setItem("accessToken", responseData.data.accessToken);
-          console.log("💾 Stored access token in localStorage");
         }
         if (responseData.data.refreshToken) {
           localStorage.setItem("refreshToken", responseData.data.refreshToken);
-          console.log("💾 Stored refresh token in localStorage");
         }
-
-        // Check if cookies were actually set
-        console.log("🍪 Cookies after login:", document.cookie);
-        
-        // Verify localStorage storage
-        console.log("💾 Access token in localStorage:", !!localStorage.getItem("accessToken"));
-        console.log("💾 Refresh token in localStorage:", !!localStorage.getItem("refreshToken"));
 
         router.push(`/${responseData.data.user.username}/home`);
       }
     } catch (error: any) {
       setError(error?.message || "Unknown error");
-      console.log("Error during login:", error?.message);
+      console.error("Error during login:", error?.message);
     } finally {
       setPending(false);
     }

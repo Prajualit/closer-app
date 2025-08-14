@@ -70,7 +70,6 @@ const CreateModal: React.FC<CreateModalProps> = ({ nav, activeNav, open, onOpenC
 
     const handleSubmitFile = async () => {
         if (!file) {
-            console.error("Please select a file first");
             return;
         }
 
@@ -86,7 +85,6 @@ const CreateModal: React.FC<CreateModalProps> = ({ nav, activeNav, open, onOpenC
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("File uploaded successfully");
                 setFile(null);
                 setPreviewUrl(null);
                 setCaption(""); // Reset caption
