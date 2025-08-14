@@ -1,5 +1,8 @@
-// API configuration
-export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+// API configuration - Force HTTPS in production
+const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+export const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? baseUrl.replace(/^http:/, 'https:') 
+  : baseUrl;
 
 // API endpoints
 type EndpointFn = (...args: any[]) => string;

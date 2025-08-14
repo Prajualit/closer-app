@@ -14,7 +14,7 @@ import Image from "next/image";
 // @ts-ignore
 import search from "@/assets/search.png";
 import { useToast } from "@/hooks/use-toast";
-import { API_ENDPOINTS } from "@/lib/api";
+import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
 import DefaultAvatar from "@/components/ui/defaultAvatar";
 
 const Navsearch = () => {
@@ -53,11 +53,8 @@ const Navsearch = () => {
 
       setIsSearching(true);
       try {
-        const response = await fetch(
-          API_ENDPOINTS.USER_SEARCH(encodeURIComponent(query)),
-          {
-            credentials: "include",
-          }
+        const response = await makeAuthenticatedRequest(
+          API_ENDPOINTS.USER_SEARCH(encodeURIComponent(query))
         );
         const data = await response.json();
 

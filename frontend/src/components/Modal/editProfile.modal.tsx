@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import { API_ENDPOINTS } from "@/lib/api";
+import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
 
 interface EditModalProps {
   nav?: { name: string; icon: React.ReactElement };
@@ -122,10 +122,9 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
                 return;
             }
 
-            const response = await fetch(API_ENDPOINTS.UPDATE_PROFILE, {
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.UPDATE_PROFILE, {
                 method: "POST",
                 body: formData,
-                credentials: "include",
             });
 
             const responseData = await response.json();
@@ -174,7 +173,7 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
         try {
             if (passwordStep === 1) {
                 // Verify current password
-                const response = await fetch(API_ENDPOINTS.VERIFY_PASSWORD, {
+                const response = await makeAuthenticatedRequest(API_ENDPOINTS.VERIFY_PASSWORD, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -182,7 +181,6 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
                     body: JSON.stringify({
                         currentPassword: data.currentPassword
                     }),
-                    credentials: "include",
                 });
 
                 const responseData = await response.json();
@@ -196,7 +194,7 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
                 }
             } else {
                 // Change password (step 2)
-                const response = await fetch(API_ENDPOINTS.CHANGE_PASSWORD, {
+                const response = await makeAuthenticatedRequest(API_ENDPOINTS.CHANGE_PASSWORD, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -205,7 +203,6 @@ const EditModal: React.FC<EditModalProps> = ({ nav, activeNav }) => {
                         currentPassword: currentPasswordValue,
                         newPassword: data.newPassword,
                     }),
-                    credentials: "include",
                 });
 
                 const responseData = await response.json();

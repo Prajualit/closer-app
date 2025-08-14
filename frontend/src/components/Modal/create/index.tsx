@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useDispatch } from "react-redux";
 import { updateUser } from "@/redux/slice/userSlice";
 import { Input } from "@/components/ui/input";
-import { API_ENDPOINTS } from "@/lib/api";
+import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
 
 import Image from "next/image";
 
@@ -79,10 +79,9 @@ const CreateModal: React.FC<CreateModalProps> = ({ nav, activeNav, open, onOpenC
         formData.append("caption", caption); // Add caption to form data
 
         try {
-            const response = await fetch(API_ENDPOINTS.CREATE_MEDIA, {
+            const response = await makeAuthenticatedRequest(API_ENDPOINTS.CREATE_MEDIA, {
                 method: "POST",
                 body: formData,
-                credentials: "include",
             });
 
             if (response.ok) {

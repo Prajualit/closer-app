@@ -37,7 +37,7 @@ import { updateUser } from "@/redux/slice/userSlice";
 import Navbar from "@/components/HomePg/Navbar";
 import LoadingButton from "@/components/LoadingButton";
 import ImageModal from "@/components/Modal/viewMedia.modal";
-import { API_ENDPOINTS } from "@/lib/api";
+import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
 import DefaultAvatar from "@/components/ui/defaultAvatar";
 
 const ProfilePage = () => {
@@ -91,9 +91,7 @@ const ProfilePage = () => {
   const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_ENDPOINTS.USER_PROFILE(userId), {
-        credentials: "include",
-      });
+      const response = await makeAuthenticatedRequest(API_ENDPOINTS.USER_PROFILE(userId));
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -143,12 +141,8 @@ const ProfilePage = () => {
     try {
       if (!profile) return;
       const [photosResponse, filmsResponse] = await Promise.all([
-        fetch(API_ENDPOINTS.USER_PHOTOS(profile._id), {
-          credentials: "include",
-        }),
-        fetch(API_ENDPOINTS.USER_FILMS(profile._id), {
-          credentials: "include",
-        }),
+        makeAuthenticatedRequest(API_ENDPOINTS.USER_PHOTOS(profile._id)),
+        makeAuthenticatedRequest(API_ENDPOINTS.USER_FILMS(profile._id)),
       ]);
 
       if (photosResponse.ok) {
@@ -168,9 +162,7 @@ const ProfilePage = () => {
   const checkFollowStatus = useCallback(async () => {
     try {
       if (!profile) return;
-      const response = await fetch(API_ENDPOINTS.FOLLOW_STATUS(profile._id), {
-        credentials: "include",
-      });
+      const response = await makeAuthenticatedRequest(API_ENDPOINTS.FOLLOW_STATUS(profile._id));
       const data = await response.json();
 
       if (data.success) {
@@ -199,14 +191,13 @@ const ProfilePage = () => {
   const handleFollow = async () => {
     try {
       if (!profile) return;
-      const response = await fetch(
+      const response = await makeAuthenticatedRequest(
         isFollowing ? API_ENDPOINTS.UNFOLLOW : API_ENDPOINTS.FOLLOW,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
           body: JSON.stringify({ userId: profile._id }),
         }
       );
@@ -310,15 +301,13 @@ const ProfilePage = () => {
         allMedia.map(async (media) => {
           try {
             // Likes
-            const likesRes = await fetch(
-              API_ENDPOINTS.GET_LIKES_COUNT(media.postId, media.mediaId),
-              { credentials: "include" }
+            const likesRes = await makeAuthenticatedRequest(
+              API_ENDPOINTS.GET_LIKES_COUNT(media.postId, media.mediaId)
             );
             const likesData = likesRes.ok ? await likesRes.json() : {};
             // Comments
-            const commentsRes = await fetch(
-              API_ENDPOINTS.GET_COMMENTS(media.postId, media.mediaId),
-              { credentials: "include" }
+            const commentsRes = await makeAuthenticatedRequest(
+              API_ENDPOINTS.GET_COMMENTS(media.postId, media.mediaId)
             );
             const commentsData = commentsRes.ok ? await commentsRes.json() : {};
             stats[String(media._id)] = {

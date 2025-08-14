@@ -88,9 +88,8 @@ const UserButton = () => {
       return;
     }
     try {
-      const response = await fetch(API_ENDPOINTS.DELETE_ACCOUNT, {
+      const response = await authenticatedFetch(API_ENDPOINTS.DELETE_ACCOUNT, {
         method: "DELETE",
-        credentials: "include",
       });
       const data = await response.json();
       console.log("Data:", data);
