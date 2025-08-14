@@ -6,7 +6,8 @@ import Navbar from "@/components/HomePg/Navbar";
 import ChatList from "@/components/Chat/ChatList";
 import ChatInterface from "@/components/Chat/ChatInterface";
 import { useToast } from "@/hooks/use-toast";
-import { API_ENDPOINTS, makeAuthenticatedRequest } from "@/lib/api";
+import { API_ENDPOINTS } from "@/lib/api";
+import { useAuthenticatedFetch } from "@/hooks/useAuthenticatedFetch";
 
 interface Participant {
   _id: string;
@@ -26,6 +27,7 @@ const ChatPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
+  const authenticatedFetch = useAuthenticatedFetch();
   const [selectedChat, setSelectedChat] = useState<ChatRoom | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isGoingBack, setIsGoingBack] = useState<boolean>(false);
@@ -38,7 +40,7 @@ const ChatPage = () => {
   useEffect(() => {
     const fetchChatRooms = async () => {
       try {
-        const response = await makeAuthenticatedRequest(
+        const response = await authenticatedFetch(
           API_ENDPOINTS.CHAT_ROOMS
         );
         const data = await response.json();
@@ -60,7 +62,7 @@ const ChatPage = () => {
       }
     };
     fetchChatRooms();
-  }, [toast, isInitializing]);
+  }, [toast, isInitializing, authenticatedFetch]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -108,7 +110,7 @@ const ChatPage = () => {
         hasProcessedInitialParams.current = true;
         try {
           // Create or get existing chat room with this user
-          const response = await makeAuthenticatedRequest(
+          const response = await authenticatedFetch(
             API_ENDPOINTS.CHAT_ROOM(userId)
           );
           const data = await response.json();
@@ -157,7 +159,7 @@ const ChatPage = () => {
     };
 
     initializeChat();
-  }, [searchParams, toast, isGoingBack, selectedChat?.chatId]);
+  }, [searchParams, toast, isGoingBack, selectedChat?.chatId, authenticatedFetch]);
 
   const handleSelectChat = useCallback(
     (chatRoom: ChatRoom) => {

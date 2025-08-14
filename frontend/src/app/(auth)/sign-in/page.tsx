@@ -71,17 +71,22 @@ const Page = () => {
         console.log("✅ Login successful, dispatching user data");
         dispatch(setUser(responseData.data.user));
 
-        // EMERGENCY FIX: Store tokens in localStorage as backup
+        // Store tokens in localStorage as backup - CRITICAL for production
         if (responseData.data.accessToken) {
           localStorage.setItem("accessToken", responseData.data.accessToken);
+          console.log("💾 Stored access token in localStorage");
         }
         if (responseData.data.refreshToken) {
           localStorage.setItem("refreshToken", responseData.data.refreshToken);
+          console.log("💾 Stored refresh token in localStorage");
         }
 
         // Check if cookies were actually set
         console.log("🍪 Cookies after login:", document.cookie);
-        console.log("💾 Stored tokens in localStorage as backup");
+        
+        // Verify localStorage storage
+        console.log("💾 Access token in localStorage:", !!localStorage.getItem("accessToken"));
+        console.log("💾 Refresh token in localStorage:", !!localStorage.getItem("refreshToken"));
 
         router.push(`/${responseData.data.user.username}/home`);
       }

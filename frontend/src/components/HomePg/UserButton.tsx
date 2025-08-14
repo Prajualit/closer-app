@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
 import ThemeDropdown from "../ui/ThemeDropdown";
 import { API_ENDPOINTS } from "@/lib/api";
+import { useAuthenticatedFetch } from "@/hooks/useAuthenticatedFetch";
 import DefaultAvatar from "@/components/ui/defaultAvatar";
 
 const UserButton = () => {
@@ -34,11 +35,16 @@ const UserButton = () => {
   }, [isOpen]);
 
   const router = useRouter();
+  const authenticatedFetch = useAuthenticatedFetch();
+  
   const handleLogout = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.LOGOUT, {
+      // Clear localStorage tokens first
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      
+      const response = await authenticatedFetch(API_ENDPOINTS.LOGOUT, {
         method: "POST",
-        credentials: "include",
       });
       const data = await response.json();
       console.log("Data:", data);
@@ -50,22 +56,25 @@ const UserButton = () => {
           variant: "success",
         });
       } else {
+        // Even if logout fails on server, redirect to login since we cleared local tokens
+        router.push("/sign-in");
         toast({
-          title: "Logout Error",
-          description: data.error || "Failed to log out.",
-          variant: "destructive",
+          title: "Logged Out",
+          description: "You have been logged out.",
+          variant: "success",
         });
       }
     } catch (error) {
-      if (
-        error &&
-        typeof error === "object" &&
-        "name" in error &&
-        typeof (error as any).name === "string" &&
-        (error as any).name !== "AbortError"
-      ) {
-        console.error("Error during logout:", error);
-      }
+      console.error("Error during logout:", error);
+      // Clear tokens and redirect anyway
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      router.push("/sign-in");
+      toast({
+        title: "Logged Out",
+        description: "You have been logged out.",
+        variant: "success",
+      });
     }
   };
 

@@ -10,9 +10,12 @@ export const verifyJWT = asyncHandler(
     try {
       // If cookies is undefined, fallback to empty object
       const cookies = (req as any).cookies || {};
+      
+      // Check multiple sources for token
       const token =
         cookies.accessToken ||
-        req.header("Authorization")?.replace("Bearer ", "");
+        req.header("Authorization")?.replace("Bearer ", "") ||
+        req.body.accessToken; // Support localStorage fallback via request body
       if (!token) {
         throw new ApiError(401, "Unauthorized request");
       }

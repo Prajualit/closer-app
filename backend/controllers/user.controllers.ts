@@ -95,10 +95,13 @@ const registerUser = asyncHandler(async (req: any, res: any) => {
   const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" as const,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
-    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
+    // For production deployment on different domains
+    ...(process.env.NODE_ENV === "production" && { 
+      domain: process.env.COOKIE_DOMAIN || undefined
+    })
   };
 
   //   return a response with tokens (auto-login)
@@ -155,10 +158,13 @@ const loginUser = asyncHandler(async (req: any, res: any) => {
   const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" as const,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
-    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
+    // For production deployment on different domains
+    ...(process.env.NODE_ENV === "production" && { 
+      domain: process.env.COOKIE_DOMAIN || undefined
+    })
   };
 
   // send response
@@ -185,9 +191,12 @@ const logoutUser = asyncHandler(async (req: any, res: any) => {
   const options = { 
     httpOnly: true, 
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" as const,
     path: "/",
-    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
+    // For production deployment on different domains
+    ...(process.env.NODE_ENV === "production" && { 
+      domain: process.env.COOKIE_DOMAIN || undefined
+    })
   };
 
   res
@@ -257,10 +266,13 @@ const editUser = asyncHandler(async (req: any, res: any) => {
   const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" as const,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
-    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
+    // For production deployment on different domains
+    ...(process.env.NODE_ENV === "production" && { 
+      domain: process.env.COOKIE_DOMAIN || undefined
+    })
   };
 
   return res
@@ -307,10 +319,13 @@ const refreshAccessToken = asyncHandler(async (req: any, res: any) => {
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" as const,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
-      ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
+      // For production deployment on different domains
+      ...(process.env.NODE_ENV === "production" && { 
+        domain: process.env.COOKIE_DOMAIN || undefined
+      })
     };
 
     const { accessToken, refreshToken: newRefreshToken } =
@@ -406,10 +421,13 @@ const deleteUserAccount = asyncHandler(async (req: any, res: any) => {
   const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" as const,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
-    ...(process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN })
+    // For production deployment on different domains
+    ...(process.env.NODE_ENV === "production" && { 
+      domain: process.env.COOKIE_DOMAIN || undefined
+    })
   };
 
   res

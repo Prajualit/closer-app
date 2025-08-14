@@ -50,12 +50,17 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           refreshTokenCookie.split('=')[1] : 
           localStorage.getItem('refreshToken');
         
+        // Get access token for Authorization header fallback
+        const accessToken = localStorage.getItem('accessToken');
+        
         const res = await fetch(
           API_ENDPOINTS.REFRESH_TOKEN,
           {
             method: "POST",
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              // Include Authorization header as fallback
+              ...(accessToken && { Authorization: `Bearer ${accessToken}` })
             },
             credentials: "include",
             body: JSON.stringify({ refreshToken })

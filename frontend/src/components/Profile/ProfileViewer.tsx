@@ -8,6 +8,7 @@ import { X, MessageCircle, UserPlus, UserMinus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSelector } from "react-redux";
 import { API_ENDPOINTS } from "@/lib/api";
+import { useAuthenticatedFetch } from "@/hooks/useAuthenticatedFetch";
 import DefaultAvatar from "@/components/ui/defaultAvatar";
 
 interface MediaItem {
@@ -52,6 +53,7 @@ const ProfileViewer: React.FC<ProfileViewerProps> = ({
     Record<string, boolean>
   >({});
   const { toast } = useToast();
+  const authenticatedFetch = useAuthenticatedFetch();
   const currentUser = useSelector(
     (state: { user: { user: UserType } }) => state.user.user
   );
@@ -101,9 +103,7 @@ const ProfileViewer: React.FC<ProfileViewerProps> = ({
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_ENDPOINTS.USER_PROFILE(userId), {
-        credentials: "include",
-      });
+      const response = await authenticatedFetch(API_ENDPOINTS.USER_PROFILE(userId));
       const data = await response.json();
 
       if (data.success) {
@@ -130,15 +130,10 @@ const ProfileViewer: React.FC<ProfileViewerProps> = ({
   const fetchUserMedia = async () => {
     if (!profile || !profile._id) return;
     try {
-      const photosResponse = await fetch(
-        API_ENDPOINTS.USER_PHOTOS(profile._id),
-        {
-          credentials: "include",
-        }
+      const photosResponse = await authenticatedFetch(
+        API_ENDPOINTS.USER_PHOTOS(profile._id)
       );
-      const filmsResponse = await fetch(API_ENDPOINTS.USER_FILMS(profile._id), {
-        credentials: "include",
-      });
+      const filmsResponse = await authenticatedFetch(API_ENDPOINTS.USER_FILMS(profile._id));
 
       if (photosResponse.ok) {
         const photosData = await photosResponse.json();
@@ -167,9 +162,7 @@ const ProfileViewer: React.FC<ProfileViewerProps> = ({
   const checkFollowStatus = async () => {
     if (!profile || !profile._id) return;
     try {
-      const response = await fetch(API_ENDPOINTS.FOLLOW_STATUS(profile._id), {
-        credentials: "include",
-      });
+      const response = await authenticatedFetch(API_ENDPOINTS.FOLLOW_STATUS(profile._id));
       const data = await response.json();
 
       if (data.success) {
@@ -183,14 +176,13 @@ const ProfileViewer: React.FC<ProfileViewerProps> = ({
   const handleFollow = async () => {
     if (!profile || !profile._id) return;
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         isFollowing ? API_ENDPOINTS.UNFOLLOW : API_ENDPOINTS.FOLLOW,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
           body: JSON.stringify({ userId: profile._id }),
         }
       );
