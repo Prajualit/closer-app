@@ -87,4 +87,4 @@ This project is open-source and available under the [MIT License](LICENSE).
 ## Contact
 For any questions or suggestions, feel free to contact me via:
 - GitHub: [Prajualit Tickoo](https://github.com/Prajualit)
-- Email: your-email@example.com
+- Email: prajualit@gmail.com
